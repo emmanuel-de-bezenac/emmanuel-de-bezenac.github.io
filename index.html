@@ -3,247 +3,206 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Emmanuel de Bézenac — Research</title>
+<title>Emmanuel de Bézenac</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Source+Serif+4:opsz,wght@8..60,300;8..60,400;8..60,600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
-  /* ── Reset & Base ── */
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
   :root {
-    --bg:       #FAFAF8;
-    --surface:  #FFFFFF;
-    --text:     #1a1a1a;
-    --text-2:   #555;
-    --text-3:   #888;
-    --accent:   #2d5a3d;
-    --accent-light: #e8f0eb;
-    --border:   #e8e6e1;
-    --radius:   10px;
-    --max-w:    860px;
-    --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-    --font-serif: 'Source Serif 4', Georgia, serif;
+    --bg:      #fdfdfc;
+    --text:    #222;
+    --text-2:  #555;
+    --text-3:  #999;
+    --accent:  #333;
+    --link:    #1a1a1a;
+    --border:  #eee;
+    --max-w:   720px;
+    --sans:    'Inter', system-ui, sans-serif;
+    --serif:   'EB Garamond', Georgia, serif;
   }
 
-  html { scroll-behavior: smooth; font-size: 16px; }
+  html { scroll-behavior: smooth; }
 
   body {
-    font-family: var(--font-sans);
+    font-family: var(--sans);
+    font-size: 15px;
     color: var(--text);
     background: var(--bg);
-    line-height: 1.7;
+    line-height: 1.75;
     -webkit-font-smoothing: antialiased;
   }
 
-  ::selection { background: var(--accent-light); color: var(--accent); }
+  ::selection { background: #e0e0e0; }
 
-  /* ── Navigation ── */
+  a { color: var(--link); }
+
+  /* ── Nav ── */
   nav {
-    position: sticky;
-    top: 0;
-    z-index: 100;
-    background: rgba(250,250,248,0.85);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    border-bottom: 1px solid var(--border);
+    position: sticky; top: 0; z-index: 10;
+    background: rgba(253,253,252,0.92);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
   }
 
-  nav .nav-inner {
+  .nav-inner {
     max-width: var(--max-w);
     margin: 0 auto;
-    padding: 0 2rem;
+    padding: 0 1.5rem;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    height: 56px;
+    height: 52px;
+    border-bottom: 1px solid var(--border);
   }
 
-  nav .nav-name {
-    font-weight: 600;
-    font-size: 0.95rem;
-    letter-spacing: -0.01em;
-    color: var(--text);
-  }
-
-  nav .nav-links { display: flex; gap: 1.8rem; }
-
-  nav .nav-links a {
-    text-decoration: none;
-    color: var(--text-3);
-    font-size: 0.82rem;
+  .nav-name {
+    font-family: var(--serif);
+    font-size: 1rem;
     font-weight: 500;
-    letter-spacing: 0.03em;
-    text-transform: uppercase;
+    letter-spacing: 0.01em;
+  }
+
+  .nav-links { display: flex; gap: 1.6rem; }
+
+  .nav-links a {
+    font-size: 0.75rem;
+    font-weight: 400;
+    color: var(--text-3);
+    text-decoration: none;
+    letter-spacing: 0.04em;
+    text-transform: lowercase;
     transition: color 0.2s;
   }
 
-  nav .nav-links a:hover { color: var(--accent); }
+  .nav-links a:hover { color: var(--text); }
 
-  /* mobile hamburger */
-  .nav-toggle { display: none; background: none; border: none; cursor: pointer; padding: 4px; }
-  .nav-toggle svg { width: 22px; height: 22px; stroke: var(--text); }
+  .nav-toggle { display: none; background: none; border: none; cursor: pointer; }
+  .nav-toggle svg { width: 20px; height: 20px; stroke: var(--text); }
 
   /* ── Hero ── */
   .hero {
     max-width: var(--max-w);
     margin: 0 auto;
-    padding: 5rem 2rem 4rem;
-    display: grid;
-    grid-template-columns: 1fr 200px;
-    gap: 3rem;
-    align-items: center;
+    padding: 4.5rem 1.5rem 3.5rem;
   }
 
-  .hero-text h1 {
-    font-family: var(--font-serif);
-    font-weight: 600;
-    font-size: 2.4rem;
+  .hero h1 {
+    font-family: var(--serif);
+    font-weight: 400;
+    font-size: 2.2rem;
     line-height: 1.2;
-    letter-spacing: -0.02em;
-    margin-bottom: 0.6rem;
+    margin-bottom: 1rem;
   }
 
-  .hero-text .tagline {
-    font-size: 1.05rem;
+  .hero .tagline {
+    font-size: 0.92rem;
     color: var(--text-2);
     font-weight: 300;
-    margin-bottom: 1.4rem;
-    line-height: 1.6;
+    line-height: 1.7;
+    max-width: 520px;
+    margin-bottom: 1rem;
   }
 
-  .hero-text .affiliation {
-    font-size: 0.85rem;
+  .hero .affil {
+    font-size: 0.8rem;
     color: var(--text-3);
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.4rem 1.2rem;
   }
 
-  .hero-text .affiliation a {
-    color: var(--accent);
+  .hero .affil a {
+    color: var(--text-2);
     text-decoration: none;
-    border-bottom: 1px solid transparent;
+    border-bottom: 1px solid var(--border);
     transition: border-color 0.2s;
   }
-  .hero-text .affiliation a:hover { border-bottom-color: var(--accent); }
 
-  .hero-photo {
-    width: 200px;
-    height: 200px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, var(--accent-light), #d4ddd7);
+  .hero .affil a:hover { border-color: var(--text); }
+
+  .links-row {
     display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
-    position: relative;
-  }
-
-  .hero-photo .initials {
-    font-family: var(--font-serif);
-    font-size: 3rem;
-    font-weight: 600;
-    color: var(--accent);
-    opacity: 0.6;
-  }
-
-  /* Replace .initials with an <img> when you have a photo:
-     .hero-photo img { width:100%; height:100%; object-fit:cover; } */
-
-  .social-row {
-    display: flex;
-    gap: 0.8rem;
+    gap: 1.2rem;
     margin-top: 1.2rem;
+    font-size: 0.78rem;
   }
 
-  .social-row a {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.35rem;
-    font-size: 0.78rem;
-    font-weight: 500;
+  .links-row a {
     color: var(--text-3);
     text-decoration: none;
-    padding: 0.35rem 0.7rem;
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    transition: all 0.2s;
+    transition: color 0.2s;
   }
 
-  .social-row a:hover {
-    border-color: var(--accent);
-    color: var(--accent);
-    background: var(--accent-light);
-  }
-
-  .social-row a svg { width: 14px; height: 14px; flex-shrink: 0; }
+  .links-row a:hover { color: var(--text); }
 
   /* ── Sections ── */
   section {
     max-width: var(--max-w);
     margin: 0 auto;
-    padding: 3.5rem 2rem;
+    padding: 3rem 1.5rem;
+    border-top: 1px solid var(--border);
   }
 
-  section + section { border-top: 1px solid var(--border); }
-
-  .section-title {
-    font-family: var(--font-serif);
-    font-weight: 600;
-    font-size: 1.4rem;
+  .section-label {
+    font-size: 0.7rem;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-3);
     margin-bottom: 1.5rem;
-    letter-spacing: -0.01em;
   }
 
   /* ── About ── */
   .about p {
+    font-size: 0.9rem;
     color: var(--text-2);
-    font-size: 0.95rem;
-    margin-bottom: 1rem;
-    max-width: 680px;
+    margin-bottom: 0.9rem;
+    max-width: 600px;
+    line-height: 1.8;
   }
 
   .about a {
-    color: var(--accent);
+    color: var(--text);
     text-decoration: none;
-    border-bottom: 1px solid transparent;
+    border-bottom: 1px solid var(--border);
     transition: border-color 0.2s;
   }
-  .about a:hover { border-bottom-color: var(--accent); }
 
-  .research-tags {
+  .about a:hover { border-color: var(--text); }
+
+  .tags {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.5rem;
-    margin-top: 1.2rem;
+    gap: 0.45rem;
+    margin-top: 1.4rem;
   }
 
-  .research-tags span {
-    font-size: 0.75rem;
-    font-weight: 500;
-    padding: 0.3rem 0.75rem;
-    border-radius: 20px;
-    background: var(--accent-light);
-    color: var(--accent);
-    letter-spacing: 0.02em;
+  .tags span {
+    font-size: 0.68rem;
+    font-weight: 400;
+    padding: 0.25rem 0.65rem;
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    color: var(--text-2);
+    transition: border-color 0.2s;
   }
+
+  .tags span:hover { border-color: var(--text-3); }
 
   /* ── Publications ── */
   .pub-list { list-style: none; }
 
   .pub-item {
-    padding: 1.2rem 0;
-    border-bottom: 1px solid var(--border);
+    padding: 1rem 0;
   }
 
-  .pub-item:last-child { border-bottom: none; }
+  .pub-item + .pub-item { border-top: 1px solid #f5f5f5; }
 
   .pub-title {
-    font-weight: 500;
-    font-size: 0.95rem;
+    font-family: var(--serif);
+    font-size: 0.98rem;
+    font-weight: 400;
     line-height: 1.45;
-    margin-bottom: 0.3rem;
+    margin-bottom: 0.2rem;
   }
 
   .pub-title a {
@@ -252,321 +211,177 @@
     transition: color 0.2s;
   }
 
-  .pub-title a:hover { color: var(--accent); }
+  .pub-title a:hover { color: var(--text-3); }
 
-  .pub-authors {
-    font-size: 0.82rem;
+  .pub-meta {
+    font-size: 0.76rem;
     color: var(--text-3);
-    margin-bottom: 0.2rem;
+    line-height: 1.5;
   }
 
-  .pub-authors .me { color: var(--text); font-weight: 500; }
-
-  .pub-venue {
-    font-size: 0.82rem;
-    color: var(--text-2);
+  .pub-meta .venue {
     font-style: italic;
   }
 
-  .pub-venue .year {
-    font-style: normal;
+  .pub-meta .me {
+    color: var(--text);
     font-weight: 500;
-    color: var(--accent);
-    margin-right: 0.3rem;
   }
 
-  .pub-venue .award {
-    font-style: normal;
+  .pub-meta .award {
+    color: var(--text-2);
     font-weight: 500;
-    color: #b8860b;
+    font-style: normal;
   }
 
   .pub-links {
-    margin-top: 0.5rem;
-    display: flex;
-    gap: 0.6rem;
-    flex-wrap: wrap;
+    margin-top: 0.3rem;
   }
 
   .pub-links a {
-    font-size: 0.72rem;
-    font-weight: 500;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    color: var(--accent);
-    text-decoration: none;
-    padding: 0.2rem 0.5rem;
-    border: 1px solid var(--accent);
-    border-radius: 4px;
-    transition: all 0.15s;
-  }
-
-  .pub-links a:hover {
-    background: var(--accent);
-    color: #fff;
-  }
-
-  .pub-note {
-    text-align: center;
-    margin-top: 1.5rem;
-  }
-
-  .pub-note a {
-    color: var(--accent);
-    text-decoration: none;
-    font-size: 0.88rem;
-    font-weight: 500;
-    border-bottom: 1px dashed var(--accent);
-  }
-
-  /* ── Open Positions ── */
-  .positions-box {
-    background: var(--surface);
-    border: 1px solid var(--accent);
-    border-radius: var(--radius);
-    padding: 2rem;
-    position: relative;
-    overflow: hidden;
-  }
-
-  .positions-box::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 3px;
-    background: linear-gradient(90deg, var(--accent), #5a9e72);
-  }
-
-  .positions-box h3 {
-    font-family: var(--font-serif);
-    font-size: 1.15rem;
-    margin-bottom: 0.8rem;
-  }
-
-  .positions-box p {
-    color: var(--text-2);
-    font-size: 0.9rem;
-    margin-bottom: 1rem;
-    line-height: 1.65;
-  }
-
-  .cta-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.4rem;
-    padding: 0.65rem 1.4rem;
-    background: var(--accent);
-    color: #fff;
-    font-size: 0.85rem;
-    font-weight: 500;
-    border: none;
-    border-radius: 8px;
-    text-decoration: none;
-    cursor: pointer;
-    transition: background 0.2s, transform 0.1s;
-  }
-
-  .cta-btn:hover { background: #234a30; transform: translateY(-1px); }
-
-  /* ── Blog ── */
-  .blog-list { list-style: none; }
-
-  .blog-item {
-    padding: 1.2rem 0;
-    border-bottom: 1px solid var(--border);
-  }
-
-  .blog-item:last-child { border-bottom: none; }
-
-  .blog-date {
-    font-size: 0.75rem;
+    font-size: 0.7rem;
     color: var(--text-3);
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    margin-bottom: 0.25rem;
+    text-decoration: none;
+    margin-right: 0.8rem;
+    transition: color 0.2s;
   }
 
-  .blog-item-title {
-    font-weight: 500;
-    font-size: 0.95rem;
-    margin-bottom: 0.3rem;
+  .pub-links a:hover { color: var(--text); }
+
+  .all-pubs {
+    margin-top: 1.5rem;
+    font-size: 0.8rem;
   }
 
-  .blog-item-title a {
-    color: var(--text);
+  .all-pubs a {
+    color: var(--text-3);
     text-decoration: none;
     transition: color 0.2s;
   }
 
-  .blog-item-title a:hover { color: var(--accent); }
+  .all-pubs a:hover { color: var(--text); }
 
-  .blog-excerpt {
-    font-size: 0.85rem;
-    color: var(--text-2);
-    line-height: 1.55;
-  }
-
-  .blog-lang {
-    display: inline-block;
-    font-size: 0.68rem;
-    font-weight: 500;
-    padding: 0.15rem 0.45rem;
-    border-radius: 4px;
-    background: var(--accent-light);
-    color: var(--accent);
-    margin-left: 0.4rem;
-    vertical-align: middle;
-    letter-spacing: 0.03em;
-  }
-
-  .blog-empty {
-    color: var(--text-3);
+  /* ── Positions ── */
+  .positions p {
     font-size: 0.9rem;
+    color: var(--text-2);
+    line-height: 1.8;
+    max-width: 560px;
+    margin-bottom: 1.2rem;
+  }
+
+  .positions .cta {
+    display: inline-block;
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--text);
+    text-decoration: none;
+    padding: 0.5rem 1.2rem;
+    border: 1px solid var(--text);
+    border-radius: 4px;
+    transition: background 0.2s, color 0.2s;
+  }
+
+  .positions .cta:hover {
+    background: var(--text);
+    color: var(--bg);
+  }
+
+  /* ── Blog ── */
+  .blog-empty {
+    font-size: 0.85rem;
+    color: var(--text-3);
     font-style: italic;
   }
 
   /* ── Contact ── */
-  .contact-grid {
+  .contact-row {
     display: flex;
-    flex-wrap: wrap;
     gap: 2rem;
-  }
-
-  .contact-item { flex: 1; min-width: 200px; }
-
-  .contact-label {
-    font-size: 0.72rem;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    color: var(--text-3);
-    margin-bottom: 0.3rem;
-    font-weight: 500;
-  }
-
-  .contact-value {
-    font-size: 0.92rem;
+    flex-wrap: wrap;
+    font-size: 0.85rem;
     color: var(--text-2);
   }
 
-  .contact-value a {
-    color: var(--accent);
+  .contact-row a {
+    color: var(--text-2);
     text-decoration: none;
-    border-bottom: 1px solid transparent;
+    border-bottom: 1px solid var(--border);
     transition: border-color 0.2s;
   }
 
-  .contact-value a:hover { border-bottom-color: var(--accent); }
+  .contact-row a:hover { border-color: var(--text); }
+
+  .contact-label {
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-3);
+    margin-bottom: 0.15rem;
+  }
 
   /* ── Footer ── */
   footer {
     max-width: var(--max-w);
     margin: 0 auto;
-    padding: 2rem;
-    text-align: center;
-    font-size: 0.75rem;
+    padding: 2rem 1.5rem;
+    font-size: 0.7rem;
     color: var(--text-3);
     border-top: 1px solid var(--border);
   }
 
   /* ── Responsive ── */
-  @media (max-width: 700px) {
-    .hero {
-      grid-template-columns: 1fr;
-      text-direction: column;
-      padding: 3rem 1.5rem 2.5rem;
-      text-align: center;
-    }
-
-    .hero-photo {
-      width: 140px;
-      height: 140px;
-      margin: 0 auto 1rem;
-      order: -1;
-    }
-
-    .hero-text .affiliation { justify-content: center; }
-    .social-row { justify-content: center; }
-
-    section { padding: 2.5rem 1.5rem; }
+  @media (max-width: 600px) {
+    .hero { padding: 3rem 1.25rem 2.5rem; }
+    .hero h1 { font-size: 1.7rem; }
+    section { padding: 2.5rem 1.25rem; }
 
     .nav-links { display: none; }
     .nav-links.open {
       display: flex;
       flex-direction: column;
       position: absolute;
-      top: 56px;
-      left: 0; right: 0;
-      background: rgba(250,250,248,0.97);
-      backdrop-filter: blur(16px);
-      padding: 1rem 2rem;
-      gap: 1rem;
+      top: 52px; left: 0; right: 0;
+      background: rgba(253,253,252,0.98);
+      backdrop-filter: blur(12px);
+      padding: 1rem 1.5rem;
+      gap: 0.8rem;
       border-bottom: 1px solid var(--border);
     }
-
     .nav-toggle { display: block; }
   }
-
-  /* ── Subtle entrance animation ── */
-  @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(16px); }
-    to   { opacity: 1; transform: translateY(0); }
-  }
-
-  .hero, section { animation: fadeUp 0.6s ease-out both; }
-  section:nth-child(3) { animation-delay: 0.08s; }
-  section:nth-child(4) { animation-delay: 0.12s; }
-  section:nth-child(5) { animation-delay: 0.16s; }
-  section:nth-child(6) { animation-delay: 0.2s; }
-  section:nth-child(7) { animation-delay: 0.24s; }
 </style>
 </head>
 <body>
 
-<!-- ── Navigation ── -->
 <nav>
   <div class="nav-inner">
-    <span class="nav-name">E. de Bézenac</span>
+    <span class="nav-name">Emmanuel de Bézenac</span>
     <button class="nav-toggle" onclick="document.querySelector('.nav-links').classList.toggle('open')" aria-label="Menu">
-      <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round"><line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="17" x2="20" y2="17"/></svg>
     </button>
     <div class="nav-links">
-      <a href="#about">About</a>
-      <a href="#publications">Publications</a>
-      <a href="#positions">Positions</a>
-      <a href="#blog">Blog</a>
-      <a href="#contact">Contact</a>
+      <a href="#about">about</a>
+      <a href="#publications">publications</a>
+      <a href="#positions">positions</a>
+      <a href="#blog">blog</a>
+      <a href="#contact">contact</a>
     </div>
   </div>
 </nav>
 
-<!-- ── Hero ── -->
 <header class="hero">
-  <div class="hero-text">
-    <h1>Emmanuel de Bézenac</h1>
-    <p class="tagline">Permanent Researcher at INRIA Paris, working on deep learning for physical systems, generative models, and weather forecasting.</p>
-    <div class="affiliation">
-      <span><a href="https://team.inria.fr/arches/" target="_blank">ARCHES Team</a> · INRIA Paris</span>
-    </div>
-    <div class="social-row">
-      <a href="https://scholar.google.com/citations?user=KvZw5gYAAAAJ" target="_blank">
-        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 24a7 7 0 1 1 0-14 7 7 0 0 1 0 14Zm0-2a5 5 0 1 0 0-10 5 5 0 0 0 0 10ZM1.5 4.5 12 0l10.5 4.5L12 9 1.5 4.5Z"/></svg>
-        Scholar
-      </a>
-      <a href="https://www.linkedin.com/in/emmanuel-de-b%C3%A9zenac-446789220/" target="_blank">
-        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.45 20.45h-3.56v-5.57c0-1.33-.02-3.04-1.85-3.04-1.85 0-2.14 1.45-2.14 2.94v5.67H9.35V9h3.41v1.56h.05c.48-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.46v6.28ZM5.34 7.43a2.07 2.07 0 1 1 0-4.13 2.07 2.07 0 0 1 0 4.13ZM7.12 20.45H3.56V9h3.56v11.45ZM22.22 0H1.77A1.75 1.75 0 0 0 0 1.73v20.54A1.75 1.75 0 0 0 1.77 24h20.45A1.75 1.75 0 0 0 24 22.27V1.73A1.75 1.75 0 0 0 22.22 0Z"/></svg>
-        LinkedIn
-      </a>
-    </div>
-  </div>
-  <div class="hero-photo">
-    <!-- Replace the <span> below with: <img src="photo.jpg" alt="Emmanuel de Bézenac"> -->
-    <span class="initials">EdB</span>
+  <h1>Emmanuel de Bézenac</h1>
+  <p class="tagline">Permanent researcher at INRIA Paris. Deep learning for physical systems, generative models, weather forecasting.</p>
+  <p class="affil"><a href="https://team.inria.fr/arches/" target="_blank">ARCHES</a> · INRIA Paris</p>
+  <div class="links-row">
+    <a href="https://scholar.google.com/citations?user=KvZw5gYAAAAJ" target="_blank">Google Scholar</a>
+    <a href="https://www.linkedin.com/in/emmanuel-de-b%C3%A9zenac-446789220/" target="_blank">LinkedIn</a>
   </div>
 </header>
 
-<!-- ── About ── -->
 <section id="about" class="about">
-  <h2 class="section-title">About</h2>
+  <div class="section-label">About</div>
   <p>
     I am a permanent researcher (ISFP) at INRIA Paris in the
     <a href="https://team.inria.fr/arches/" target="_blank">ARCHES</a> team,
@@ -590,146 +405,96 @@
     where I have been working since 2017 on modeling physical processes with deep learning,
     developing models that embed prior scientific knowledge and PDEs.
   </p>
-  <div class="research-tags">
-    <span>AI Weather Forecasting</span>
+  <div class="tags">
+    <span>Weather Forecasting</span>
     <span>Generative Models</span>
     <span>Neural PDE Solvers</span>
     <span>Physics-Informed ML</span>
     <span>Dynamical Systems</span>
-    <span>Foundation Models for Science</span>
   </div>
 </section>
 
-<!-- ── Selected Publications ── -->
 <section id="publications">
-  <h2 class="section-title">Selected Publications</h2>
+  <div class="section-label">Selected Publications</div>
   <ul class="pub-list">
 
     <li class="pub-item">
-      <div class="pub-title"><a href="https://arxiv.org/abs/2310.19272" target="_blank">Poseidon: Efficient Foundation Models for PDEs</a></div>
-      <div class="pub-authors">M. Herde, B. Raonic, T. Rohner, R. Käppeli, R. Molinaro, <span class="me">E. de Bézenac</span>, S. Mishra</div>
-      <div class="pub-venue"><span class="year">2024</span> NeurIPS</div>
-      <div class="pub-links">
-        <a href="https://arxiv.org/abs/2310.19272" target="_blank">arXiv</a>
-      </div>
+      <div class="pub-title"><a href="https://arxiv.org/abs/2405.19101" target="_blank">Poseidon: Efficient Foundation Models for PDEs</a></div>
+      <div class="pub-meta">M. Herde, B. Raonic, T. Rohner, R. Käppeli, R. Molinaro, <span class="me">E. de Bézenac</span>, S. Mishra · <span class="venue">NeurIPS 2024</span></div>
+      <div class="pub-links"><a href="https://arxiv.org/abs/2405.19101" target="_blank">arXiv</a></div>
     </li>
 
     <li class="pub-item">
-      <div class="pub-title"><a href="https://arxiv.org/abs/2302.01178" target="_blank">An Operator Preconditioning Perspective on Training in Physics-Informed Machine Learning</a></div>
-      <div class="pub-authors"><span class="me">E. de Bézenac</span>, T. De Ryck, F. Bonnet, S. Mishra</div>
-      <div class="pub-venue"><span class="year">2024</span> ICLR</div>
-      <div class="pub-links">
-        <a href="https://arxiv.org/abs/2302.01178" target="_blank">arXiv</a>
-      </div>
+      <div class="pub-title"><a href="https://arxiv.org/abs/2310.05801" target="_blank">An Operator Preconditioning Perspective on Training in Physics-Informed Machine Learning</a></div>
+      <div class="pub-meta"><span class="me">E. de Bézenac</span>, T. De Ryck, F. Bonnet, S. Mishra · <span class="venue">ICLR 2024</span></div>
+      <div class="pub-links"><a href="https://arxiv.org/abs/2310.05801" target="_blank">arXiv</a></div>
     </li>
 
     <li class="pub-item">
       <div class="pub-title"><a href="https://arxiv.org/abs/2305.16150" target="_blank">Unifying GANs and Score-Based Diffusion as Generative Particle Models</a></div>
-      <div class="pub-authors">J.-Y. Franceschi, M. Gartrell, L. Dos Santos, T. Issenhuth, <span class="me">E. de Bézenac</span>, M. Chen, A. Rakotomamonjy</div>
-      <div class="pub-venue"><span class="year">2023</span> NeurIPS</div>
-      <div class="pub-links">
-        <a href="https://arxiv.org/abs/2305.16150" target="_blank">arXiv</a>
-        <a href="https://github.com/White-Link/gpm" target="_blank">Code</a>
-      </div>
+      <div class="pub-meta">J.-Y. Franceschi, M. Gartrell, L. Dos Santos, T. Issenhuth, <span class="me">E. de Bézenac</span>, M. Chen, A. Rakotomamonjy · <span class="venue">NeurIPS 2023</span></div>
+      <div class="pub-links"><a href="https://arxiv.org/abs/2305.16150" target="_blank">arXiv</a> <a href="https://github.com/White-Link/gpm" target="_blank">code</a></div>
     </li>
 
     <li class="pub-item">
       <div class="pub-title"><a href="https://arxiv.org/abs/2302.01178" target="_blank">Convolutional Neural Operators for Robust and Accurate Learning of PDEs</a></div>
-      <div class="pub-authors">B. Raonic, R. Molinaro, <span class="me">E. de Bézenac</span>, T. Rohner, S. Mishra</div>
-      <div class="pub-venue"><span class="year">2023</span> NeurIPS</div>
-      <div class="pub-links">
-        <a href="https://arxiv.org/abs/2302.01178" target="_blank">arXiv</a>
-      </div>
+      <div class="pub-meta">B. Raonic, R. Molinaro, <span class="me">E. de Bézenac</span>, T. Rohner, S. Mishra · <span class="venue">NeurIPS 2023</span></div>
+      <div class="pub-links"><a href="https://arxiv.org/abs/2302.01178" target="_blank">arXiv</a></div>
     </li>
 
     <li class="pub-item">
-      <div class="pub-title"><a href="https://arxiv.org/abs/2010.09874" target="_blank">Augmenting Physical Models with Deep Networks for Complex Dynamics Forecasting</a></div>
-      <div class="pub-authors">Y. Yin, V. Le Guen, J. Donà, <span class="me">E. de Bézenac</span>, I. Ayed, N. Thome, P. Gallinari</div>
-      <div class="pub-venue"><span class="year">2021</span> ICLR <span class="award">· Oral</span></div>
-      <div class="pub-links">
-        <a href="https://arxiv.org/abs/2010.09874" target="_blank">arXiv</a>
-      </div>
+      <div class="pub-title"><a href="https://arxiv.org/abs/2010.04456" target="_blank">Augmenting Physical Models with Deep Networks for Complex Dynamics Forecasting</a></div>
+      <div class="pub-meta">Y. Yin, V. Le Guen, J. Donà, <span class="me">E. de Bézenac</span>, I. Ayed, N. Thome, P. Gallinari · <span class="venue">ICLR 2021</span> <span class="award">· Oral</span></div>
+      <div class="pub-links"><a href="https://arxiv.org/abs/2010.04456" target="_blank">arXiv</a></div>
     </li>
 
     <li class="pub-item">
       <div class="pub-title"><a href="https://proceedings.neurips.cc/paper/2020/hash/1f47cef5e38c952f94c5d61726027439-Abstract.html" target="_blank">Normalizing Kalman Filters for Multivariate Time Series Analysis</a></div>
-      <div class="pub-authors"><span class="me">E. de Bézenac</span>, S. S. Rangapuram, K. Benidis, M. Bohlke-Schneider, R. Kurle, L. Stella, H. Hasson, P. Gallinari, T. Januschowski</div>
-      <div class="pub-venue"><span class="year">2020</span> NeurIPS</div>
-      <div class="pub-links">
-        <a href="https://proceedings.neurips.cc/paper/2020/hash/1f47cef5e38c952f94c5d61726027439-Abstract.html" target="_blank">Paper</a>
-      </div>
+      <div class="pub-meta"><span class="me">E. de Bézenac</span>, S. S. Rangapuram, K. Benidis, M. Bohlke-Schneider, R. Kurle, L. Stella, H. Hasson, P. Gallinari, T. Januschowski · <span class="venue">NeurIPS 2020</span></div>
+      <div class="pub-links"><a href="https://proceedings.neurips.cc/paper/2020/hash/1f47cef5e38c952f94c5d61726027439-Abstract.html" target="_blank">paper</a></div>
     </li>
 
     <li class="pub-item">
       <div class="pub-title"><a href="https://arxiv.org/abs/1711.07970" target="_blank">Deep Learning for Physical Processes: Incorporating Prior Scientific Knowledge</a></div>
-      <div class="pub-authors"><span class="me">E. de Bézenac</span>, A. Pajot, P. Gallinari</div>
-      <div class="pub-venue"><span class="year">2018</span> ICLR</div>
-      <div class="pub-links">
-        <a href="https://arxiv.org/abs/1711.07970" target="_blank">arXiv</a>
-      </div>
+      <div class="pub-meta"><span class="me">E. de Bézenac</span>, A. Pajot, P. Gallinari · <span class="venue">ICLR 2018</span></div>
+      <div class="pub-links"><a href="https://arxiv.org/abs/1711.07970" target="_blank">arXiv</a></div>
     </li>
-  </ul>
 
-  <p class="pub-note">
-    <a href="https://scholar.google.com/citations?user=KvZw5gYAAAAJ" target="_blank">View all publications on Google Scholar →</a>
+  </ul>
+  <p class="all-pubs"><a href="https://scholar.google.com/citations?user=KvZw5gYAAAAJ" target="_blank">All publications →</a></p>
+</section>
+
+<section id="positions" class="positions">
+  <div class="section-label">Open Positions</div>
+  <p>
+    Our team may have openings for postdocs, PhD students, and M2 research interns.
+    If the topics on this page resonate with you and you're genuinely excited about this
+    line of research, feel free to reach out.
   </p>
+  <a href="mailto:emmanuel.de-bezenac@inria.fr?subject=Research%20Position%20Inquiry" class="cta">Get in touch</a>
 </section>
 
-<!-- ── Open Positions ── -->
-<section id="positions">
-  <h2 class="section-title">Open Positions</h2>
-  <div class="positions-box">
-    <h3>Interested in working together?</h3>
-    <p>
-      Our team may have openings for postdocs, PhD students, and M2 research interns.
-      If the topics on this page resonate with you and you're genuinely excited about this
-      line of research, feel free to reach out — I'd be happy to discuss potential projects.
-    </p>
-    <a href="mailto:emmanuel.de-bezenac@inria.fr?subject=Research%20Position%20Inquiry" class="cta-btn">
-      Get in touch
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-    </a>
-  </div>
-</section>
-
-<!-- ── Blog ── -->
 <section id="blog">
-  <h2 class="section-title">Blog</h2>
-  <p class="blog-empty">Coming soon — posts about research, in English and in French.</p>
-  <!--
-  <ul class="blog-list">
-    <li class="blog-item">
-      <div class="blog-date">January 2026</div>
-      <div class="blog-item-title"><a href="#">Example Post Title</a> <span class="blog-lang">EN</span></div>
-      <div class="blog-excerpt">A short excerpt or description of the blog post goes here...</div>
-    </li>
-    <li class="blog-item">
-      <div class="blog-date">Décembre 2025</div>
-      <div class="blog-item-title"><a href="#">Titre d'exemple</a> <span class="blog-lang">FR</span></div>
-      <div class="blog-excerpt">Un court résumé de l'article de blog...</div>
-    </li>
-  </ul>
-  -->
+  <div class="section-label">Blog</div>
+  <p class="blog-empty">Coming soon — in English and French.</p>
 </section>
 
-<!-- ── Contact ── -->
 <section id="contact">
-  <h2 class="section-title">Contact</h2>
-  <div class="contact-grid">
-    <div class="contact-item">
+  <div class="section-label">Contact</div>
+  <div class="contact-row">
+    <div>
       <div class="contact-label">Email</div>
-      <div class="contact-value"><a href="mailto:emmanuel.de-bezenac@inria.fr">emmanuel.de-bezenac@inria.fr</a></div>
+      <a href="mailto:emmanuel.de-bezenac@inria.fr">emmanuel.de-bezenac@inria.fr</a>
     </div>
-    <div class="contact-item">
-      <div class="contact-label">Team page</div>
-      <div class="contact-value"><a href="https://team.inria.fr/arches/" target="_blank">ARCHES @ INRIA</a></div>
+    <div>
+      <div class="contact-label">Team</div>
+      <a href="https://team.inria.fr/arches/" target="_blank">ARCHES @ INRIA</a>
     </div>
   </div>
 </section>
 
-<!-- ── Footer ── -->
 <footer>
-  &copy; 2026 Emmanuel de Bézenac
+  © 2026 Emmanuel de Bézenac
 </footer>
 
 </body>
