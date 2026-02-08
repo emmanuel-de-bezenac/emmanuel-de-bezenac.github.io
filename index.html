@@ -1,33 +1,24 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-GDL2746PEE"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-GDL2746PEE');
-</script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Emmanuel de Bézenac</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=Inter:wght@300;400;500&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
   :root {
-    --bg:      #fdfdfc;
-    --text:    #222;
+    --bg:      #faf9f7;
+    --text:    #1a1a1a;
     --text-2:  #555;
     --text-3:  #999;
-    --accent:  #333;
-    --link:    #1a1a1a;
-    --border:  #eee;
-    --max-w:   720px;
+    --text-4:  #bbb;
+    --border:  #ece9e4;
+    --max-w:   800px;
+    --grotesk: 'Space Grotesk', system-ui, sans-serif;
     --sans:    'Inter', system-ui, sans-serif;
     --serif:   'EB Garamond', Georgia, serif;
   }
@@ -43,45 +34,43 @@
     -webkit-font-smoothing: antialiased;
   }
 
-  ::selection { background: #e0e0e0; }
+  ::selection { background: #e4ddd5; }
 
-  a { color: var(--link); }
+  a { color: var(--text); }
 
   /* ── Nav ── */
   nav {
     position: sticky; top: 0; z-index: 10;
-    background: rgba(253,253,252,0.92);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
+    background: rgba(250,249,247,0.9);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
   }
 
   .nav-inner {
     max-width: var(--max-w);
     margin: 0 auto;
-    padding: 0 1.5rem;
+    padding: 0 2rem;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    height: 52px;
-    border-bottom: 1px solid var(--border);
+    height: 56px;
   }
 
   .nav-name {
-    font-family: var(--serif);
-    font-size: 1rem;
-    font-weight: 500;
-    letter-spacing: 0.01em;
+    font-family: var(--grotesk);
+    font-size: 0.85rem;
+    font-weight: 700;
+    letter-spacing: -0.01em;
   }
 
-  .nav-links { display: flex; gap: 1.6rem; }
+  .nav-links { display: flex; gap: 1.8rem; }
 
   .nav-links a {
-    font-size: 0.75rem;
+    font-size: 0.72rem;
     font-weight: 400;
     color: var(--text-3);
     text-decoration: none;
-    letter-spacing: 0.04em;
-    text-transform: lowercase;
+    letter-spacing: 0.03em;
     transition: color 0.2s;
   }
 
@@ -94,86 +83,79 @@
   .hero {
     max-width: var(--max-w);
     margin: 0 auto;
-    padding: 4.5rem 1.5rem 3.5rem;
+    padding: 6rem 2rem 5rem;
   }
 
   .hero h1 {
-    font-family: var(--serif);
-    font-weight: 400;
-    font-size: 2.2rem;
-    line-height: 1.2;
-    margin-bottom: 1rem;
+    font-family: var(--grotesk);
+    font-weight: 700;
+    font-size: 3.4rem;
+    line-height: 1.08;
+    letter-spacing: -0.03em;
+    margin-bottom: 1.4rem;
   }
 
   .hero .tagline {
-    font-size: 0.92rem;
+    font-size: 1rem;
     color: var(--text-2);
     font-weight: 300;
-    line-height: 1.7;
+    line-height: 1.65;
     max-width: 520px;
-    margin-bottom: 1rem;
   }
 
-  .hero .affil {
-    font-size: 0.8rem;
+  .hero-meta {
+    margin-top: 1.6rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    font-size: 0.78rem;
     color: var(--text-3);
   }
 
-  .hero .affil a {
-    color: var(--text-2);
-    text-decoration: none;
-    border-bottom: 1px solid var(--border);
-    transition: border-color 0.2s;
-  }
-
-  .hero .affil a:hover { border-color: var(--text); }
-
-  .links-row {
-    display: flex;
-    gap: 1.2rem;
-    margin-top: 1.2rem;
-    font-size: 0.78rem;
-  }
-
-  .links-row a {
+  .hero-meta a {
     color: var(--text-3);
     text-decoration: none;
     transition: color 0.2s;
   }
 
-  .links-row a:hover { color: var(--text); }
+  .hero-meta a:hover { color: var(--text); }
+
+  .hero-meta .sep { color: var(--text-4); }
 
   /* ── Sections ── */
   section {
     max-width: var(--max-w);
     margin: 0 auto;
-    padding: 3rem 1.5rem;
-    border-top: 1px solid var(--border);
+    padding: 4.5rem 2rem;
   }
 
   .section-label {
-    font-size: 0.7rem;
+    font-family: var(--grotesk);
+    font-size: 0.68rem;
     font-weight: 500;
-    letter-spacing: 0.1em;
+    letter-spacing: 0.12em;
     text-transform: uppercase;
-    color: var(--text-3);
-    margin-bottom: 1.5rem;
+    color: var(--text-4);
+    margin-bottom: 2rem;
+    padding-bottom: 0.8rem;
+    border-bottom: 1px solid var(--border);
   }
 
   /* ── About ── */
   .about p {
-    font-size: 0.9rem;
+    font-size: 0.92rem;
     color: var(--text-2);
-    margin-bottom: 0.9rem;
-    max-width: 600px;
-    line-height: 1.8;
+    margin-bottom: 1rem;
+    line-height: 1.85;
+    max-width: 620px;
   }
 
   .about a {
     color: var(--text);
     text-decoration: none;
     border-bottom: 1px solid var(--border);
-    transition: border-color 0.2s;
+    transition: border-color 0.25s;
   }
 
   .about a:hover { border-color: var(--text); }
@@ -181,16 +163,16 @@
   .tags {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.45rem;
-    margin-top: 1.4rem;
+    gap: 0.5rem;
+    margin-top: 1.8rem;
   }
 
   .tags span {
     font-size: 0.68rem;
     font-weight: 400;
-    padding: 0.25rem 0.65rem;
+    padding: 0.3rem 0.75rem;
     border: 1px solid var(--border);
-    border-radius: 3px;
+    border-radius: 100px;
     color: var(--text-2);
     transition: border-color 0.2s;
   }
@@ -200,18 +182,16 @@
   /* ── Publications ── */
   .pub-list { list-style: none; }
 
-  .pub-item {
-    padding: 1rem 0;
-  }
+  .pub-item { padding: 1.1rem 0; }
 
-  .pub-item + .pub-item { border-top: 1px solid #f5f5f5; }
+  .pub-item + .pub-item { border-top: 1px solid var(--border); }
 
   .pub-title {
     font-family: var(--serif);
-    font-size: 0.98rem;
+    font-size: 1.05rem;
     font-weight: 400;
-    line-height: 1.45;
-    margin-bottom: 0.2rem;
+    line-height: 1.4;
+    margin-bottom: 0.25rem;
   }
 
   .pub-title a {
@@ -223,14 +203,12 @@
   .pub-title a:hover { color: var(--text-3); }
 
   .pub-meta {
-    font-size: 0.76rem;
+    font-size: 0.74rem;
     color: var(--text-3);
     line-height: 1.5;
   }
 
-  .pub-meta .venue {
-    font-style: italic;
-  }
+  .pub-meta .venue { font-style: italic; }
 
   .pub-meta .me {
     color: var(--text);
@@ -238,28 +216,25 @@
   }
 
   .pub-meta .award {
-    color: var(--text-2);
     font-weight: 500;
     font-style: normal;
   }
 
-  .pub-links {
-    margin-top: 0.3rem;
-  }
+  .pub-links { margin-top: 0.35rem; }
 
   .pub-links a {
-    font-size: 0.7rem;
+    font-size: 0.68rem;
     color: var(--text-3);
     text-decoration: none;
-    margin-right: 0.8rem;
+    margin-right: 0.9rem;
     transition: color 0.2s;
   }
 
   .pub-links a:hover { color: var(--text); }
 
   .all-pubs {
-    margin-top: 1.5rem;
-    font-size: 0.8rem;
+    margin-top: 1.8rem;
+    font-size: 0.78rem;
   }
 
   .all-pubs a {
@@ -272,90 +247,115 @@
 
   /* ── Positions ── */
   .positions p {
-    font-size: 0.9rem;
+    font-size: 0.92rem;
     color: var(--text-2);
-    line-height: 1.8;
+    line-height: 1.85;
     max-width: 560px;
-    margin-bottom: 1.2rem;
+    margin-bottom: 1.5rem;
   }
 
   .positions .cta {
     display: inline-block;
-    font-size: 0.8rem;
+    font-family: var(--grotesk);
+    font-size: 0.78rem;
     font-weight: 500;
-    color: var(--text);
+    color: var(--bg);
     text-decoration: none;
-    padding: 0.5rem 1.2rem;
-    border: 1px solid var(--text);
-    border-radius: 4px;
-    transition: background 0.2s, color 0.2s;
+    padding: 0.6rem 1.6rem;
+    background: var(--text);
+    border-radius: 100px;
+    transition: opacity 0.2s;
   }
 
-  .positions .cta:hover {
-    background: var(--text);
-    color: var(--bg);
-  }
+  .positions .cta:hover { opacity: 0.75; }
 
   /* ── Blog ── */
   .blog-empty {
-    font-size: 0.85rem;
+    font-size: 0.88rem;
     color: var(--text-3);
     font-style: italic;
   }
 
   /* ── Contact ── */
-  .contact-row {
+  .contact-items {
     display: flex;
-    gap: 2rem;
+    gap: 3rem;
     flex-wrap: wrap;
     font-size: 0.85rem;
-    color: var(--text-2);
   }
 
-  .contact-row a {
+  .contact-item a {
     color: var(--text-2);
     text-decoration: none;
     border-bottom: 1px solid var(--border);
-    transition: border-color 0.2s;
+    transition: border-color 0.25s;
   }
 
-  .contact-row a:hover { border-color: var(--text); }
+  .contact-item a:hover { border-color: var(--text); }
 
-  .contact-label {
-    font-size: 0.68rem;
-    text-transform: uppercase;
+  .contact-item .label {
+    font-size: 0.65rem;
+    font-weight: 500;
     letter-spacing: 0.08em;
-    color: var(--text-3);
-    margin-bottom: 0.15rem;
+    text-transform: uppercase;
+    color: var(--text-4);
+    margin-bottom: 0.2rem;
   }
 
   /* ── Footer ── */
   footer {
     max-width: var(--max-w);
     margin: 0 auto;
-    padding: 2rem 1.5rem;
-    font-size: 0.7rem;
-    color: var(--text-3);
-    border-top: 1px solid var(--border);
+    padding: 3rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.68rem;
+    color: var(--text-4);
   }
 
-  /* ── Responsive ── */
-  @media (max-width: 600px) {
-    .hero { padding: 3rem 1.25rem 2.5rem; }
-    .hero h1 { font-size: 1.7rem; }
-    section { padding: 2.5rem 1.25rem; }
+  footer .inria-link {
+    display: inline-block;
+  }
 
+  footer .inria-link img {
+    height: 18px;
+    opacity: 0.45;
+    transition: opacity 0.2s;
+  }
+
+  footer .inria-link:hover img { opacity: 0.8; }
+
+  /* Fallback if logo image is missing */
+  footer .inria-fallback {
+    font-family: var(--grotesk);
+    font-weight: 700;
+    font-size: 0.8rem;
+    color: var(--text-4);
+    text-decoration: none;
+    letter-spacing: -0.01em;
+    transition: color 0.2s;
+  }
+
+  footer .inria-fallback:hover { color: var(--text-3); }
+
+  /* ── Responsive ── */
+  @media (max-width: 640px) {
+    .hero { padding: 4rem 1.5rem 3.5rem; }
+    .hero h1 { font-size: 2.4rem; }
+    section { padding: 3.5rem 1.5rem; }
+    .nav-inner { padding: 0 1.5rem; }
+    footer { padding: 2.5rem 1.5rem; }
     .nav-links { display: none; }
     .nav-links.open {
       display: flex;
       flex-direction: column;
       position: absolute;
-      top: 52px; left: 0; right: 0;
-      background: rgba(253,253,252,0.98);
-      backdrop-filter: blur(12px);
-      padding: 1rem 1.5rem;
-      gap: 0.8rem;
-      border-bottom: 1px solid var(--border);
+      top: 56px; left: 0; right: 0;
+      background: rgba(250,249,247,0.98);
+      backdrop-filter: blur(14px);
+      padding: 1.2rem 1.5rem;
+      gap: 0.9rem;
     }
     .nav-toggle { display: block; }
   }
@@ -365,26 +365,31 @@
 
 <nav>
   <div class="nav-inner">
-    <span class="nav-name">Emmanuel de Bézenac</span>
+    <span class="nav-name">EdB</span>
     <button class="nav-toggle" onclick="document.querySelector('.nav-links').classList.toggle('open')" aria-label="Menu">
       <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round"><line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="17" x2="20" y2="17"/></svg>
     </button>
     <div class="nav-links">
-      <a href="#about">about</a>
-      <a href="#publications">publications</a>
-      <a href="#positions">positions</a>
-      <a href="#blog">blog</a>
-      <a href="#contact">contact</a>
+      <a href="#about">About</a>
+      <a href="#publications">Publications</a>
+      <a href="#talks">Talks</a>
+      <a href="#positions">Positions</a>
+      <a href="#blog">Blog</a>
+      <a href="#contact">Contact</a>
     </div>
   </div>
 </nav>
 
 <header class="hero">
-  <h1>Emmanuel de Bézenac</h1>
-  <p class="tagline">Permanent researcher at INRIA Paris. Deep learning for physical systems, generative models, weather forecasting.</p>
-  <p class="affil"><a href="https://team.inria.fr/arches/" target="_blank">ARCHES</a> · INRIA Paris</p>
-  <div class="links-row">
-    <a href="https://scholar.google.com/citations?user=KvZw5gYAAAAJ" target="_blank">Google Scholar</a>
+  <h1>Emmanuel<br>de Bézenac</h1>
+  <p class="tagline">Permanent researcher at INRIA Paris, working on deep learning for physical systems, generative models, and weather forecasting.</p>
+  <div class="hero-meta">
+    <a href="https://team.inria.fr/arches/" target="_blank">ARCHES</a>
+    <span class="sep">·</span>
+    <a href="https://www.inria.fr" target="_blank">INRIA Paris</a>
+    <span class="sep">·</span>
+    <a href="https://scholar.google.com/citations?user=KvZw5gYAAAAJ" target="_blank">Scholar</a>
+    <span class="sep">·</span>
     <a href="https://www.linkedin.com/in/emmanuel-de-b%C3%A9zenac-446789220/" target="_blank">LinkedIn</a>
   </div>
 </header>
@@ -473,6 +478,25 @@
   <p class="all-pubs"><a href="https://scholar.google.com/citations?user=KvZw5gYAAAAJ" target="_blank">All publications →</a></p>
 </section>
 
+<section id="talks">
+  <div class="section-label">Selected Talks</div>
+  <ul class="pub-list">
+
+    <li class="pub-item">
+      <div class="pub-title"><a href="reno_presentation_pavia.pdf" target="_blank">Some Insights into Neural Operators for Solving PDEs</a></div>
+      <div class="pub-meta"><span class="me">E. de Bézenac</span></div>
+      <div class="pub-links"><a href="reno_presentation_pavia.pdf" target="_blank">slides (pdf)</a></div>
+    </li>
+
+    <li class="pub-item">
+      <div class="pub-title"><a href="pinns_presentation.pdf" target="_blank">Physics Informed Neural Networks: Some Insights and Limitations</a></div>
+      <div class="pub-meta"><span class="me">E. de Bézenac</span></div>
+      <div class="pub-links"><a href="pinns_presentation.pdf" target="_blank">slides (pdf)</a></div>
+    </li>
+
+  </ul>
+</section>
+
 <section id="positions" class="positions">
   <div class="section-label">Open Positions</div>
   <p>
@@ -490,20 +514,24 @@
 
 <section id="contact">
   <div class="section-label">Contact</div>
-  <div class="contact-row">
-    <div>
-      <div class="contact-label">Email</div>
+  <div class="contact-items">
+    <div class="contact-item">
+      <div class="label">Email</div>
       <a href="mailto:emmanuel.de-bezenac@inria.fr">emmanuel.de-bezenac@inria.fr</a>
     </div>
-    <div>
-      <div class="contact-label">Team</div>
+    <div class="contact-item">
+      <div class="label">Team</div>
       <a href="https://team.inria.fr/arches/" target="_blank">ARCHES @ INRIA</a>
     </div>
   </div>
 </section>
 
 <footer>
-  © 2026 Emmanuel de Bézenac
+  <span>© 2026 Emmanuel de Bézenac</span>
+  <!-- To use the real INRIA logo: download it from https://www.inria.fr/en/charter-use-visual-identity-inria
+       save as inria-logo.svg next to index.html, then uncomment the line below and remove the fallback -->
+  <!-- <a href="https://www.inria.fr" target="_blank" class="inria-link"><img src="inria-logo.svg" alt="INRIA"></a> -->
+  <a href="https://www.inria.fr" target="_blank" class="inria-fallback">INRIA</a>
 </footer>
 
 </body>
