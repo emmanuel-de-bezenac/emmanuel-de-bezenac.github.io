@@ -717,7 +717,7 @@
     const share = Object.fromEntries(MODELS.map(m => [m, list.filter(s => s.winner === m).length]));
     const bar = document.getElementById('sharebar'), leg = document.getElementById('sharelegend');
     bar.replaceChildren(); leg.replaceChildren();
-    document.querySelector('#sharebar').previousElementSibling.textContent = `Lowest NLL of the three models, share of the ${nStorms} storms`;
+    document.querySelector('#sharebar').previousElementSibling.textContent = `Colour on the map: the model with the lowest NLL of the three, share of the ${nStorms} storms`;
     ['fgn', 'gencast_op', 'ifsens_e2s'].forEach(m => {
       if (!share[m]) return;
       const d = el('div', {}, share[m] / nStorms >= 0.12 ? `${NAME[m]} ${Math.round(100 * share[m] / nStorms)}%` : '');

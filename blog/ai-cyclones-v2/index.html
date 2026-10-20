@@ -185,6 +185,24 @@
   #rank-chart { width: 100%; display: block; touch-action: none; cursor: crosshair; }
   .rankfig .readout { font-size: 0.9rem; color: var(--text-2); line-height: 1.6; }
   .rankfig .readout .big { font-family: var(--grotesk); font-weight: 700; font-size: 1.6rem; color: var(--text); line-height: 1.2; font-variant-numeric: tabular-nums; margin-bottom: 0.4rem; }
+  .fig-title { font-family: var(--grotesk); font-weight: 700; font-size: 1.08rem; letter-spacing: -0.01em; line-height: 1.35; margin-bottom: 0.8rem; }
+  .tldr { max-width: var(--max-w); margin: 2rem auto 0; padding: 0 1.5rem; }
+  .tldr > * { background: var(--surface); }
+  .tldr { background: none; }
+  .tldr-h, .tldr ol, .tldr-f { border-left: 1px solid var(--border); border-right: 1px solid var(--border); padding-left: 1.2rem; padding-right: 1.2rem; }
+  .tldr-h { border-top: 1px solid var(--border); border-radius: 8px 8px 0 0; padding-top: 1rem; font-family: var(--grotesk); font-size: 0.7rem; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-3); }
+  .tldr ol { list-style: none; counter-reset: k; margin: 0; padding-top: 0.5rem; padding-bottom: 0.2rem; }
+  article .tldr li { counter-increment: k; position: relative; max-width: none; margin: 0 0 0.7rem; padding: 0 0 0 2rem; font-size: 0.95rem; line-height: 1.6; color: #2b2b2b; }
+  article .tldr li::before { content: counter(k); position: absolute; left: 0; top: 0; font-family: var(--grotesk); font-weight: 700; color: var(--text-4); }
+  .tldr li a { font-weight: 600; text-decoration: none; color: var(--text); border-bottom: 1px solid var(--text-4); }
+  .tldr-f { border-bottom: 1px solid var(--border); border-radius: 0 0 8px 8px; padding-bottom: 1rem; font-size: 0.82rem; color: var(--text-2); }
+  .tldr-f a { color: var(--text-2); }
+  details.fold { max-width: var(--wide-w); margin: 0 auto 2rem; padding: 0 1.5rem; }
+  details.fold > summary { cursor: pointer; font-size: 0.86rem; color: var(--text-2); padding: 0.55rem 0.9rem; border: 1px solid var(--border); border-radius: 8px; background: var(--surface); list-style: none; }
+  details.fold > summary::-webkit-details-marker { display: none; }
+  details.fold > summary::before { content: '+'; display: inline-block; width: 1.1rem; color: var(--text-3); font-weight: 600; }
+  details.fold[open] > summary::before { content: '−'; }
+  details.fold[open] > summary { margin-bottom: 1rem; }
   /* scoreboard */
   .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 1.5rem; }
   .stat .v { font-family: var(--grotesk); font-weight: 700; font-size: 2rem; line-height: 1.1; font-variant-numeric: tabular-nums; }
@@ -272,9 +290,18 @@
 <article>
   <p class="lead">AI weather models now match or beat the best physics-based forecasts on average scores. Whether they also work for rare, extreme events, where forecasts matter most, is still debated.</p>
   <p>In our paper we compare three AI ensemble models (GenCast, FourCastNet&nbsp;3 and FGN) with ECMWF's operational physics-based ensemble, IFS-ENS, on 178 tropical cyclones between 2021 and 2025. This page shows the 2025 part of that comparison, using the forecasts themselves. It covers GenCast, FGN and IFS-ENS, in the versions that run operationally.</p>
+  <aside class="tldr">
+    <div class="tldr-h">In short</div>
+    <ol>
+      <li><a href="#season">The AI models forecast the track better.</a> FGN gives the observed storm positions more probability than IFS-ENS on 37 of the 41 storms of 2025, GenCast on 32.</li>
+      <li><a href="#intensity">They make the storms too weak.</a> Both underestimate the maximum wind by about 15 to 20% between 2 and 9 days ahead; IFS-ENS stays within about 10%.</li>
+      <li><a href="#intensity">The weak storms still behave like cyclones.</a> Once the difference in intensity is removed, wind depends on pressure in the same way in every model as in the observations.</li>
+    </ol>
+    <div class="tldr-f">To score an ensemble of 49 tracks we treat it as a probability distribution (<a href="#score">section 2</a>). But first, <a href="#guess">try to tell the models apart</a>.</div>
+  </aside>
 
   <h2 id="guess"><span class="num">1</span>Guess the physics model</h2>
-  <p>Each panel is a 15-day ensemble forecast started about 12 hours before the storm was first observed. Each dot is the storm centre in one of the 49 members of the ensemble, and the thick outlined line is the observed track from IBTrACS. Tracks and dots are coloured by wind speed, on the same scale for the observation and the forecasts, and the histogram under each map shows the members' winds next to the observed one. The models' winds are weaker than the observed winds; switch to "Rescaled to observations" to compare them on the observed scale. One panel is IFS-ENS, ECMWF's physics-based ensemble. The other two are AI models from Google DeepMind: GenCast and FGN. Play the forecast, choose the panel you think is the physics model, then tell the two AI models apart, or choose "Show the models" to see the names directly.</p>
+  <p>Each panel is a 15-day forecast of 49 members, started about 12 hours before the storm was first observed. One panel is IFS-ENS, ECMWF's physics-based ensemble; the other two are AI models from Google DeepMind, GenCast and FGN. Dots are the storm centre in each member, the outlined line is the observed track, and colours give the maximum wind, on the same scale for forecasts and observation. Play the forecast and guess which panel is which, or choose "Show the models".</p>
 
   <figure class="wide" id="player-fig">
     <div class="seg" id="mode" role="group" aria-label="Mode">
@@ -317,6 +344,7 @@
   <p>We score the ensemble as a probability distribution instead. The member positions are smoothed into a probability density, and the score is minus the logarithm of that density at the observed position: the negative log-likelihood, or NLL. Lower is better. A forecast scores badly when it is confident and wrong, and also when it is spread so widely that it says little. The two examples below are times at which the two scores disagree: the model whose mean is closest to the storm has the highest NLL.</p>
 
   <figure class="wide">
+    <div class="fig-title">When the closest mean gets the worst score</div>
     <div class="chips" id="explain-cases" role="group" aria-label="Example"></div>
     <div class="explain3" id="explain-panels"></div>
     <p class="explain-text" id="explain-text"></p>
@@ -327,6 +355,7 @@
   <p>We scored every 2025 storm that reached 64&nbsp;kt and that all three models tracked in at least 10 members at 5 or more common times: 41 storms in total. For each storm, the NLL is averaged over these times.</p>
 
   <figure class="wide">
+    <div class="fig-title">Track NLL of the three models on each storm</div>
     <div class="chips" id="basin-filter" role="group" aria-label="Basin"></div>
     <div class="stats" id="stats"></div>
     <div class="note">Lowest NLL of the three models, share of the 41 storms</div>
@@ -337,24 +366,32 @@
     <details class="table"><summary>Table of the 41 storms</summary><table id="storm-table"></table></details>
   </figure>
 
-  <p>FGN, the most recent model, puts more probability on the observed positions than IFS-ENS for 90% of the storms. GenCast does so for 78%. No model is best everywhere: IFS-ENS is best on three storms, and the ranking between FGN and GenCast changes from storm to storm. Choose two models below to compare them storm by storm.</p>
+  <p>No model is best everywhere: IFS-ENS has the lowest NLL on three storms, and the order of FGN and GenCast changes from storm to storm.</p>
 
-  <figure class="wide"><div id="duel"></div></figure>
+  <details class="fold wide"><summary>Compare two models storm by storm</summary><div id="duel"></div></details>
 
-  <p>The advantage also depends on how far ahead the forecast is. Each scored time of each storm counts once below, grouped by forecast day.</p>
+  <p>The ranking does not depend on how far ahead the forecast is. Below, each scored time of each storm counts once, grouped by forecast day.</p>
 
-  <figure class="wide"><div id="leadtime"></div></figure>
+  <figure class="wide">
+    <div class="fig-title">FGN has the lowest NLL at about half of the times, on every day up to day 10</div>
+    <div id="leadtime"></div>
+  </figure>
 
-  <p>From day 1 to day 10, FGN has the lowest NLL at about half of the scored times, GenCast at 33 to 48%, and IFS-ENS at 4 to 13%. After day 10 few storms are still being tracked by all three models, so those columns rest on a few cases.</p>
+  <p>From day 1 to day 10, FGN has the lowest NLL at 45 to 60% of the scored times, GenCast at 33 to 48%, and IFS-ENS at 4 to 13%. After day 10 few storms are still tracked by all three models, so those columns rest on a few cases.</p>
 
   <h2 id="intensity"><span class="num">4</span>The right place, but too weak</h2>
   <p>The damage a cyclone does depends on its intensity as much as on its position. Here the AI models are weaker than the reference. Compared with HRES-fc0, the ECMWF analysis on which both were fine-tuned, FGN and GenCast underestimate the maximum 10&nbsp;m wind by about 15 to 20% between 2 and 9 days of lead time. IFS-ENS stays within about 10%. The AI models' bias is close to that of ERA5, the older reanalysis on which they were first trained. This suggests that the training data play a role, but our evaluation does not establish it.</p>
 
-  <figure class="wide"><div id="bias-chart"></div></figure>
+  <figure class="wide">
+    <div class="fig-title">The AI models' maximum winds are 15 to 20% too weak, closer to ERA5 than to IFS-ENS</div>
+    <div id="bias-chart"></div>
+  </figure>
 
   <p>Do the weak storms still behave like cyclones? In a cyclone, lower central pressure goes with stronger wind. Below, each source contributes the minimum pressure and maximum wind of every member at every time. The AI models and ERA5 sit at weaker winds and higher pressures than HRES-fc0 and the observations. Replacing each value by its rank within its own dataset removes these differences in intensity. What remains is how wind varies with pressure, and it is nearly the same for every source.</p>
 
-  <figure class="wide"><div id="pw-chart"></div>
+  <figure class="wide">
+    <div class="fig-title">With the differences in intensity removed, wind depends on pressure in the same way for every source</div>
+    <div id="pw-chart"></div>
     <figcaption>2025 storms, all lead times pooled, at times matched to IBTrACS observations. For each source the contours enclose about 70% (dashed) and 30% (solid) of its points; the curves along the axes are the distributions of pressure and wind alone. "Ranks only" replaces each value by its rank within its own source, which removes the differences in intensity and keeps how wind depends on pressure.</figcaption>
   </figure>
 
@@ -362,6 +399,7 @@
   <p>The same ranks put the forecast winds on the observed scale, which is what "Rescaled to observations" does in the player of section 1. For each source, the curves below give the share of its 2025 maximum winds that are below each speed. A member's wind is moved from its model's curve to the observed curve at the same height: it gets the observed wind with the same rank. The strongest winds of a model become the strongest observed winds, the median becomes the observed median, and so on. Choose a model and move the pointer over the chart.</p>
 
   <figure class="wide">
+    <div class="fig-title">How the player puts forecast winds on the observed scale</div>
     <div class="chips" id="rank-models" role="group" aria-label="Model"></div>
     <div class="rankfig">
       <svg id="rank-chart" role="img" aria-label="Share of winds below each speed, for each model and for the observations"></svg>
@@ -391,8 +429,8 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/topojson/3.0.2/topojson.min.js"></script>
-<script src="js/intensity.js?v=8"></script>
-<script src="js/season-extra.js?v=8"></script>
-<script src="js/main.js?v=8"></script>
+<script src="js/intensity.js?v=9"></script>
+<script src="js/season-extra.js?v=9"></script>
+<script src="js/main.js?v=9"></script>
 </body>
 </html>
