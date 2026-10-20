@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-GDL2746PEE"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-GDL2746PEE');
+</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI weather models and the tropical cyclones of 2025 · Emmanuel de Bézenac</title>
+<meta name="description" content="Interactive companion to the paper 'Can AI Forecast the Extremes?': ensemble track forecasts of GenCast, FGN and ECMWF's IFS-ENS for the tropical cyclones of 2025.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=Inter:wght@300;400;500;600&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg:      #faf9f7;
+    --surface: #ffffff;
+    --text:    #1a1a1a;
+    --text-2:  #555;
+    --text-3:  #8a8a8a;
+    --text-4:  #bbb;
+    --border:  #ece9e4;
+    --ocean:   #eef3f7;
+    --land:    #dcdad5;
+    --blind:   #d9480f;
+    --gencast: #1D9E75;
+    --ifs:     #378ADD;
+    --fgn:     #E24B4A;
+    --max-w:   720px;
+    --wide-w:  1000px;
+    --grotesk: 'Space Grotesk', system-ui, sans-serif;
+    --sans:    'Inter', system-ui, sans-serif;
+    --serif:   'EB Garamond', Georgia, serif;
+  }
+
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: var(--sans);
+    font-size: 16px;
+    color: var(--text);
+    background: var(--bg);
+    line-height: 1.75;
+    -webkit-font-smoothing: antialiased;
+  }
+  ::selection { background: #e4ddd5; }
+  a { color: var(--text); }
+
+  nav {
+    position: sticky; top: 0; z-index: 20;
+    background: rgba(250,249,247,0.9);
+    backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+  }
+  .nav-inner {
+    max-width: var(--wide-w); margin: 0 auto; padding: 0 1.5rem;
+    display: flex; align-items: center; justify-content: space-between; height: 56px;
+  }
+  .nav-name { font-family: var(--grotesk); font-size: 0.85rem; font-weight: 700; text-decoration: none; }
+  .nav-links { display: flex; gap: 1.6rem; }
+  .nav-links a { font-size: 0.72rem; color: var(--text-3); text-decoration: none; letter-spacing: 0.03em; }
+  .nav-links a:hover { color: var(--text); }
+
+  header.post {
+    max-width: var(--max-w); margin: 0 auto; padding: 4.5rem 1.5rem 2rem;
+  }
+  .kicker {
+    font-family: var(--grotesk); font-size: 0.68rem; font-weight: 500;
+    letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-3); margin-bottom: 1.2rem;
+  }
+  header.post h1 {
+    font-family: var(--grotesk); font-weight: 700; font-size: 2.6rem;
+    line-height: 1.1; letter-spacing: -0.03em; margin-bottom: 1.2rem;
+  }
+  .byline { font-size: 0.8rem; color: var(--text-3); }
+  .byline a { color: var(--text-3); }
+
+  article p, article li {
+    max-width: var(--max-w); margin-left: auto; margin-right: auto;
+    padding: 0 1.5rem; color: #2b2b2b;
+  }
+  article p { margin-bottom: 1.1rem; }
+  article ul { list-style: none; margin-bottom: 1.2rem; }
+  article ul li { position: relative; padding-left: 2.6rem; margin-bottom: 0.6rem; }
+  article ul li::before { content: '–'; position: absolute; left: 1.5rem; color: var(--text-3); }
+  article h2, figure { scroll-margin-top: 72px; }
+  article h2 {
+    max-width: var(--max-w); margin: 4rem auto 1.2rem; padding: 0 1.5rem;
+    font-family: var(--grotesk); font-size: 1.45rem; font-weight: 700; letter-spacing: -0.02em; line-height: 1.25;
+  }
+  article h2 .num { color: var(--text-4); margin-right: 0.5rem; }
+  .lead { font-size: 1.12rem; color: var(--text-2); }
+  .note { font-size: 0.82rem; color: var(--text-3); }
+
+  figure.wide { max-width: var(--wide-w); margin: 2rem auto 2.5rem; padding: 0 1.5rem; }
+  figure.text-w { max-width: var(--max-w); margin: 2rem auto 2.5rem; padding: 0 1.5rem; }
+  figcaption { font-size: 0.8rem; color: var(--text-3); line-height: 1.6; margin-top: 0.8rem; }
+  figure img { width: 100%; height: auto; display: block; background: #fff; border-radius: 6px; }
+
+  /* controls */
+  .chips { display: flex; flex-wrap: wrap; gap: 0.45rem; margin-bottom: 1rem; }
+  .chip, .btn {
+    font-family: var(--sans); font-size: 0.78rem; color: var(--text-2);
+    background: var(--surface); border: 1px solid var(--border); border-radius: 100px;
+    padding: 0.32rem 0.85rem; cursor: pointer; transition: border-color .15s, color .15s;
+  }
+  .chip:hover, .btn:hover { border-color: var(--text-3); color: var(--text); }
+  .chip[aria-pressed="true"] { border-color: var(--text); color: var(--text); font-weight: 500; }
+  .chip .done { color: var(--text-3); margin-left: 0.3rem; }
+  .btn.dark { background: var(--text); color: var(--bg); border-color: var(--text); }
+  .btn.dark:hover { opacity: 0.8; color: var(--bg); }
+  .more { font-size: 0.75rem; color: var(--text-3); align-self: center; margin-left: 0.3rem; }
+
+  /* player */
+  .player { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.9rem; }
+  .panel-head {
+    display: flex; align-items: baseline; gap: 0.6rem; margin-bottom: 0.35rem;
+    font-family: var(--grotesk); font-weight: 700; font-size: 1.05rem;
+  }
+  .panel-head .who { font-family: var(--sans); font-weight: 500; font-size: 0.82rem; }
+  .panel-head .who .kind { color: var(--text-3); font-weight: 400; margin-left: 0.35rem; }
+  .map-wrap { position: relative; border: 1px solid var(--border); border-radius: 6px; overflow: hidden; background: var(--ocean); }
+  .map-wrap canvas { display: block; width: 100%; }
+  .infobox {
+    display: flex; justify-content: space-between; flex-wrap: wrap; column-gap: 0.8rem;
+    font-size: 0.72rem; line-height: 1.45; color: var(--text-2); min-height: 2.9em; margin-bottom: 0.3rem;
+  }
+  .infobox b { color: var(--text); font-weight: 600; font-variant-numeric: tabular-nums; }
+  .clock { display: grid; grid-template-columns: 1.15fr 1fr 1.1fr; gap: 1.4rem; margin-top: 1.1rem; align-items: start; }
+  .clock > div { display: flex; flex-direction: column; }
+  .clock .day { font-family: var(--grotesk); font-weight: 700; font-size: 2.2rem; line-height: 1.1; }
+  .clock .date { color: var(--text-2); font-size: 0.95rem; margin-top: 0.2rem; }
+  .clock .obs { font-weight: 600; font-size: 0.9rem; margin-top: 0.5rem; min-height: 1.4em; }
+  .clock .caption { color: var(--text-2); font-size: 0.86rem; line-height: 1.55; min-height: 4.6em; }
+  .clock .legend { padding-top: 0.6rem; font-size: 0.76rem; color: var(--text-2); line-height: 1.9; }
+  .key-line { display: inline-block; width: 22px; height: 5px; background: #e8641f; border: 1.2px solid #2b2b2b; border-radius: 3px; vertical-align: middle; margin-right: 0.45rem; }
+  .obs-sw { display: inline-block; width: 10px; height: 10px; border-radius: 50%; border: 1.5px solid #222; margin-right: 0.4rem; vertical-align: -1px; }
+  .key-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--blind); margin: 0 0.6rem 0 0.4rem; vertical-align: middle; }
+  .transport { display: flex; align-items: center; gap: 0.8rem; margin-top: 1rem; }
+  .transport input[type=range] { flex: 1; accent-color: var(--text); }
+  .guess { margin-top: 1.2rem; padding: 1rem 1.1rem; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; }
+  .guess .q { font-weight: 500; font-size: 0.92rem; margin-bottom: 0.6rem; }
+  .guess .opts { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+  .guess .opts .btn { font-family: var(--grotesk); font-weight: 700; font-size: 0.9rem; padding: 0.35rem 1.3rem; }
+  .guess .step { font-size: 0.72rem; color: var(--text-3); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 0.2rem; }
+  .guess .hint { font-size: 0.8rem; color: var(--text-2); margin: -0.2rem 0 0.6rem; }
+  .guess .skip { font-size: 0.76rem; color: var(--text-3); background: none; border: none; text-decoration: underline; cursor: pointer; margin-left: 0.6rem; font-family: var(--sans); }
+  .guess .tally { font-size: 0.78rem; color: var(--text-3); margin-top: 0.4rem; }
+  .verdict { margin-top: 0.8rem; font-size: 0.9rem; }
+  .scores { width: 100%; border-collapse: collapse; margin-top: 0.8rem; font-size: 0.82rem; }
+  .scores td, .scores th { padding: 0.35rem 0.4rem; text-align: left; border-top: 1px solid var(--border); vertical-align: top; }
+  .scores th { font-weight: 500; color: var(--text-3); font-size: 0.72rem; border-top: none; }
+  .scores td.num { font-variant-numeric: tabular-nums; font-weight: 600; white-space: nowrap; }
+  .swatch { display: inline-block; width: 14px; height: 2px; vertical-align: middle; margin-right: 0.45rem; }
+
+  /* explainer */
+  .explain { display: grid; grid-template-columns: 3fr 2fr; gap: 1.2rem; align-items: start; }
+  .explain .map-wrap { cursor: crosshair; touch-action: none; }
+  .readout { font-size: 0.86rem; color: var(--text-2); }
+  .readout .big { font-family: var(--grotesk); font-weight: 700; font-size: 2rem; color: var(--text); line-height: 1.1; font-variant-numeric: tabular-nums; }
+  .readout .row { margin-top: 0.9rem; }
+  .readout .lbl { font-size: 0.72rem; color: var(--text-3); text-transform: uppercase; letter-spacing: 0.06em; }
+
+  /* scoreboard */
+  .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 1.5rem; }
+  .stat .v { font-family: var(--grotesk); font-weight: 700; font-size: 2rem; line-height: 1.1; font-variant-numeric: tabular-nums; }
+  .stat .k { font-size: 0.8rem; color: var(--text-2); line-height: 1.45; margin-top: 0.3rem; }
+  .sharebar { display: flex; height: 26px; border-radius: 4px; overflow: hidden; gap: 2px; margin: 0.4rem 0 0.4rem; }
+  .sharebar div { display: flex; align-items: center; padding-left: 0.5rem; color: #fff; font-size: 0.72rem; font-weight: 600; white-space: nowrap; overflow: hidden; }
+  .sharelegend { font-size: 0.76rem; color: var(--text-2); display: flex; gap: 1.2rem; flex-wrap: wrap; margin-bottom: 1rem; }
+  #worldmap { width: 100%; display: block; background: var(--ocean); border: 1px solid var(--border); border-radius: 6px; }
+  #worldmap path.track { fill: none; stroke-width: 2; stroke-linecap: round; cursor: pointer; }
+  #worldmap path.hit { fill: none; stroke: transparent; stroke-width: 14; cursor: pointer; }
+  #worldmap path.track.dim { opacity: 0.25; }
+  .tooltip {
+    position: fixed; pointer-events: none; z-index: 30; background: var(--surface); border: 1px solid var(--border);
+    border-radius: 6px; padding: 0.5rem 0.7rem; font-size: 0.76rem; line-height: 1.5; box-shadow: 0 4px 14px rgba(0,0,0,0.08);
+    display: none; min-width: 170px;
+  }
+  .tooltip .t { font-weight: 600; margin-bottom: 0.2rem; }
+  .tooltip .r { display: flex; justify-content: space-between; gap: 1rem; }
+  .tooltip .r b { font-variant-numeric: tabular-nums; }
+  details.table { margin-top: 1rem; font-size: 0.8rem; }
+  details.table summary { cursor: pointer; color: var(--text-2); }
+  details.table table { width: 100%; border-collapse: collapse; margin-top: 0.6rem; }
+  details.table td, details.table th { padding: 0.25rem 0.4rem; border-top: 1px solid var(--border); text-align: left; font-variant-numeric: tabular-nums; }
+  details.table th { color: var(--text-3); font-weight: 500; border-top: none; }
+  details.table td.best { font-weight: 600; }
+
+  /* toggle figure */
+  .seg { display: inline-flex; border: 1px solid var(--border); border-radius: 100px; overflow: hidden; margin-bottom: 0.8rem; background: var(--surface); }
+  .seg button { font-family: var(--sans); font-size: 0.78rem; padding: 0.32rem 0.95rem; border: none; background: none; color: var(--text-2); cursor: pointer; }
+  .seg button[aria-pressed="true"] { background: var(--text); color: var(--bg); }
+  .rho { font-size: 0.8rem; color: var(--text-2); margin-top: 0.6rem; }
+  .rho span { margin-right: 1rem; white-space: nowrap; }
+
+  .windkey { display: flex; align-items: center; gap: 0.8rem; font-size: 0.74rem; color: var(--text-2); margin-top: 0.6rem; flex-wrap: wrap; }
+  .windkey[hidden] { display: none; }
+  .windbar { flex: 1; min-width: 280px; max-width: 560px; }
+  .windbar .blocks { display: flex; gap: 2px; }
+  .windbar .blocks span { flex: 1; text-align: center; font-weight: 600; color: #fff; line-height: 1.7; border-radius: 2px; cursor: help; }
+  .windbar .blocks span.light { color: var(--text); }
+  .windbar .blocks span.none { font-weight: 400; }
+  .windbar .ticks { position: relative; height: 1.2rem; }
+  .windbar .ticks span { position: absolute; top: 0.1rem; transform: translateX(-50%); color: var(--text-3); font-variant-numeric: tabular-nums; }
+  .windkey .seg { margin-bottom: 0; }
+  .windkey .wlabel { max-width: 200px; line-height: 1.45; }
+  .ctrl { margin-top: 1.2rem; display: flex; flex-direction: column; gap: 0.4rem; font-size: 0.82rem; color: var(--text-2); }
+  .ctrl input[type=range] { accent-color: var(--text); width: 100%; }
+  .ctrl input[type=checkbox] { accent-color: var(--text); margin-right: 0.35rem; }
+  .btn[aria-pressed="true"] { border-color: var(--text); color: var(--text); font-weight: 500; }
+  footer {
+    max-width: var(--max-w); margin: 5rem auto 0; padding: 2.5rem 1.5rem 3rem;
+    border-top: 1px solid var(--border); font-size: 0.75rem; color: var(--text-3);
+    display: flex; justify-content: space-between; gap: 1rem; flex-wrap: wrap;
+  }
+  footer a { color: var(--text-3); }
+
+  @media (max-width: 760px) {
+    header.post h1 { font-size: 2rem; }
+    .player { grid-template-columns: 1fr; }
+    .clock { grid-template-columns: 1fr; gap: 0.6rem; }
+    .explain { grid-template-columns: 1fr; }
+    .stats { grid-template-columns: 1fr; }
+    .nav-links { display: none; }
+    .clock .caption { min-height: 0; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <a class="nav-name" href="../../">EdB</a>
+    <div class="nav-links">
+      <a href="#guess">Guess</a>
+      <a href="#score">Scoring</a>
+      <a href="#season">2025 season</a>
+      <a href="#intensity">Intensity</a>
+      <a href="#limits">Limits</a>
+    </div>
+  </div>
+</nav>
+
+<header class="post">
+  <div class="kicker">Blog · Weather forecasting</div>
+  <h1>Where will the storm go? AI weather models and the tropical cyclones of 2025</h1>
+  <p class="byline">Emmanuel de Bézenac · October 2026 · Companion to the paper
+    <a href="https://arxiv.org/abs/2610.22077" target="_blank">Can AI Forecast the Extremes? Evaluating Probabilistic Weather Models on Tropical Cyclones</a>,
+    joint work with Nathan Chalumeau and co-authors</p>
+</header>
+
+<article>
+  <p class="lead">AI weather models now match or beat the best physics-based forecasts on average scores. Whether they also work for rare, extreme events, where forecasts matter most, is still debated.</p>
+  <p>In our paper we compare three AI ensemble models (GenCast, FourCastNet&nbsp;3 and FGN) with ECMWF's operational physics-based ensemble, IFS-ENS, on 178 tropical cyclones between 2021 and 2025. This page shows the 2025 part of that comparison, using the forecasts themselves. It covers GenCast, FGN and IFS-ENS, in the versions that run operationally.</p>
+
+  <h2 id="guess"><span class="num">1</span>Guess the physics model</h2>
+  <p>Each panel is a 15-day ensemble forecast started about 12 hours before the storm was first observed. Each dot is the storm centre in one of the 49 members of the ensemble, and the thick outlined line is the observed track from IBTrACS. Tracks and dots are coloured by wind speed, on the same scale for the observation and the forecasts. One panel is IFS-ENS, ECMWF's physics-based ensemble. The other two are AI models from Google DeepMind: GenCast and FGN. Play the forecast, choose the panel you think is the physics model, then tell the two AI models apart.</p>
+
+  <figure class="wide" id="player-fig">
+    <div class="chips" id="storm-chips" role="group" aria-label="Storm"></div>
+    <div class="player" id="player"></div>
+    <div class="transport">
+      <button class="btn dark" id="play" type="button">Play</button>
+      <input type="range" id="scrub" min="0" max="1" step="1" value="0" aria-label="Forecast time">
+    </div>
+    <div class="windkey" id="windkey">
+      <div class="seg" id="windcorr" role="group" aria-label="Forecast wind">
+        <button type="button" data-v="raw" aria-pressed="true">Forecast wind</button>
+        <button type="button" data-v="rank" aria-pressed="false">Rank-corrected</button>
+      </div>
+      <span class="wlabel">Wind speed, observed and in each member. Hover over a category for what it means.</span>
+      <div class="windbar" id="windbar"></div>
+    </div>
+    <div id="clockrow"></div>
+    <div class="guess" id="guess-box"></div>
+    <figcaption>Storm positions are found in each member with the TempestExtremes tracker and matched to the observed IBTrACS track. Members in which the storm is not found are not shown; the percentage above each panel counts the members in which it is. Panel order changes between storms. Observed wind: the 1-minute sustained wind of IBTrACS (USA agencies), grey where IBTrACS reports none (usually before the storm forms and after it becomes post-tropical). Forecast wind: the strongest 10&nbsp;m wind the tracker finds near the storm centre in each member. The models give the wind on a grid of about 25&nbsp;km, which smooths the peak, so their values are lower than the observed ones even for an exact forecast (see section 4). "Rank-corrected" removes this difference in the same way as the "ranks only" view of section 4: each member wind is replaced by its rank among all the winds of its model (41 storms, all lead times), then by the IBTrACS wind with the same rank. A member in the top 10% of its model's winds is then shown with the wind of the top 10% of observed winds. The correction is the same at every lead time, and it does not change which members are strong or weak within a model.</figcaption>
+  </figure>
+
+  <h2 id="score"><span class="num">2</span>Scoring a forecast made of 49 storms</h2>
+  <p>An ensemble does not give one track. It gives 49 possible positions at each time. Earlier evaluations average the members into a mean track and measure its distance to the observed storm. This discards the spread: two ensembles with the same mean can differ completely, and when the members split into two groups the mean can fall between them, where no member is.</p>
+  <p>We score the ensemble as a probability distribution instead. The member positions are smoothed into a probability density (kernel density estimation), and the score is minus the logarithm of that density at the observed position: the negative log-likelihood, or NLL. Lower is better. A forecast scores badly when it is confident and wrong, and also when it is spread so widely that it says little. Drag the black dot to see how the score changes with the position of the storm. The smoothing width also matters: too narrow and the density is a set of spikes around each member, too wide and every position gets a similar score.</p>
+
+  <figure class="wide">
+    <div class="chips" id="explain-models" role="group" aria-label="Model"></div>
+    <div class="explain">
+      <div class="map-wrap" id="explain-wrap"><canvas id="explain-canvas"></canvas></div>
+      <div>
+        <div class="readout" id="explain-readout"></div>
+        <div class="ctrl">
+          <label><input type="checkbox" id="show-mean"> Show the ensemble mean position</label>
+          <label for="bw">Smoothing width: <b id="bw-val"></b></label>
+          <input type="range" id="bw" min="0.4" max="3" step="0.05" value="1">
+        </div>
+      </div>
+    </div>
+    <figcaption id="explain-caption"></figcaption>
+  </figure>
+
+  <h2 id="season"><span class="num">3</span>The 2025 season: 41 storms</h2>
+  <p>We scored every 2025 storm that reached 64&nbsp;kt and that all three models tracked in at least 10 members at 5 or more common times: 41 storms in total. For each storm, the NLL is averaged over these times.</p>
+
+  <figure class="wide">
+    <div class="chips" id="basin-filter" role="group" aria-label="Basin"></div>
+    <div class="stats" id="stats"></div>
+    <div class="note">Lowest NLL of the three models, share of the 41 storms</div>
+    <div class="sharebar" id="sharebar"></div>
+    <div class="sharelegend" id="sharelegend"></div>
+    <svg id="worldmap" role="img" aria-label="Map of the 41 storms of 2025, coloured by the model with the lowest NLL"></svg>
+    <figcaption>Observed tracks of the 41 storms, coloured by the model with the lowest track NLL. Hover over a track for the three scores; click it to open the storm in the player above.</figcaption>
+    <details class="table"><summary>Table of the 41 storms</summary><table id="storm-table"></table></details>
+  </figure>
+
+  <p>FGN, the most recent model, puts more probability on the observed positions than IFS-ENS for 90% of the storms. GenCast does so for 78%. No model is best everywhere: IFS-ENS is best on three storms, and the ranking between FGN and GenCast changes from storm to storm. Choose two models below to compare them storm by storm.</p>
+
+  <figure class="wide"><div id="duel"></div></figure>
+
+  <p>The advantage also depends on how far ahead the forecast is. Each scored time of each storm counts once below, grouped by forecast day.</p>
+
+  <figure class="wide"><div id="leadtime"></div></figure>
+
+  <p>From day 1 to day 10, FGN has the lowest NLL at about half of the scored times, GenCast at 33 to 48%, and IFS-ENS at 4 to 13%. After day 10 few storms are still being tracked by all three models, so those columns rest on a few cases.</p>
+
+  <h2 id="intensity"><span class="num">4</span>The right place, but too weak</h2>
+  <p>The damage a cyclone does depends on its intensity as much as on its position. Here the AI models are weaker than the reference. Compared with HRES-fc0, the ECMWF analysis on which both were fine-tuned, FGN and GenCast underestimate the maximum 10&nbsp;m wind by about 15 to 20% between 2 and 9 days of lead time. IFS-ENS stays within about 10%. The AI models' bias is close to that of ERA5, the older reanalysis on which they were first trained. This suggests that the training data play a role, but our evaluation does not establish it.</p>
+
+  <figure class="wide"><div id="bias-chart"></div></figure>
+
+  <p>Do the weak storms still behave like cyclones? In a cyclone, lower central pressure goes with stronger wind. Below, each source contributes the minimum pressure and maximum wind of every member at every time. The AI models and ERA5 sit at weaker winds and higher pressures than HRES-fc0 and the observations. Replacing each value by its rank within its own dataset removes these differences in intensity. What remains is how wind varies with pressure, and it is nearly the same for every source.</p>
+
+  <figure class="wide"><div id="pw-chart"></div>
+    <figcaption>2025 storms, all lead times pooled, at times matched to IBTrACS observations. For each source the contours enclose about 70% (dashed) and 30% (solid) of its points; the curves along the axes are the distributions of pressure and wind alone. "Ranks only" replaces each value by its rank within its own source, which removes the differences in intensity and keeps how wind depends on pressure.</figcaption>
+  </figure>
+
+  <p>The models therefore reproduce how wind depends on pressure, and their error is in intensity. This holds for FGN, whose training loss scores each variable at each grid point separately and does not constrain how variables depend on each other.</p>
+
+  <h2 id="limits"><span class="num">5</span>What this shows and what it does not</h2>
+  <ul>
+    <li>Each storm has one forecast start time, about 12 hours before its first observation. Forecasts started closer to landfall are more accurate for every model.</li>
+    <li>Members in which the tracker does not find the storm are not scored. The paper reports the detection rate separately; on average it is similar for FGN and GenCast and lower for IFS-ENS in 2025.</li>
+    <li>NLL has no upper bound. A single time at which the storm is far from every member can dominate a storm's average. This is the case for GenCast on Typhoon Halong.</li>
+    <li>2025 is one season. In 2021–2023, with the models trained on ERA5, GenCast, FourCastNet&nbsp;3 and IFS-ENS were much closer to each other.</li>
+    <li>Reproducing a physical relationship such as the dependence of wind on pressure does not show that a model has learned the underlying physics.</li>
+  </ul>
+  <p>The paper has the full evaluation: forecast skill in the fields around the storm, the location of the strongest winds, ensemble calibration, and the 2021–2023 comparison with FourCastNet&nbsp;3. <a href="https://arxiv.org/abs/2610.22077" target="_blank">Read it on arXiv</a>.</p>
+  <p class="note">Data: IBTrACS (observed tracks), ECMWF (IFS-ENS, HRES-fc0), Google WeatherNext (GenCast and FGN operational forecasts). Storm descriptions in the player are from the NHC, JTWC, JMA, PAGASA and other agencies; sources are listed in the code that produced the data.</p>
+</article>
+
+<footer>
+  <span>© 2026 Emmanuel de Bézenac</span>
+  <a href="../../">← Home</a>
+</footer>
+
+<div class="tooltip" id="tooltip"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/topojson/3.0.2/topojson.min.js"></script>
+<script src="js/intensity.js"></script>
+<script src="js/season-extra.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>
