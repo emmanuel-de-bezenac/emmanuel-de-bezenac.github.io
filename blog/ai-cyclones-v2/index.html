@@ -134,16 +134,28 @@
   .hist { display: block; width: 100%; margin-top: 0.45rem; }
   .histnote { font-size: 0.72rem; color: var(--text-2); min-height: 1.45em; line-height: 1.45; }
   .histnote b { color: var(--text); font-weight: 600; font-variant-numeric: tabular-nums; }
-  .clock { display: grid; grid-template-columns: 1.15fr 1fr 1.1fr; gap: 1.4rem; margin-top: 1.1rem; align-items: start; }
-  .clock > div { display: flex; flex-direction: column; }
+  .stormhead { display: flex; justify-content: space-between; align-items: baseline; gap: 0.4rem 1.5rem; flex-wrap: wrap; margin: 0.4rem 0 0.9rem; }
+  .stormhead .name { font-family: var(--grotesk); font-weight: 700; font-size: 1.35rem; letter-spacing: -0.01em; line-height: 1.25; }
+  .stormhead .impact { flex-basis: 100%; order: 3; color: #b02a1a; font-size: 0.88rem; line-height: 1.5; }
+  .stormhead .init { color: var(--text-3); font-size: 0.8rem; }
+  .windcard { display: grid; grid-template-columns: 1fr 1.15fr; gap: 1rem 1.8rem; align-items: start; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 0.9rem 1.1rem; margin-bottom: 1.1rem; }
+  .wc-label { font-size: 0.68rem; color: var(--text-3); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.35rem; }
+  .seg.big { margin-bottom: 0.5rem; }
+  .seg.big button { font-size: 0.86rem; padding: 0.42rem 1.05rem; font-weight: 500; }
+  .wc-explain { font-size: 0.8rem; color: var(--text-2); line-height: 1.55; min-height: 3.1em; }
+  .wc-legend { display: flex; flex-wrap: wrap; gap: 0.2rem 1.1rem; font-size: 0.74rem; color: var(--text-2); margin-top: 0.35rem; }
+  .wc-legend span:last-child { color: var(--text-3); }
+  .clock { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr); gap: 0.4rem 1.4rem; margin-top: 0.7rem; align-items: start; }
+  .transport .now { display: flex; flex-direction: column; line-height: 1.15; min-width: 8.5rem; }
+  .transport .now .day { font-family: var(--grotesk); font-weight: 700; font-size: 1.35rem; }
+  .transport .now .date { color: var(--text-2); font-size: 0.78rem; }
   .clock .day { font-family: var(--grotesk); font-weight: 700; font-size: 2.2rem; line-height: 1.1; }
   .clock .date { color: var(--text-2); font-size: 0.95rem; margin-top: 0.2rem; }
-  .clock .obs { font-weight: 600; font-size: 0.9rem; margin-top: 0.5rem; min-height: 1.4em; }
-  .clock .caption { color: var(--text-2); font-size: 0.86rem; line-height: 1.55; min-height: 4.6em; }
-  .clock .legend { padding-top: 0.6rem; font-size: 0.76rem; color: var(--text-2); line-height: 1.9; }
+  .clock .obs { font-weight: 600; font-size: 0.9rem; min-height: 1.4em; }
+  .clock .caption { color: var(--text-2); font-size: 0.86rem; line-height: 1.55; min-height: 3.1em; }
   .key-line { display: inline-block; width: 22px; height: 5px; background: #e8641f; border: 1.2px solid #2b2b2b; border-radius: 3px; vertical-align: middle; margin-right: 0.45rem; }
   .obs-sw { display: inline-block; width: 10px; height: 10px; border-radius: 50%; border: 1.5px solid #222; margin-right: 0.4rem; vertical-align: -1px; }
-  .key-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--blind); margin: 0 0.6rem 0 0.4rem; vertical-align: middle; }
+  .key-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--text-3); margin: 0 0.6rem 0 0.4rem; vertical-align: middle; }
   .transport { display: flex; align-items: center; gap: 0.8rem; margin-top: 1rem; }
   .transport input[type=range] { flex: 1; accent-color: var(--text); }
   .guess { margin-top: 1.2rem; padding: 1rem 1.1rem; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; }
@@ -202,17 +214,13 @@
   .rho { font-size: 0.8rem; color: var(--text-2); margin-top: 0.6rem; }
   .rho span { margin-right: 1rem; white-space: nowrap; }
 
-  .windkey { display: flex; align-items: center; gap: 0.8rem; font-size: 0.74rem; color: var(--text-2); margin-top: 0.6rem; flex-wrap: wrap; }
-  .windkey[hidden] { display: none; }
-  .windbar { flex: 1; min-width: 280px; max-width: 560px; }
+  .windbar { font-size: 0.74rem; }
   .windbar .blocks { display: flex; gap: 2px; }
   .windbar .blocks span { flex: 1; text-align: center; font-weight: 600; color: #fff; line-height: 1.7; border-radius: 2px; cursor: help; }
   .windbar .blocks span.light { color: var(--text); }
   .windbar .blocks span.none { font-weight: 400; }
   .windbar .ticks { position: relative; height: 1.2rem; }
   .windbar .ticks span { position: absolute; top: 0.1rem; transform: translateX(-50%); color: var(--text-3); font-variant-numeric: tabular-nums; }
-  .windkey .seg { margin-bottom: 0; }
-  .windkey .wlabel { max-width: 200px; line-height: 1.45; }
   .ctrl { margin-top: 1.2rem; display: flex; flex-direction: column; gap: 0.4rem; font-size: 0.82rem; color: var(--text-2); }
   .ctrl input[type=range] { accent-color: var(--text); width: 100%; }
   .ctrl input[type=checkbox] { accent-color: var(--text); margin-right: 0.35rem; }
@@ -228,6 +236,7 @@
     header.post h1 { font-size: 2rem; }
     .player { grid-template-columns: 1fr; }
     .clock { grid-template-columns: 1fr; gap: 0.6rem; }
+    .windcard { grid-template-columns: 1fr; }
     .explain { grid-template-columns: 1fr; }
     .stats { grid-template-columns: 1fr; }
     .nav-links { display: none; }
@@ -263,26 +272,38 @@
   <p>In our paper we compare three AI ensemble models (GenCast, FourCastNet&nbsp;3 and FGN) with ECMWF's operational physics-based ensemble, IFS-ENS, on 178 tropical cyclones between 2021 and 2025. This page shows the 2025 part of that comparison, using the forecasts themselves. It covers GenCast, FGN and IFS-ENS, in the versions that run operationally.</p>
 
   <h2 id="guess"><span class="num">1</span>Guess the physics model</h2>
-  <p>Each panel is a 15-day ensemble forecast started about 12 hours before the storm was first observed. Each dot is the storm centre in one of the 49 members of the ensemble, and the thick outlined line is the observed track from IBTrACS. Tracks and dots are coloured by wind speed, on the same scale for the observation and the forecasts. One panel is IFS-ENS, ECMWF's physics-based ensemble. The other two are AI models from Google DeepMind: GenCast and FGN. Play the forecast, choose the panel you think is the physics model, then tell the two AI models apart.</p>
+  <p>Each panel is a 15-day ensemble forecast started about 12 hours before the storm was first observed. Each dot is the storm centre in one of the 49 members of the ensemble, and the thick outlined line is the observed track from IBTrACS. Tracks and dots are coloured by wind speed, on the same scale for the observation and the forecasts, and the histogram under each map shows the members' winds next to the observed one. The models' winds are weaker than the observed winds; switch to "Rescaled to observations" to compare them on the observed scale. One panel is IFS-ENS, ECMWF's physics-based ensemble. The other two are AI models from Google DeepMind: GenCast and FGN. Play the forecast, choose the panel you think is the physics model, then tell the two AI models apart.</p>
 
   <figure class="wide" id="player-fig">
     <div class="chips" id="storm-chips" role="group" aria-label="Storm"></div>
+    <div class="stormhead" id="stormhead"></div>
+    <div class="windcard">
+      <div>
+        <div class="wc-label">Forecast wind shown as</div>
+        <div class="seg big" id="windcorr" role="group" aria-label="Forecast wind shown as">
+          <button type="button" data-v="raw" aria-pressed="true">Model winds</button>
+          <button type="button" data-v="rank" aria-pressed="false">Rescaled to observations</button>
+        </div>
+        <div class="wc-explain" id="wc-explain"></div>
+      </div>
+      <div>
+        <div class="windbar" id="windbar"></div>
+        <div class="wc-legend">
+          <span><span class="key-line"></span>observed track and wind</span>
+          <span><span class="key-dot"></span>storm centre in one member</span>
+          <span>Hover over a category for what it means.</span>
+        </div>
+      </div>
+    </div>
     <div class="player" id="player"></div>
     <div class="transport">
       <button class="btn dark" id="play" type="button">Play</button>
+      <div class="now"><span class="day" id="now-day"></span><span class="date" id="now-date"></span></div>
       <input type="range" id="scrub" min="0" max="1" step="1" value="0" aria-label="Forecast time">
-    </div>
-    <div class="windkey" id="windkey">
-      <div class="seg" id="windcorr" role="group" aria-label="Forecast wind">
-        <button type="button" data-v="raw" aria-pressed="true">Forecast wind</button>
-        <button type="button" data-v="rank" aria-pressed="false">Rank-corrected</button>
-      </div>
-      <span class="wlabel">Wind speed, observed and in each member. Hover over a category for what it means.</span>
-      <div class="windbar" id="windbar"></div>
     </div>
     <div id="clockrow"></div>
     <div class="guess" id="guess-box"></div>
-    <figcaption>Storm positions are found in each member with the TempestExtremes tracker and matched to the observed IBTrACS track. Members in which the storm is not found are not shown; the percentage above each panel counts the members in which it is. Panel order changes between storms. Observed wind: the 1-minute sustained wind of IBTrACS (USA agencies), grey where IBTrACS reports none (usually before the storm forms and after it becomes post-tropical). Forecast wind: the strongest 10&nbsp;m wind the tracker finds near the storm centre in each member. The models give the wind on a grid of about 25&nbsp;km, which smooths the peak, so their values are lower than the observed ones even for an exact forecast (see section 4). "Rank-corrected" removes this difference in the same way as the "ranks only" view of section 4: each member wind is replaced by its rank among all the winds of its model (41 storms, all lead times), then by the IBTrACS wind with the same rank. A member in the top 10% of its model's winds is then shown with the wind of the top 10% of observed winds. The correction is the same at every lead time, and it does not change which members are strong or weak within a model. Under each map, the histogram counts the members by their wind at the time shown (2.5&nbsp;m/s per bar, same vertical scale in the three panels), and the black line is the IBTrACS wind at that time.</figcaption>
+    <figcaption>Storm positions are found in each member with the TempestExtremes tracker and matched to the observed track. Members in which the storm is not found are not shown and not counted in the histograms. Panel order changes between storms. Observed: IBTrACS track and 1-minute sustained wind (USA agencies); the track is grey where IBTrACS reports no wind, usually before the storm forms and after it becomes post-tropical. Model winds: the strongest 10&nbsp;m wind the tracker finds near the storm centre in each member. Rescaled to observations: the rank of each member's wind among all the winds of its model (41 storms, all lead times) is kept, and the value is replaced by the observed wind of the same rank; the rescaling is the same at every lead time. Histograms: members by wind at the time shown, 2.5&nbsp;m/s per bar, one vertical scale for the three panels; the black line is the observed wind.</figcaption>
   </figure>
 
   <h2 id="score"><span class="num">2</span>Scoring a forecast made of 49 storms</h2>
@@ -363,8 +384,8 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/topojson/3.0.2/topojson.min.js"></script>
-<script src="js/intensity.js"></script>
-<script src="js/season-extra.js"></script>
-<script src="js/main.js"></script>
+<script src="js/intensity.js?v=3"></script>
+<script src="js/season-extra.js?v=3"></script>
+<script src="js/main.js?v=3"></script>
 </body>
 </html>

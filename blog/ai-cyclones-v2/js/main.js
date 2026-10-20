@@ -182,12 +182,20 @@
     block('no data', NO_WIND, 'No wind reported', [], 'IBTrACS has no wind from the USA agencies at these times, usually before the storm forms and after it becomes post-tropical.').classList.add('none');
     const unit = el('span', {}, 'm/s'); unit.style.left = `${100 * CATS.length / (CATS.length + 1)}%`; ticks.append(unit);
     bar.append(blocks, ticks);
-    const seg = document.getElementById('windcorr');
-    seg.querySelectorAll('button').forEach(b => b.addEventListener('click', () => {
-      player.corrected = b.dataset.v === 'rank';
-      seg.querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', String(x === b)));
-      draw();
-    }));
+    const seg = document.getElementById('windcorr'), explain = document.getElementById('wc-explain');
+    const EXPLAIN = {
+      raw: 'The 10 m wind each model gives near the storm centre. The models compute wind on a grid of about 25 km, ' +
+           'which smooths the peak, so even an exact forecast is weaker than the observed wind.',
+      rank: 'Each member\'s wind is replaced by the observed wind of the same rank among all 2025 winds of its model, ' +
+            'as in the "ranks only" view of section 4. This removes each model\'s overall bias; which members are strong or weak does not change.',
+    };
+    const setMode = v => {
+      player.corrected = v === 'rank';
+      seg.querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', String(x.dataset.v === v)));
+      explain.textContent = EXPLAIN[v];
+    };
+    setMode('raw');
+    seg.querySelectorAll('button').forEach(b => b.addEventListener('click', () => { setMode(b.dataset.v); draw(); }));
   }
   const playBtn = document.getElementById('play');
   const scrub = document.getElementById('scrub');
@@ -250,28 +258,16 @@
       root.append(cell);
       player.panels.push({ model: m, canvas, info, wrapEl, hist, histNote });
     });
+    const head = document.getElementById('stormhead');
+    head.replaceChildren(el('div', { class: 'name' }, storm.title || `${storm.name}, ${storm.init.slice(0, 4)}`),
+      el('div', { class: 'init' }, `All forecasts started ${fmtDate(new Date(storm.init.replace('Z', ':00Z')))}`));
+    if (storm.impact) head.append(el('div', { class: 'impact' }, storm.impact));
     const clock = el('div', { class: 'clock' });
     player.clock = {
-      day: el('div', { class: 'day' }), date: el('div', { class: 'date' }),
+      day: document.getElementById('now-day'), date: document.getElementById('now-date'),
       obs: el('div', { class: 'obs' }), caption: el('div', { class: 'caption' }),
     };
-    const title = el('div', { class: 'date' });
-    title.style.fontWeight = '600'; title.style.color = 'var(--text)';
-    title.textContent = storm.title || `${storm.name}, ${storm.init.slice(0, 4)}`;
-    const impact = el('div', { class: 'caption' }, storm.impact || '');
-    impact.style.minHeight = '0'; impact.style.color = '#b02a1a';
-    const legend = el('div', { class: 'legend' });
-    const l1 = el('div'); l1.append(el('span', { class: 'key-line' }), document.createTextNode(`${storm.name}, observed (IBTrACS)`));
-    const l2 = el('div'); const dot = el('span', { class: 'key-dot' });
-    dot.style.background = 'var(--text-3)';
-    l2.append(dot, document.createTextNode('storm centre in one member'));
-    const l3 = el('div', {}, `Forecasts started ${fmtDate(new Date(storm.init.replace('Z', ':00Z')))}`);
-    legend.append(l1, l2, l3);
-    const colA = el('div'), colB = el('div'), colC = el('div');
-    colA.append(title, impact, legend);
-    colB.append(player.clock.day, player.clock.date, player.clock.obs);
-    colC.append(player.clock.caption);
-    clock.append(colA, colB, colC);
+    clock.append(player.clock.obs, player.clock.caption);
     document.getElementById('clockrow').replaceChildren(clock);
     resizePlayer();
     renderGuess();
@@ -322,7 +318,7 @@
       ctx.fillStyle = '#2b2b2b'; ctx.fillRect(x - 1, HIST_TOP - 2, 2, base - HIST_TOP + 2);
       ctx.font = '600 10px Inter, system-ui, sans-serif'; ctx.textBaseline = 'alphabetic';
       ctx.textAlign = x > W * 0.6 ? 'right' : 'left';
-      ctx.fillText(`IBTrACS ${Math.round(obsMs)} m/s`, x + (x > W * 0.6 ? -4 : 4), HIST_TOP - 4);
+      ctx.fillText('observed', x + (x > W * 0.6 ? -4 : 4), HIST_TOP - 4);
     }
   }
 
@@ -406,7 +402,7 @@
       p.histNote.replaceChildren();
       if (obsMs != null && winds.length) {
         const weaker = winds.filter(w => w < obsMs).length;
-        p.histNote.append(document.createTextNode('IBTrACS stronger than '),
+        p.histNote.append(document.createTextNode('observed wind above '),
           el('b', {}, weaker === winds.length ? `all ${winds.length}` : `${weaker} of ${winds.length}`),
           document.createTextNode(` members (${Math.round(100 * weaker / winds.length)}%)`));
       }
@@ -421,7 +417,7 @@
     c.obs.replaceChildren();
     if (kt != null) {
       const sw = el('span', { class: 'obs-sw' }); sw.style.background = windColor(kt * KT);
-      c.obs.append(sw, document.createTextNode(`Observed: ${category(kt)}, ${Math.round(kt)} kt (${Math.round(kt * KT)} m/s)`));
+      c.obs.append(sw, document.createTextNode(`Observed: ${category(kt)}, ${Math.round(kt * KT)} m/s (${Math.round(kt)} kt)`));
     }
     const ev = storm.events.filter(e => e[0] <= t).pop();
     c.caption.textContent = ev ? ev[1] : '';
