@@ -131,6 +131,9 @@
     font-size: 0.72rem; line-height: 1.45; color: var(--text-2); min-height: 2.9em; margin-bottom: 0.3rem;
   }
   .infobox b { color: var(--text); font-weight: 600; font-variant-numeric: tabular-nums; }
+  .hist { display: block; width: 100%; margin-top: 0.45rem; }
+  .histnote { font-size: 0.72rem; color: var(--text-2); min-height: 1.45em; line-height: 1.45; }
+  .histnote b { color: var(--text); font-weight: 600; font-variant-numeric: tabular-nums; }
   .clock { display: grid; grid-template-columns: 1.15fr 1fr 1.1fr; gap: 1.4rem; margin-top: 1.1rem; align-items: start; }
   .clock > div { display: flex; flex-direction: column; }
   .clock .day { font-family: var(--grotesk); font-weight: 700; font-size: 2.2rem; line-height: 1.1; }
@@ -279,7 +282,7 @@
     </div>
     <div id="clockrow"></div>
     <div class="guess" id="guess-box"></div>
-    <figcaption>Storm positions are found in each member with the TempestExtremes tracker and matched to the observed IBTrACS track. Members in which the storm is not found are not shown; the percentage above each panel counts the members in which it is. Panel order changes between storms. Observed wind: the 1-minute sustained wind of IBTrACS (USA agencies), grey where IBTrACS reports none (usually before the storm forms and after it becomes post-tropical). Forecast wind: the strongest 10&nbsp;m wind the tracker finds near the storm centre in each member. The models give the wind on a grid of about 25&nbsp;km, which smooths the peak, so their values are lower than the observed ones even for an exact forecast (see section 4). "Rank-corrected" removes this difference in the same way as the "ranks only" view of section 4: each member wind is replaced by its rank among all the winds of its model (41 storms, all lead times), then by the IBTrACS wind with the same rank. A member in the top 10% of its model's winds is then shown with the wind of the top 10% of observed winds. The correction is the same at every lead time, and it does not change which members are strong or weak within a model.</figcaption>
+    <figcaption>Storm positions are found in each member with the TempestExtremes tracker and matched to the observed IBTrACS track. Members in which the storm is not found are not shown; the percentage above each panel counts the members in which it is. Panel order changes between storms. Observed wind: the 1-minute sustained wind of IBTrACS (USA agencies), grey where IBTrACS reports none (usually before the storm forms and after it becomes post-tropical). Forecast wind: the strongest 10&nbsp;m wind the tracker finds near the storm centre in each member. The models give the wind on a grid of about 25&nbsp;km, which smooths the peak, so their values are lower than the observed ones even for an exact forecast (see section 4). "Rank-corrected" removes this difference in the same way as the "ranks only" view of section 4: each member wind is replaced by its rank among all the winds of its model (41 storms, all lead times), then by the IBTrACS wind with the same rank. A member in the top 10% of its model's winds is then shown with the wind of the top 10% of observed winds. The correction is the same at every lead time, and it does not change which members are strong or weak within a model. Under each map, the histogram counts the members by their wind at the time shown (2.5&nbsp;m/s per bar, same vertical scale in the three panels), and the black line is the IBTrACS wind at that time.</figcaption>
   </figure>
 
   <h2 id="score"><span class="num">2</span>Scoring a forecast made of 49 storms</h2>

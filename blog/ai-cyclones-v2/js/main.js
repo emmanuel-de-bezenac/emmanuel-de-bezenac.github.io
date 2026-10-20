@@ -245,9 +245,10 @@
       const canvas = el('canvas');
       const info = el('div', { class: 'infobox' });
       wrapEl.append(canvas);
-      cell.append(head, info, wrapEl);
+      const hist = el('canvas', { class: 'hist' }), histNote = el('div', { class: 'histnote' });
+      cell.append(head, info, wrapEl, hist, histNote);
       root.append(cell);
-      player.panels.push({ model: m, canvas, info, wrapEl });
+      player.panels.push({ model: m, canvas, info, wrapEl, hist, histNote });
     });
     const clock = el('div', { class: 'clock' });
     player.clock = {
@@ -285,16 +286,52 @@
     for (const p of player.panels) {
       p.canvas.width = width * dpr; p.canvas.height = player.frame.height * dpr;
       p.canvas.style.height = player.frame.height + 'px';
+      p.hist.width = width * dpr; p.hist.height = HIST_H * dpr; p.hist.style.height = HIST_H + 'px';
       p.base = base; p.dpr = dpr;
     }
     draw();
   }
   window.addEventListener('resize', () => { resizePlayer(); resizeExplain(); });
 
+  // histogram of the member winds at the current time, one bar per 2.5 m/s from 0 to 85 m/s
+  const HIST_H = 78, HIST_MAX = 85, HIST_BIN = 2.5, HIST_TOP = 16, HIST_AXIS = 15;
+  const histCounts = winds => {
+    const c = new Array(Math.round(HIST_MAX / HIST_BIN)).fill(0);
+    for (const w of winds) if (w != null) c[Math.min(c.length - 1, Math.floor(Math.max(0, w) / HIST_BIN))]++;
+    return c;
+  };
+  function drawHist(p, counts, yMax, obsMs) {
+    const ctx = p.hist.getContext('2d'), W = p.hist.width / p.dpr;
+    ctx.setTransform(p.dpr, 0, 0, p.dpr, 0, 0);
+    ctx.clearRect(0, 0, W, HIST_H);
+    const X = w => w / HIST_MAX * W, base = HIST_H - HIST_AXIS, hMax = base - HIST_TOP;
+    counts.forEach((n, i) => {
+      if (!n) return;
+      const h = Math.max(2, n / yMax * hMax);
+      ctx.fillStyle = windColor((i + 0.5) * HIST_BIN);
+      ctx.fillRect(X(i * HIST_BIN) + 0.5, base - h, X(HIST_BIN) - 1, h);
+    });
+    ctx.fillStyle = '#ece9e4'; ctx.fillRect(0, base, W, 1);
+    ctx.font = '10px Inter, system-ui, sans-serif'; ctx.fillStyle = '#8a8a8a'; ctx.textBaseline = 'top';
+    for (const w of [0, 20, 40, 60, 80]) {
+      ctx.textAlign = w === 0 ? 'left' : 'center';
+      ctx.fillText(w === 80 ? '80 m/s' : String(w), X(w), base + 3);
+    }
+    if (obsMs != null) {
+      const x = Math.min(W - 1, X(Math.min(obsMs, HIST_MAX)));
+      ctx.fillStyle = '#2b2b2b'; ctx.fillRect(x - 1, HIST_TOP - 2, 2, base - HIST_TOP + 2);
+      ctx.font = '600 10px Inter, system-ui, sans-serif'; ctx.textBaseline = 'alphabetic';
+      ctx.textAlign = x > W * 0.6 ? 'right' : 'left';
+      ctx.fillText(`IBTrACS ${Math.round(obsMs)} m/s`, x + (x > W * 0.6 ? -4 : 4), HIST_TOP - 4);
+    }
+  }
+
   function draw() {
     const storm = player.storm, t = player.t, F = player.frame;
     if (!storm || !F) return;
     const obsPts = storm.obs;     // [h, lon, lat, wind_kt]
+    const obsKt = obsWindAt(storm.obs, t), obsMs = obsKt == null ? null : obsKt * KT;
+    const hists = [];
     for (const p of player.panels) {
       const ctx = p.canvas.getContext('2d');
       ctx.setTransform(p.dpr, 0, 0, p.dpr, 0, 0);
@@ -364,7 +401,19 @@
         document.createTextNode(` members (${Math.round(100 * n / N_MEMBERS)}%)`));
       score.append(document.createTextNode('track NLL so far: '), el('b', {}, nll));
       p.info.replaceChildren(found, score);
+      const winds = dots.map(d => d[2]).filter(w => w != null);
+      hists.push([p, histCounts(winds)]);
+      p.histNote.replaceChildren();
+      if (obsMs != null && winds.length) {
+        const weaker = winds.filter(w => w < obsMs).length;
+        p.histNote.append(document.createTextNode('IBTrACS stronger than '),
+          el('b', {}, weaker === winds.length ? `all ${winds.length}` : `${weaker} of ${winds.length}`),
+          document.createTextNode(` members (${Math.round(100 * weaker / winds.length)}%)`));
+      }
     }
+    // one vertical scale for the three panels, so their bar heights compare
+    const yMax = Math.max(5, ...hists.map(([, c]) => Math.max(...c)));
+    for (const [p, counts] of hists) drawHist(p, counts, yMax, obsMs);
     const c = player.clock;
     c.day.textContent = `Day ${(t / 24).toFixed(1)}`;
     c.date.textContent = fmtDate(new Date(Date.parse(storm.init.replace('Z', ':00Z')) + t * 3600e3));
