@@ -132,7 +132,7 @@
   }
   .infobox b { color: var(--text); font-weight: 600; font-variant-numeric: tabular-nums; }
   .hist { display: block; width: 100%; margin-top: 0.45rem; }
-  .histnote { font-size: 0.72rem; color: var(--text-2); min-height: 1.45em; line-height: 1.45; }
+  .histnote { font-size: 0.72rem; color: var(--text-2); min-height: 2.9em; line-height: 1.45; }
   .histnote b { color: var(--text); font-weight: 600; font-variant-numeric: tabular-nums; }
   .stormhead { display: flex; justify-content: space-between; align-items: baseline; gap: 0.4rem 1.5rem; flex-wrap: wrap; margin: 0.4rem 0 0.9rem; }
   .stormhead .name { font-family: var(--grotesk); font-weight: 700; font-size: 1.35rem; letter-spacing: -0.01em; line-height: 1.25; }
@@ -336,7 +336,7 @@
     </div>
     <div id="clockrow"></div>
     <div class="guess" id="guess-box"></div>
-    <figcaption>Storm positions are found in each member with the TempestExtremes tracker and matched to the observed track. Members in which the storm is not found are not shown and not counted in the histograms. Panel order changes between storms. Observed: IBTrACS track and maximum 1-minute sustained wind (USA agencies); the track is grey where IBTrACS reports no wind, usually before the storm forms and after it becomes post-tropical. Model winds: the maximum 10&nbsp;m wind speed within 2° (about 220&nbsp;km) of the storm centre found by the tracker in each member. Rescaled to observations: the rank of each member's wind among all the winds of its model (41 storms, all lead times) is kept, and the value is replaced by the observed wind of the same rank; the rescaling is the same at every lead time. Histograms: members by wind at the time shown, 2.5&nbsp;m/s per bar, one vertical scale for the three panels; the black line is the observed wind.</figcaption>
+    <figcaption>Storm positions are found in each member with the TempestExtremes tracker and matched to the observed track. Members in which the storm is not found are not shown and not counted in the histograms. Panel order changes between storms. Observed: IBTrACS track and maximum 1-minute sustained wind (USA agencies); the track is grey where IBTrACS reports no wind, usually before the storm forms and after it becomes post-tropical. Model winds: the maximum 10&nbsp;m wind speed within 2° (about 220&nbsp;km) of the storm centre found by the tracker in each member. Rescaled to observations: the rank of each member's wind among all the winds of its model (41 storms, all lead times) is kept, and the value is replaced by the observed wind of the same rank; the rescaling is the same at every lead time. Histograms: members by wind at the time shown, 2.5&nbsp;m/s per bar, one vertical scale for the three panels; the black line is the observed wind. Ring on the map and ▼ on the histogram: the member closest to the observed position at that time.</figcaption>
   </figure>
 
   <h2 id="score"><span class="num">2</span>Scoring a forecast made of 49 storms</h2>
@@ -429,8 +429,8 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/topojson/3.0.2/topojson.min.js"></script>
-<script src="js/intensity.js?v=9"></script>
-<script src="js/season-extra.js?v=9"></script>
-<script src="js/main.js?v=9"></script>
+<script src="js/intensity.js?v=10"></script>
+<script src="js/season-extra.js?v=10"></script>
+<script src="js/main.js?v=10"></script>
 </body>
 </html>

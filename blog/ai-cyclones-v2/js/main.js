@@ -326,7 +326,7 @@
     for (const w of winds) if (w != null) c[Math.min(c.length - 1, Math.floor(Math.max(0, w) / HIST_BIN))]++;
     return c;
   };
-  function drawHist(p, counts, yMax, obsMs) {
+  function drawHist(p, counts, yMax, obsMs, closest) {
     const ctx = p.hist.getContext('2d'), W = p.hist.width / p.dpr;
     ctx.setTransform(p.dpr, 0, 0, p.dpr, 0, 0);
     ctx.clearRect(0, 0, W, HIST_H);
@@ -349,6 +349,13 @@
       ctx.font = '600 10px Inter, system-ui, sans-serif'; ctx.textBaseline = 'alphabetic';
       ctx.textAlign = x > W * 0.6 ? 'right' : 'left';
       ctx.fillText('observed', x + (x > W * 0.6 ? -4 : 4), HIST_TOP - 4);
+    }
+    // the member closest to the observed position: a triangle on top of its bar
+    if (closest && closest.w != null) {
+      const i = Math.min(counts.length - 1, Math.floor(Math.max(0, closest.w) / HIST_BIN));
+      const x = X((i + 0.5) * HIST_BIN), top = base - Math.max(2, counts[i] / yMax * hMax) - 2;
+      ctx.beginPath(); ctx.moveTo(x - 4.5, top - 7); ctx.lineTo(x + 4.5, top - 7); ctx.lineTo(x, top); ctx.closePath();
+      ctx.fillStyle = '#2b2b2b'; ctx.fill();
     }
   }
 
@@ -384,7 +391,7 @@
         if (now) {
           const x = F.X(now[0]), y = F.Y(now[1]);
           seg(x, y, wind(now[2]));
-          dots.push([x, y, wind(now[2])]); members.add(tr.mb);
+          dots.push([x, y, wind(now[2]), now[0], now[1]]); members.add(tr.mb);
         }
       }
       ctx.lineWidth = 1; ctx.globalAlpha = 0.5;
@@ -412,6 +419,19 @@
         ctx.strokeStyle = windColor(seg[i - 1][2] == null ? null : seg[i - 1][2] * KT); ctx.stroke();
       }
       ctx.lineCap = 'butt';
+      // member closest to the observed position (km on a plane tangent at the observation)
+      let closest = null;
+      if (o) {
+        const c = Math.cos(o[1] * Math.PI / 180);
+        for (const [x, y, w, lon, lat] of dots) {
+          const km = Math.hypot(((lon - o[0] + 540) % 360 - 180) * 111.2 * c, (lat - o[1]) * 111.2);
+          if (!closest || km < closest.km) closest = { x, y, w, km };
+        }
+      }
+      if (closest) {
+        ctx.beginPath(); ctx.arc(closest.x, closest.y, 7, 0, 2 * Math.PI);
+        ctx.lineWidth = 1.6; ctx.strokeStyle = '#2b2b2b'; ctx.stroke();
+      }
       if (o && seg.length) {
         const [x, y] = seg[seg.length - 1];
         ctx.beginPath(); ctx.arc(x, y, 5.5, 0, 2 * Math.PI);
@@ -428,7 +448,7 @@
       score.append(document.createTextNode('track NLL so far: '), el('b', {}, nll));
       p.info.replaceChildren(found, score);
       const winds = dots.map(d => d[2]).filter(w => w != null);
-      hists.push([p, histCounts(winds)]);
+      hists.push([p, histCounts(winds), closest]);
       p.histNote.replaceChildren();
       if (obsMs != null && winds.length) {
         const weaker = winds.filter(w => w < obsMs).length;
@@ -436,10 +456,16 @@
           el('b', {}, weaker === winds.length ? `all ${winds.length}` : `${weaker} of ${winds.length}`),
           document.createTextNode(` members (${Math.round(100 * weaker / winds.length)}%)`));
       }
+      if (closest && closest.w != null) {
+        const line = el('div');
+        line.append(document.createTextNode('▼ closest member: '), el('b', {}, `${Math.round(closest.w)} m/s`),
+          document.createTextNode(`, ${Math.round(closest.km)} km from the storm`));
+        p.histNote.append(line);
+      }
     }
     // one vertical scale for the three panels, so their bar heights compare
     const yMax = Math.max(5, ...hists.map(([, c]) => Math.max(...c)));
-    for (const [p, counts] of hists) drawHist(p, counts, yMax, obsMs);
+    for (const [p, counts, closest] of hists) drawHist(p, counts, yMax, obsMs, closest);
     const c = player.clock;
     c.day.textContent = `Day ${(t / 24).toFixed(1)}`;
     c.date.textContent = fmtDate(new Date(Date.parse(storm.init.replace('Z', ':00Z')) + t * 3600e3));
