@@ -343,19 +343,31 @@
       ctx.textAlign = w === 0 ? 'left' : 'center';
       ctx.fillText(w === 80 ? '80 m/s' : String(w), X(w), base + 3);
     }
+    ctx.textBaseline = 'alphabetic';
+    // label to the right of its line, or to the left near the right edge; returns its [x0, x1]
+    const label = (x, text, font, color, side) => {
+      ctx.font = font;
+      const w = ctx.measureText(text).width, right = side ?? (x <= W * 0.6);
+      const x0 = right ? x + 4 : x - 4 - w;
+      return { x0, x1: x0 + w, draw: () => { ctx.font = font; ctx.fillStyle = color; ctx.textAlign = 'left'; ctx.fillText(text, x0, HIST_TOP - 4); } };
+    };
+    let obsLab = null;
     if (obsMs != null) {
       const x = Math.min(W - 1, X(Math.min(obsMs, HIST_MAX)));
       ctx.fillStyle = '#2b2b2b'; ctx.fillRect(x - 1, HIST_TOP - 2, 2, base - HIST_TOP + 2);
-      ctx.font = '600 10px Inter, system-ui, sans-serif'; ctx.textBaseline = 'alphabetic';
-      ctx.textAlign = x > W * 0.6 ? 'right' : 'left';
-      ctx.fillText('observed', x + (x > W * 0.6 ? -4 : 4), HIST_TOP - 4);
+      obsLab = label(x, 'observed', '600 10px Inter, system-ui, sans-serif', '#2b2b2b');
+      obsLab.draw();
     }
-    // the member closest to the observed position: a triangle on top of its bar
+    // the member closest to the observed position: thin dashed grey line, label on the side away
+    // from the observed label, left out if neither side is free
     if (closest && closest.w != null) {
-      const i = Math.min(counts.length - 1, Math.floor(Math.max(0, closest.w) / HIST_BIN));
-      const x = X((i + 0.5) * HIST_BIN), top = base - Math.max(2, counts[i] / yMax * hMax) - 2;
-      ctx.beginPath(); ctx.moveTo(x - 4.5, top - 7); ctx.lineTo(x + 4.5, top - 7); ctx.lineTo(x, top); ctx.closePath();
-      ctx.fillStyle = '#2b2b2b'; ctx.fill();
+      const x = Math.min(W - 1, X(Math.min(closest.w, HIST_MAX)));
+      ctx.strokeStyle = '#9a9a9a'; ctx.lineWidth = 1; ctx.setLineDash([3, 2]);
+      ctx.beginPath(); ctx.moveTo(x + 0.5, HIST_TOP - 2); ctx.lineTo(x + 0.5, base); ctx.stroke(); ctx.setLineDash([]);
+      const font = '10px Inter, system-ui, sans-serif';
+      const free = l => l.x0 >= 0 && l.x1 <= W && (!obsLab || l.x1 + 6 < obsLab.x0 || l.x0 > obsLab.x1 + 6);
+      const lab = [label(x, 'closest', font, '#8a8a8a', true), label(x, 'closest', font, '#8a8a8a', false)].find(free);
+      if (lab) lab.draw();
     }
   }
 
@@ -423,14 +435,10 @@
       let closest = null;
       if (o) {
         const c = Math.cos(o[1] * Math.PI / 180);
-        for (const [x, y, w, lon, lat] of dots) {
+        for (const [, , w, lon, lat] of dots) {
           const km = Math.hypot(((lon - o[0] + 540) % 360 - 180) * 111.2 * c, (lat - o[1]) * 111.2);
-          if (!closest || km < closest.km) closest = { x, y, w, km };
+          if (!closest || km < closest.km) closest = { w, km };
         }
-      }
-      if (closest) {
-        ctx.beginPath(); ctx.arc(closest.x, closest.y, 7, 0, 2 * Math.PI);
-        ctx.lineWidth = 1.6; ctx.strokeStyle = '#2b2b2b'; ctx.stroke();
       }
       if (o && seg.length) {
         const [x, y] = seg[seg.length - 1];
@@ -458,7 +466,7 @@
       }
       if (closest && closest.w != null) {
         const line = el('div');
-        line.append(document.createTextNode('▼ closest member: '), el('b', {}, `${Math.round(closest.w)} m/s`),
+        line.append(document.createTextNode('closest member: '), el('b', {}, `${Math.round(closest.w)} m/s`),
           document.createTextNode(`, ${Math.round(closest.km)} km from the storm`));
         p.histNote.append(line);
       }
