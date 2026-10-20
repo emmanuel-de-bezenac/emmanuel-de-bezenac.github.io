@@ -174,13 +174,17 @@
   .swatch { display: inline-block; width: 14px; height: 2px; vertical-align: middle; margin-right: 0.45rem; }
 
   /* explainer */
-  .explain { display: grid; grid-template-columns: 3fr 2fr; gap: 1.2rem; align-items: start; }
-  .explain .map-wrap { cursor: crosshair; touch-action: none; }
-  .readout { font-size: 0.86rem; color: var(--text-2); }
-  .readout .big { font-family: var(--grotesk); font-weight: 700; font-size: 2rem; color: var(--text); line-height: 1.1; font-variant-numeric: tabular-nums; }
-  .readout .row { margin-top: 0.9rem; }
-  .readout .lbl { font-size: 0.72rem; color: var(--text-3); text-transform: uppercase; letter-spacing: 0.06em; }
 
+  .explain3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.9rem; }
+  .explain3 .map-wrap { cursor: crosshair; touch-action: none; }
+  .exstats { width: 100%; border-collapse: collapse; margin-top: 0.4rem; font-size: 0.76rem; color: var(--text-2); }
+  .exstats td { padding: 0.2rem 0; border-top: 1px solid var(--border); vertical-align: top; }
+  .exstats td.num { text-align: right; color: var(--text); font-variant-numeric: tabular-nums; white-space: nowrap; padding-left: 0.6rem; }
+  article .explain-text { padding: 0; max-width: none; margin: 0.9rem 0 0; font-size: 0.9rem; color: var(--text-2); line-height: 1.6; }
+  .rankfig { display: grid; grid-template-columns: 3fr 2fr; gap: 1.4rem; align-items: center; }
+  #rank-chart { width: 100%; display: block; touch-action: none; cursor: crosshair; }
+  .rankfig .readout { font-size: 0.9rem; color: var(--text-2); line-height: 1.6; }
+  .rankfig .readout .big { font-family: var(--grotesk); font-weight: 700; font-size: 1.6rem; color: var(--text); line-height: 1.2; font-variant-numeric: tabular-nums; margin-bottom: 0.4rem; }
   /* scoreboard */
   .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 1.5rem; }
   .stat .v { font-family: var(--grotesk); font-weight: 700; font-size: 2rem; line-height: 1.1; font-variant-numeric: tabular-nums; }
@@ -221,9 +225,6 @@
   .windbar .blocks span.none { font-weight: 400; }
   .windbar .ticks { position: relative; height: 1.2rem; }
   .windbar .ticks span { position: absolute; top: 0.1rem; transform: translateX(-50%); color: var(--text-3); font-variant-numeric: tabular-nums; }
-  .ctrl { margin-top: 1.2rem; display: flex; flex-direction: column; gap: 0.4rem; font-size: 0.82rem; color: var(--text-2); }
-  .ctrl input[type=range] { accent-color: var(--text); width: 100%; }
-  .ctrl input[type=checkbox] { accent-color: var(--text); margin-right: 0.35rem; }
   .btn[aria-pressed="true"] { border-color: var(--text); color: var(--text); font-weight: 500; }
   footer {
     max-width: var(--max-w); margin: 5rem auto 0; padding: 2.5rem 1.5rem 3rem;
@@ -237,7 +238,8 @@
     .player { grid-template-columns: 1fr; }
     .clock { grid-template-columns: 1fr; gap: 0.6rem; }
     .windcard { grid-template-columns: 1fr; }
-    .explain { grid-template-columns: 1fr; }
+    .explain3 { grid-template-columns: 1fr; }
+    .rankfig { grid-template-columns: 1fr; }
     .stats { grid-template-columns: 1fr; }
     .nav-links { display: none; }
     .clock .caption { min-height: 0; }
@@ -272,9 +274,13 @@
   <p>In our paper we compare three AI ensemble models (GenCast, FourCastNet&nbsp;3 and FGN) with ECMWF's operational physics-based ensemble, IFS-ENS, on 178 tropical cyclones between 2021 and 2025. This page shows the 2025 part of that comparison, using the forecasts themselves. It covers GenCast, FGN and IFS-ENS, in the versions that run operationally.</p>
 
   <h2 id="guess"><span class="num">1</span>Guess the physics model</h2>
-  <p>Each panel is a 15-day ensemble forecast started about 12 hours before the storm was first observed. Each dot is the storm centre in one of the 49 members of the ensemble, and the thick outlined line is the observed track from IBTrACS. Tracks and dots are coloured by wind speed, on the same scale for the observation and the forecasts, and the histogram under each map shows the members' winds next to the observed one. The models' winds are weaker than the observed winds; switch to "Rescaled to observations" to compare them on the observed scale. One panel is IFS-ENS, ECMWF's physics-based ensemble. The other two are AI models from Google DeepMind: GenCast and FGN. Play the forecast, choose the panel you think is the physics model, then tell the two AI models apart.</p>
+  <p>Each panel is a 15-day ensemble forecast started about 12 hours before the storm was first observed. Each dot is the storm centre in one of the 49 members of the ensemble, and the thick outlined line is the observed track from IBTrACS. Tracks and dots are coloured by wind speed, on the same scale for the observation and the forecasts, and the histogram under each map shows the members' winds next to the observed one. The models' winds are weaker than the observed winds; switch to "Rescaled to observations" to compare them on the observed scale. One panel is IFS-ENS, ECMWF's physics-based ensemble. The other two are AI models from Google DeepMind: GenCast and FGN. Play the forecast, choose the panel you think is the physics model, then tell the two AI models apart, or choose "Show the models" to see the names directly.</p>
 
   <figure class="wide" id="player-fig">
+    <div class="seg" id="mode" role="group" aria-label="Mode">
+      <button type="button" data-v="guess" aria-pressed="true">Guess the models</button>
+      <button type="button" data-v="show" aria-pressed="false">Show the models</button>
+    </div>
     <div class="chips" id="storm-chips" role="group" aria-label="Storm"></div>
     <div class="stormhead" id="stormhead"></div>
     <div class="windcard">
@@ -303,27 +309,18 @@
     </div>
     <div id="clockrow"></div>
     <div class="guess" id="guess-box"></div>
-    <figcaption>Storm positions are found in each member with the TempestExtremes tracker and matched to the observed track. Members in which the storm is not found are not shown and not counted in the histograms. Panel order changes between storms. Observed: IBTrACS track and 1-minute sustained wind (USA agencies); the track is grey where IBTrACS reports no wind, usually before the storm forms and after it becomes post-tropical. Model winds: the strongest 10&nbsp;m wind the tracker finds near the storm centre in each member. Rescaled to observations: the rank of each member's wind among all the winds of its model (41 storms, all lead times) is kept, and the value is replaced by the observed wind of the same rank; the rescaling is the same at every lead time. Histograms: members by wind at the time shown, 2.5&nbsp;m/s per bar, one vertical scale for the three panels; the black line is the observed wind.</figcaption>
+    <figcaption>Storm positions are found in each member with the TempestExtremes tracker and matched to the observed track. Members in which the storm is not found are not shown and not counted in the histograms. Panel order changes between storms. Observed: IBTrACS track and maximum 1-minute sustained wind (USA agencies); the track is grey where IBTrACS reports no wind, usually before the storm forms and after it becomes post-tropical. Model winds: the maximum 10&nbsp;m wind speed within 2° (about 220&nbsp;km) of the storm centre found by the tracker in each member. Rescaled to observations: the rank of each member's wind among all the winds of its model (41 storms, all lead times) is kept, and the value is replaced by the observed wind of the same rank; the rescaling is the same at every lead time. Histograms: members by wind at the time shown, 2.5&nbsp;m/s per bar, one vertical scale for the three panels; the black line is the observed wind.</figcaption>
   </figure>
 
   <h2 id="score"><span class="num">2</span>Scoring a forecast made of 49 storms</h2>
   <p>An ensemble does not give one track. It gives 49 possible positions at each time. Earlier evaluations average the members into a mean track and measure its distance to the observed storm. This discards the spread: two ensembles with the same mean can differ completely, and when the members split into two groups the mean can fall between them, where no member is.</p>
-  <p>We score the ensemble as a probability distribution instead. The member positions are smoothed into a probability density (kernel density estimation), and the score is minus the logarithm of that density at the observed position: the negative log-likelihood, or NLL. Lower is better. A forecast scores badly when it is confident and wrong, and also when it is spread so widely that it says little. Drag the black dot to see how the score changes with the position of the storm. The smoothing width also matters: too narrow and the density is a set of spikes around each member, too wide and every position gets a similar score.</p>
+  <p>We score the ensemble as a probability distribution instead. The member positions are smoothed into a probability density, and the score is minus the logarithm of that density at the observed position: the negative log-likelihood, or NLL. Lower is better. A forecast scores badly when it is confident and wrong, and also when it is spread so widely that it says little. The two examples below are times at which the two scores disagree: the model whose mean is closest to the storm has the highest NLL.</p>
 
   <figure class="wide">
-    <div class="chips" id="explain-models" role="group" aria-label="Model"></div>
-    <div class="explain">
-      <div class="map-wrap" id="explain-wrap"><canvas id="explain-canvas"></canvas></div>
-      <div>
-        <div class="readout" id="explain-readout"></div>
-        <div class="ctrl">
-          <label><input type="checkbox" id="show-mean"> Show the ensemble mean position</label>
-          <label for="bw">Smoothing width: <b id="bw-val"></b></label>
-          <input type="range" id="bw" min="0.4" max="3" step="0.05" value="1">
-        </div>
-      </div>
-    </div>
-    <figcaption id="explain-caption"></figcaption>
+    <div class="chips" id="explain-cases" role="group" aria-label="Example"></div>
+    <div class="explain3" id="explain-panels"></div>
+    <p class="explain-text" id="explain-text"></p>
+    <figcaption>Dots: storm centre in each member. Shading: the smoothed density, on one scale for the three maps. Cross: mean position of the members. Dashed ring: observed position (IBTrACS). Drag the black dot, in any of the three maps, to see the NLL each model would get if the storm had been there. The smoothing width is chosen for each model and time by cross-validation, as in the paper; the numbers are computed in your browser and can differ from the paper's in the second decimal.</figcaption>
   </figure>
 
   <h2 id="season"><span class="num">3</span>The 2025 season: 41 storms</h2>
@@ -362,6 +359,16 @@
   </figure>
 
   <p>The models therefore reproduce how wind depends on pressure, and their error is in intensity. This holds for FGN, whose training loss scores each variable at each grid point separately and does not constrain how variables depend on each other.</p>
+  <p>The same ranks put the forecast winds on the observed scale, which is what "Rescaled to observations" does in the player of section 1. For each source, the curves below give the share of its 2025 maximum winds that are below each speed. A member's wind is moved from its model's curve to the observed curve at the same height: it gets the observed wind with the same rank. The strongest winds of a model become the strongest observed winds, the median becomes the observed median, and so on. Choose a model and move the pointer over the chart.</p>
+
+  <figure class="wide">
+    <div class="chips" id="rank-models" role="group" aria-label="Model"></div>
+    <div class="rankfig">
+      <svg id="rank-chart" role="img" aria-label="Share of winds below each speed, for each model and for the observations"></svg>
+      <div class="readout" id="rank-readout"></div>
+    </div>
+    <figcaption id="rank-caption"></figcaption>
+  </figure>
 
   <h2 id="limits"><span class="num">5</span>What this shows and what it does not</h2>
   <ul>
@@ -384,8 +391,8 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/topojson/3.0.2/topojson.min.js"></script>
-<script src="js/intensity.js?v=3"></script>
-<script src="js/season-extra.js?v=3"></script>
-<script src="js/main.js?v=3"></script>
+<script src="js/intensity.js?v=8"></script>
+<script src="js/season-extra.js?v=8"></script>
+<script src="js/main.js?v=8"></script>
 </body>
 </html>

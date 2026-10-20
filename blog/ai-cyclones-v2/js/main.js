@@ -12,7 +12,20 @@
   const OCEAN = '#eef3f7', LAND = '#dcdad5', COAST = '#a9a6a0', INK = '#111111';
   const N_MEMBERS = 49, HOURS_PER_SECOND = 20;
   const CURATED = ['2025294N14290', '2025308N09144', '2025305N08140', '2025276N20147'];
-  const EXPLAIN = { hid: '2025223N17337', hour: 150 };   // Hurricane Erin, 17 Aug 2025 00 UTC
+  // Section 2 examples: times at which the model with the closest ensemble mean has the highest NLL
+  // (found by comparing per_timestep_nll.csv with the member mean positions over all 2025 storms)
+  const CASES = [
+    { hid: '2025054S17051', hour: 114, label: 'Members split into two groups', name: 'Cyclone Garance',
+      text: 'FGN\'s members split into two groups, west and east of the storm. Their mean falls between the groups, ' +
+            'close to the storm but where few members are: it is the closest of the three means, yet FGN gives the ' +
+            'observed position the least probability and has the highest NLL. GenCast\'s mean is farther away, but its ' +
+            'members surround the storm, and its NLL is the lowest.' },
+    { hid: '2025082S13116', hour: 138, label: 'Members spread in all directions', name: 'Cyclone Courtney',
+      text: 'IFS-ENS\'s members are spread in all directions around the storm, so their mean lands close to it: the ' +
+            'closest of the three. The spread gives every position a low probability, so IFS-ENS has the highest NLL. ' +
+            'FGN\'s members are grouped north-east of the storm; its mean is farther away, but it gives the observed ' +
+            'position more probability and has the lowest NLL.' },
+  ];
 
   const el = (tag, attrs = {}, text) => {
     const e = document.createElement(tag);
@@ -113,16 +126,22 @@
   const windColor = ms => ms == null ? NO_WIND : CAT_COLOR[catOf(ms)];
   // rank correction (export_blog_data.wind_qmap): the quantile of w among the model's member winds,
   // then the IBTrACS wind at that quantile; both by linear interpolation between percentiles
-  function rankCorrected(model, w) {
-    if (w == null) return null;
-    const src = qmap.models[model], dst = qmap.ibtracs, n = src.length - 1;
-    if (w <= src[0]) return dst[0];
-    if (w >= src[n]) return dst[n];
+  // share of the model's winds below w (0 to 1)
+  function rankOf(model, w) {
+    const src = qmap.models[model], n = src.length - 1;
+    if (w <= src[0]) return 0;
+    if (w >= src[n]) return 1;
     let i = 0;
     while (src[i + 1] < w) i++;
     const f = src[i + 1] === src[i] ? 0 : (w - src[i]) / (src[i + 1] - src[i]);
-    return dst[i] + f * (dst[i + 1] - dst[i]);
+    return (i + f) / n;
   }
+  // observed wind with share q of the observed winds below it
+  function observedAt(q) {
+    const dst = qmap.ibtracs, n = dst.length - 1, x = q * n, i = Math.min(n - 1, Math.floor(x));
+    return dst[i] + (x - i) * (dst[i + 1] - dst[i]);
+  }
+  const rankCorrected = (model, w) => w == null ? null : observedAt(rankOf(model, w));
   function obsWindAt(obs, t) {
     const v = obs.filter(p => p[3] != null);
     if (!v.length || t < v[0][0] || t > v[v.length - 1][0]) return null;
@@ -139,7 +158,10 @@
   const guesses = {};
   const guessOf = hid => (guesses[hid] ??= {});
   // a panel is labelled once its model is known: IFS-ENS after the first guess, all three at the end
-  const shown = (hid, m) => { const g = guesses[hid] || {}; return !!g.done || (g.physics != null && m === 'ifsens_e2s'); };
+  const shown = (hid, m) => {
+    const g = guesses[hid] || {};
+    return player.mode === 'show' || !!g.done || (g.physics != null && m === 'ifsens_e2s');
+  };
   const player = { storm: null, t: 0, playing: false, panels: [], frame: null };
   const chips = document.getElementById('storm-chips');
   const withTracks = index.filter(s => s.tracks);
@@ -184,7 +206,7 @@
     bar.append(blocks, ticks);
     const seg = document.getElementById('windcorr'), explain = document.getElementById('wc-explain');
     const EXPLAIN = {
-      raw: 'The 10 m wind each model gives near the storm centre. The models compute wind on a grid of about 25 km, ' +
+      raw: 'The maximum 10 m wind each model gives within about 220 km of the storm centre. The models compute wind on a grid of about 25 km, ' +
            'which smooths the peak, so even an exact forecast is weaker than the observed wind.',
       rank: 'Each member\'s wind is replaced by the observed wind of the same rank among all 2025 winds of its model, ' +
             'as in the "ranks only" view of section 4. This removes each model\'s overall bias; which members are strong or weak does not change.',
@@ -197,6 +219,14 @@
     setMode('raw');
     seg.querySelectorAll('button').forEach(b => b.addEventListener('click', () => { setMode(b.dataset.v); draw(); }));
   }
+  // "Guess the models" (names hidden until the reader answers) or "Show the models" (names shown, no questions)
+  player.mode = 'guess';
+  const modeSeg = document.getElementById('mode');
+  modeSeg.querySelectorAll('button').forEach(b => b.addEventListener('click', () => {
+    player.mode = b.dataset.v;
+    modeSeg.querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', String(x === b)));
+    const t = player.t; buildPanels(); player.t = t; draw();
+  }));
   const playBtn = document.getElementById('play');
   const scrub = document.getElementById('scrub');
   playBtn.addEventListener('click', () => setPlaying(!player.playing));
@@ -423,6 +453,24 @@
     c.caption.textContent = ev ? ev[1] : '';
   }
 
+  function scoreTable() {
+    const storm = player.storm, table = el('table', { class: 'scores' });
+    const hr = el('tr'); ['Panel', 'Model', `Track NLL on ${storm.name}`, ''].forEach(h => hr.append(el('th', {}, h)));
+    table.append(hr);
+    const ranked = [...MODELS].sort((a, b) => storm.storm_nll[a] - storm.storm_nll[b]);
+    storm.order.forEach((m, i) => {
+      const tr = el('tr');
+      tr.append(el('td', {}, 'ABC'[i]));
+      const name = el('td'); const sw = el('span', { class: 'swatch' }); sw.style.background = COLOR[m];
+      name.append(sw, document.createTextNode(`${NAME[m]} (${KIND[m]})`));
+      tr.append(name);
+      tr.append(el('td', { class: 'num' }, `${storm.storm_nll[m].toFixed(2)}  ·  ${['lowest', 'second', 'highest'][ranked.indexOf(m)]}`));
+      tr.append(el('td', {}, DESC[m]));
+      table.append(tr);
+    });
+    return table;
+  }
+
   function renderGuess() {
     const storm = player.storm, box = document.getElementById('guess-box');
     box.replaceChildren();
@@ -451,6 +499,10 @@
     const physicsVerdict = () => g.physics === physics ? `Correct: ${physics} is IFS-ENS, ECMWF's physics-based ensemble.`
       : `Not this time: ${physics} is IFS-ENS, ECMWF's physics-based ensemble. You chose ${g.physics}, which is ${NAME[storm.order['ABC'.indexOf(g.physics)]]}.`;
 
+    if (player.mode === 'show') {
+      box.append(scoreTable());
+      return;
+    }
     if (!g.done && g.physics == null) {
       ask('Step 1 of 2', 'Which panel is the physics-based model?', null, 'ABC',
           L => { Object.assign(guessOf(storm.hid), { physics: L, okPhysics: L === physics }); redraw(); });
@@ -480,21 +532,7 @@
       box.append(el('div', { class: 'tally' },
         `Your score so far: physics model found on ${ok('okPhysics')} of ${played.length} storms, FGN and GenCast told apart on ${ok('okFgn')} of ${played.length}.`));
     }
-    const table = el('table', { class: 'scores' });
-    const hr = el('tr'); ['Panel', 'Model', `Track NLL on ${storm.name}`, ''].forEach(h => hr.append(el('th', {}, h)));
-    table.append(hr);
-    const ranked = [...MODELS].sort((a, b) => storm.storm_nll[a] - storm.storm_nll[b]);
-    storm.order.forEach((m, i) => {
-      const tr = el('tr');
-      tr.append(el('td', {}, 'ABC'[i]));
-      const name = el('td'); const sw = el('span', { class: 'swatch' }); sw.style.background = COLOR[m];
-      name.append(sw, document.createTextNode(`${NAME[m]} (${KIND[m]})`));
-      tr.append(name);
-      tr.append(el('td', { class: 'num' }, `${storm.storm_nll[m].toFixed(2)}  ·  ${['lowest', 'second', 'highest'][ranked.indexOf(m)]}`));
-      tr.append(el('td', {}, DESC[m]));
-      table.append(tr);
-    });
-    box.append(table);
+    box.append(scoreTable());
     const again = el('button', { class: 'btn', type: 'button' }, 'Hide the names again');
     again.style.marginTop = '0.8rem';
     again.addEventListener('click', () => { delete guesses[storm.hid]; chipFor[storm.hid]?.querySelector('.done')?.remove(); redraw(); });
@@ -502,138 +540,151 @@
   }
 
   // ---------------------------------------------------------------- 2. explainer
-  const ex = { model: 'fgn', marker: null, bwScale: 1, showMean: false };
-  const bwInput = document.getElementById('bw'), bwVal = document.getElementById('bw-val');
-  bwInput.addEventListener('input', () => { ex.bwScale = +bwInput.value; drawExplain(); });
-  document.getElementById('show-mean').addEventListener('change', e => { ex.showMean = e.target.checked; drawExplain(); });
-  const exStorm = await loadStorm(EXPLAIN.hid).catch(() => null);
-  const exModels = document.getElementById('explain-models');
-  const exCanvas = document.getElementById('explain-canvas');
-  const exWrap = document.getElementById('explain-wrap');
-  const exReadout = document.getElementById('explain-readout');
-  if (exStorm) {
-    ['fgn', 'gencast_op', 'ifsens_e2s'].forEach(m => {
-      const b = el('button', { class: 'chip', type: 'button', 'aria-pressed': String(m === ex.model) }, NAME[m]);
-      b.addEventListener('click', () => {
-        ex.model = m;
-        exModels.querySelectorAll('.chip').forEach(c => c.setAttribute('aria-pressed', String(c === b)));
-        drawExplain();
-      });
-      exModels.append(b);
+  // Three models side by side at one storm and time: members, smoothed density, ensemble mean (cross),
+  // observed position (ring) and a black dot the reader drags; the dot is shared by the three maps.
+  const exRoot = document.getElementById('explain-panels'), exText = document.getElementById('explain-text');
+  const exCases = document.getElementById('explain-cases');
+  const ex = { case: null, marker: null, panels: [] };
+  const EX_ORDER = ['fgn', 'gencast_op', 'ifsens_e2s'];
+  // km on a plane tangent at the observed position
+  const toKm = ([lon, lat]) => {
+    const c = Math.cos(ex.obs[1] * Math.PI / 180);
+    return [((lon - ex.obs[0] + 540) % 360 - 180) * 111.2 * c, (lat - ex.obs[1]) * 111.2];
+  };
+  // Gaussian KDE in km; the bandwidth is chosen as in the paper (compute_traj_metrics._kde_bandwidth):
+  // 5-fold cross-validation, folds in member order, 100 values from half a grid cell (13.9 km) to
+  // max(4 x 13.9 km, 5 x the mean of the x and y standard deviations)
+  const logDensity = (P, h, [x, y]) => {
+    const e = P.map(p => -((x - p[0]) ** 2 + (y - p[1]) ** 2) / (2 * h * h)), m = Math.max(...e);
+    return m + Math.log(e.reduce((a, v) => a + Math.exp(v - m), 0)) - Math.log(P.length * 2 * Math.PI * h * h);
+  };
+  function cvBandwidth(P) {
+    const n = P.length, k = Math.min(5, n), floor = 27.8 / 2;
+    const sd = i => Math.sqrt(d3.mean(P, p => (p[i] - d3.mean(P, q => q[i])) ** 2));
+    const ceil = Math.max(4 * floor, 5 * (sd(0) + sd(1)) / 2);
+    const bounds = [0];
+    for (let f = 0; f < k; f++) bounds.push(bounds[f] + Math.floor(n / k) + (f < n % k ? 1 : 0));
+    let best = null, bestScore = -Infinity;
+    for (let b = 0; b < 100; b++) {
+      const h = floor + b * (ceil - floor) / 99;
+      let score = 0;
+      for (let f = 0; f < k; f++) {
+        const test = P.slice(bounds[f], bounds[f + 1]), train = [...P.slice(0, bounds[f]), ...P.slice(bounds[f + 1])];
+        for (const q of test) score += logDensity(train, h, q);
+      }
+      if (score > bestScore) { bestScore = score; best = h; }
+    }
+    return best;
+  }
+  CASES.forEach((c, i) => {
+    const b = el('button', { class: 'chip', type: 'button', 'aria-pressed': String(i === 0) }, c.label);
+    b.addEventListener('click', () => {
+      exCases.querySelectorAll('.chip').forEach(x => x.setAttribute('aria-pressed', String(x === b)));
+      selectCase(c);
     });
-    const reset = el('button', { class: 'btn', type: 'button' }, 'Put the dot back on the observed position');
-    reset.addEventListener('click', () => { ex.marker = null; drawExplain(); });
-    exModels.append(reset);
-    const obsNow = posAt(exStorm.obs.map(p => [p[0], p[1], p[2]]), EXPLAIN.hour);
-    ex.obs = obsNow;
-    ex.storm = { ...exStorm, extent: [obsNow[0] - 16, obsNow[0] + 16, obsNow[1] - 11, obsNow[1] + 13], center: 0 };
-    const date = fmtDate(new Date(Date.parse(exStorm.init.replace('Z', ':00Z')) + EXPLAIN.hour * 3600e3));
-    document.getElementById('explain-caption').textContent =
-      `Hurricane Erin, ${date}, ${(EXPLAIN.hour / 24).toFixed(1)} days after the forecasts started. Dots: member positions; shading: the smoothed density. ` +
-      'The smoothing width starts from a fixed rule (Scott\'s rule) and the slider scales it; the paper chooses the width by cross-validation, so the values differ slightly.';
-    let dragging = false;
-    const setMarker = evt => {
-      const r = exCanvas.getBoundingClientRect(), F = ex.frame;
-      const x = evt.clientX - r.left, y = evt.clientY - r.top;
-      const [lon0, , , lat1] = ex.storm.extent;
-      ex.marker = [lon0 + x / F.width * (ex.storm.extent[1] - lon0), lat1 - y / F.height * (lat1 - ex.storm.extent[2])];
-      drawExplain();
-    };
-    exCanvas.addEventListener('pointerdown', e => { dragging = true; exCanvas.setPointerCapture(e.pointerId); setMarker(e); });
-    exCanvas.addEventListener('pointermove', e => { if (dragging) setMarker(e); });
-    exCanvas.addEventListener('pointerup', () => { dragging = false; });
+    exCases.append(b);
+  });
+  async function selectCase(c) {
+    const storm = await loadStorm(c.hid);
+    ex.case = c; ex.marker = null;
+    ex.obs = posAt(storm.obs.map(p => p.slice(0, 3)), c.hour);
+    ex.storm = { ...storm, extent: [ex.obs[0] - 9, ex.obs[0] + 9, ex.obs[1] - 8, ex.obs[1] + 8], center: 0 };
+    const i = storm.nll_t.indexOf(c.hour);
+    exRoot.replaceChildren();
+    ex.panels = EX_ORDER.map(m => {
+      const members = storm.models[m].map(([, pts]) => posAt(pts, c.hour)).filter(Boolean);
+      const P = members.map(toKm);
+      const h = cvBandwidth(P);
+      const mean = [d3.mean(P, p => p[0]), d3.mean(P, p => p[1])];
+      const cell = el('div'), head = el('div', { class: 'panel-head' });
+      const who = el('span', { class: 'who' }, NAME[m]); who.style.color = COLOR[m];
+      head.append(who);
+      const wrap = el('div', { class: 'map-wrap' }), canvas = el('canvas'), stats = el('table', { class: 'exstats' });
+      wrap.append(canvas); cell.append(head, wrap, stats); exRoot.append(cell);
+      const panel = { m, members, P, h, mean, canvas, wrap, stats, n: members.length,
+                      dist: Math.hypot(...mean), nll: -logDensity(P, h, [0, 0]), paper: i >= 0 ? storm.nll[m][i] : null };
+      let dragging = false;
+      const setMarker = evt => {
+        const r = canvas.getBoundingClientRect(), F = ex.frame, [lon0, lon1, lat0, lat1] = ex.storm.extent;
+        ex.marker = [lon0 + (evt.clientX - r.left) / F.width * (lon1 - lon0), lat1 - (evt.clientY - r.top) / F.height * (lat1 - lat0)];
+        drawExplain();
+      };
+      canvas.addEventListener('pointerdown', e => { dragging = true; canvas.setPointerCapture(e.pointerId); setMarker(e); });
+      canvas.addEventListener('pointermove', e => { if (dragging) setMarker(e); });
+      canvas.addEventListener('pointerup', () => { dragging = false; });
+      return panel;
+    });
+    const date = fmtDate(new Date(Date.parse(storm.init.replace('Z', ':00Z')) + c.hour * 3600e3));
+    exText.replaceChildren(el('b', {}, `${c.name}, ${date}, day ${(c.hour / 24).toFixed(2).replace(/0$/, '')} of the forecast. `),
+                           document.createTextNode(c.text));
+    resizeExplain();
   }
   function resizeExplain() {
-    if (!exStorm) return;
-    const dpr = window.devicePixelRatio || 1, width = exWrap.clientWidth;
+    if (!ex.panels.length) return;
+    const dpr = window.devicePixelRatio || 1, width = ex.panels[0].wrap.clientWidth;
     ex.frame = mapFrame(ex.storm, width);
-    ex.base = basemap(ex.frame, dpr); ex.dpr = dpr;
-    exCanvas.width = width * dpr; exCanvas.height = ex.frame.height * dpr;
-    exCanvas.style.height = ex.frame.height + 'px';
-    drawExplain();
-  }
-  // km on a plane tangent at the observed position
-  function toKm([lon, lat]) {
-    const c = Math.cos(ex.obs[1] * Math.PI / 180);
-    return [(lon - ex.obs[0]) * 111.2 * c, (lat - ex.obs[1]) * 111.2];
-  }
-  function kde(pointsKm) {
-    const n = pointsKm.length;
-    const mean = [d3.mean(pointsKm, p => p[0]), d3.mean(pointsKm, p => p[1])];
-    const sd = Math.sqrt((d3.variance(pointsKm, p => p[0]) + d3.variance(pointsKm, p => p[1])) / 2) || 50;
-    const h = Math.max(sd * Math.pow(n, -1 / 6), 25) * ex.bwScale;
-    const norm = 1 / (n * 2 * Math.PI * h * h);
-    return ([x, y]) => {
-      let s = 0;
-      for (const p of pointsKm) { const dx = x - p[0], dy = y - p[1]; s += Math.exp(-(dx * dx + dy * dy) / (2 * h * h)); }
-      return { density: s * norm, h, mean };
-    };
-  }
-  function drawExplain() {
-    if (!exStorm || !ex.frame) return;
-    const F = ex.frame, ctx = exCanvas.getContext('2d');
-    ctx.setTransform(ex.dpr, 0, 0, ex.dpr, 0, 0);
-    ctx.drawImage(ex.base, 0, 0, F.width, F.height);
-    const members = exStorm.models[ex.model].map(([, pts]) => posAt(pts, EXPLAIN.hour)).filter(Boolean);
-    const ptsKm = members.map(toKm);
-    const f = ptsKm.length >= 2 ? kde(ptsKm) : null;
-    if (f) {
-      // density shading on a coarse grid, one hue, alpha proportional to density
-      const cell = 6, cols = Math.ceil(F.width / cell), rows = Math.ceil(F.height / cell);
-      const [lon0, lon1, lat0, lat1] = ex.storm.extent;
+    const F = ex.frame, base = basemap(F, dpr), [lon0, lon1, lat0, lat1] = ex.storm.extent;
+    // density on a 5 px grid for each panel; one shading scale for the three panels, so that a spread
+    // ensemble (low density everywhere) looks lighter than a concentrated one
+    const cell = 5, cols = Math.ceil(F.width / cell), rows = Math.ceil(F.height / cell);
+    const grids = ex.panels.map(p => {
       const vals = [];
-      for (let j = 0; j < rows; j++) for (let i = 0; i < cols; i++) {
-        const lon = lon0 + (i + 0.5) * cell / F.width * (lon1 - lon0), lat = lat1 - (j + 0.5) * cell / F.height * (lat1 - lat0);
-        vals.push(f(toKm([lon, lat])).density);
-      }
-      const vmax = d3.max(vals) || 1;
-      vals.forEach((v, k) => {
-        const a = Math.min(0.75, 0.75 * Math.sqrt(v / vmax));
+      for (let j = 0; j < rows; j++) for (let i = 0; i < cols; i++)
+        vals.push(Math.exp(logDensity(p.P, p.h, toKm([lon0 + (i + 0.5) * cell / F.width * (lon1 - lon0), lat1 - (j + 0.5) * cell / F.height * (lat1 - lat0)]))));
+      return vals;
+    });
+    const vmax = d3.max(grids.flat()) || 1;
+    ex.panels.forEach((p, n) => {
+      p.canvas.width = width * dpr; p.canvas.height = F.height * dpr; p.canvas.style.height = F.height + 'px';
+      // basemap and shading, drawn once per size: alpha grows with the square root of the density
+      const bg = document.createElement('canvas'); bg.width = width * dpr; bg.height = F.height * dpr;
+      const ctx = bg.getContext('2d'); ctx.scale(dpr, dpr); ctx.drawImage(base, 0, 0, F.width, F.height);
+      grids[n].forEach((v, k) => {
+        const a = 0.7 * Math.sqrt(v / vmax);
         if (a < 0.02) return;
         ctx.fillStyle = `rgba(55, 55, 90, ${a})`;
         ctx.fillRect((k % cols) * cell, Math.floor(k / cols) * cell, cell, cell);
       });
-    }
-    for (const [lon, lat] of members) {
-      ctx.beginPath(); ctx.arc(F.X(lon), F.Y(lat), 3.2, 0, 2 * Math.PI);
-      ctx.fillStyle = COLOR[ex.model]; ctx.fill(); ctx.lineWidth = 0.8; ctx.strokeStyle = '#fff'; ctx.stroke();
-    }
-    // observed position (ring) and draggable marker (dot)
-    ctx.beginPath(); ctx.arc(F.X(ex.obs[0]), F.Y(ex.obs[1]), 7, 0, 2 * Math.PI);
-    ctx.lineWidth = 1.5; ctx.strokeStyle = INK; ctx.setLineDash([3, 3]); ctx.stroke(); ctx.setLineDash([]);
-    if (ex.showMean && members.length) {
-      const mlon = d3.mean(members, p => p[0]), mlat = d3.mean(members, p => p[1]);
-      const x = F.X(mlon), y = F.Y(mlat);
-      ctx.lineWidth = 2.5; ctx.strokeStyle = '#fff';
-      ctx.beginPath(); ctx.moveTo(x - 7, y - 7); ctx.lineTo(x + 7, y + 7); ctx.moveTo(x + 7, y - 7); ctx.lineTo(x - 7, y + 7); ctx.stroke();
-      ctx.lineWidth = 1.5; ctx.strokeStyle = INK;
-      ctx.beginPath(); ctx.moveTo(x - 7, y - 7); ctx.lineTo(x + 7, y + 7); ctx.moveTo(x + 7, y - 7); ctx.lineTo(x - 7, y + 7); ctx.stroke();
-    }
-    const m = ex.marker || ex.obs;
-    ctx.beginPath(); ctx.arc(F.X(m[0]), F.Y(m[1]), 6, 0, 2 * Math.PI);
-    ctx.fillStyle = INK; ctx.fill(); ctx.lineWidth = 2; ctx.strokeStyle = '#fff'; ctx.stroke();
-
-    const at = p => f ? -Math.log(Math.max(f(toKm(p)).density, 1e-300)) : NaN;
-    const nllMarker = at(m), nllObs = at(ex.obs);
-    const i = exStorm.nll_t.indexOf(EXPLAIN.hour);
-    const paper = i >= 0 ? exStorm.nll[ex.model][i] : null;
-    const distKm = f ? Math.hypot(...f([0, 0]).mean) : NaN;
-    exReadout.replaceChildren();
-    const block = (label, big, small) => {
-      const d = el('div', { class: 'row' });
-      d.append(el('div', { class: 'lbl' }, label), el('div', { class: 'big' }, big));
-      if (small) d.append(el('div', {}, small));
-      exReadout.append(d);
-    };
-    block('NLL at the black dot', isFinite(nllMarker) ? nllMarker.toFixed(2) : '–',
-      ex.marker ? 'Drag it back towards the members and the score drops.' : 'The dot is on the observed position of Erin. Drag it.');
-    block('NLL at the observed position', isFinite(nllObs) ? nllObs.toFixed(2) : '–',
-      paper != null ? `In the paper, at this time: ${paper.toFixed(2)}.` : '');
-    bwVal.textContent = f ? `${Math.round(f([0, 0]).h)} km` : '–';
-    block(`${NAME[ex.model]} at this time`, `${members.length} / ${N_MEMBERS}`,
-      `members find the storm. Their mean position${ex.showMean ? ' (the cross)' : ''} is ${Math.round(distKm)} km from the observed one.`);
+      p.bg = bg; p.dpr = dpr;
+    });
+    drawExplain();
   }
-  resizeExplain();
+  function drawExplain() {
+    if (!ex.panels.length || !ex.frame) return;
+    const F = ex.frame, mk = ex.marker || ex.obs;
+    const best = key => Math.min(...ex.panels.map(p => p[key]));
+    for (const p of ex.panels) {
+      const ctx = p.canvas.getContext('2d');
+      ctx.setTransform(p.dpr, 0, 0, p.dpr, 0, 0);
+      ctx.drawImage(p.bg, 0, 0, F.width, F.height);
+      for (const [lon, lat] of p.members) {
+        ctx.beginPath(); ctx.arc(F.X(lon), F.Y(lat), 3, 0, 2 * Math.PI);
+        ctx.fillStyle = COLOR[p.m]; ctx.fill(); ctx.lineWidth = 0.8; ctx.strokeStyle = '#fff'; ctx.stroke();
+      }
+      // ensemble mean: cross with a white halo
+      const c = Math.cos(ex.obs[1] * Math.PI / 180);
+      const mx = F.X(ex.obs[0] + p.mean[0] / (111.2 * c)), my = F.Y(ex.obs[1] + p.mean[1] / 111.2);
+      for (const [w, col] of [[3.5, '#fff'], [1.8, INK]]) {
+        ctx.lineWidth = w; ctx.strokeStyle = col; ctx.beginPath();
+        ctx.moveTo(mx - 7, my - 7); ctx.lineTo(mx + 7, my + 7); ctx.moveTo(mx + 7, my - 7); ctx.lineTo(mx - 7, my + 7); ctx.stroke();
+      }
+      ctx.beginPath(); ctx.arc(F.X(ex.obs[0]), F.Y(ex.obs[1]), 8, 0, 2 * Math.PI);
+      ctx.lineWidth = 1.5; ctx.strokeStyle = INK; ctx.setLineDash([3, 3]); ctx.stroke(); ctx.setLineDash([]);
+      ctx.beginPath(); ctx.arc(F.X(mk[0]), F.Y(mk[1]), 5.5, 0, 2 * Math.PI);
+      ctx.fillStyle = INK; ctx.fill(); ctx.lineWidth = 2; ctx.strokeStyle = '#fff'; ctx.stroke();
+
+      p.stats.replaceChildren();
+      const row = (label, value, strong) => {
+        const tr = el('tr'); tr.append(el('td', {}, label));
+        const td = el('td', { class: 'num' }, value); if (strong) td.style.fontWeight = '700';
+        tr.append(td); p.stats.append(tr);
+      };
+      row('Mean position, distance to the storm', `${Math.round(p.dist)} km`, p.dist === best('dist'));
+      row('NLL at the observed position', p.nll.toFixed(2), p.nll === best('nll'));
+      if (ex.marker) row('NLL at the black dot', (-logDensity(p.P, p.h, toKm(mk))).toFixed(2), false);
+    }
+  }
+  if (CASES.length) selectCase(CASES[0]);
 
   // ---------------------------------------------------------------- 3. season
   const BASINS = { all: 'All basins', WP: 'West Pacific', SI: 'South Indian', EP: 'East Pacific', NA: 'North Atlantic', SP: 'South Pacific', NI: 'North Indian' };
@@ -733,6 +784,88 @@
     const c = document.getElementById('leadtime');
     if (d && window.BlogSeason && c) window.BlogSeason.renderLeadtime(c, d);
   }).catch(() => {});
+
+  // ---------------------------------------------------------------- 4b. rank rescaling
+  // Share of winds below each speed for each model and for IBTrACS (wind_qmap.json); the selected wind
+  // goes up to its model's curve, across to the observed curve and down to the rescaled wind.
+  {
+    const rk = { model: 'fgn', w: 30 };
+    const svgR = d3.select('#rank-chart'), readout = document.getElementById('rank-readout');
+    const chipsR = document.getElementById('rank-models');
+    ['fgn', 'gencast_op', 'ifsens_e2s'].forEach(m => {
+      const b = el('button', { class: 'chip', type: 'button', 'aria-pressed': String(m === rk.model) }, NAME[m]);
+      b.addEventListener('click', () => {
+        rk.model = m;
+        chipsR.querySelectorAll('.chip').forEach(c => c.setAttribute('aria-pressed', String(c === b)));
+        drawRank();
+      });
+      chipsR.append(b);
+    });
+    document.getElementById('rank-caption').textContent =
+      `Maximum winds of the 41 storms of 2025, all lead times pooled. Observed: IBTrACS, ${qmap.n.ibtracs} values. ` +
+      `Models: the maximum 10 m wind within about 220 km of the tracked centre, in the members' track points inside the ` +
+      `period with an observed wind (FGN ${qmap.n.fgn}, GenCast ${qmap.n.gencast_op}, IFS-ENS ${qmap.n.ifsens_e2s} values). ` +
+      'IBTrACS reports wind in steps of 5 kt, hence the steps in the observed curve. ' +
+      'The coloured strip under the axis gives the Saffir-Simpson category of each speed.';
+    function drawRank() {
+      const W = svgR.node().clientWidth, H = Math.round(Math.min(340, Math.max(240, W * 0.6)));
+      const mg = { l: 44, r: 12, t: 12, b: 46 }, iw = W - mg.l - mg.r, ih = H - mg.t - mg.b;
+      svgR.attr('viewBox', `0 0 ${W} ${H}`).attr('height', H);
+      svgR.selectAll('*').remove();
+      const g = svgR.append('g').attr('transform', `translate(${mg.l},${mg.t})`);
+      const x = d3.scaleLinear([0, 85], [0, iw]), y = d3.scaleLinear([0, 1], [ih, 0]);
+      g.append('g').selectAll('line').data([0.25, 0.5, 0.75, 1]).join('line')
+        .attr('x1', 0).attr('x2', iw).attr('y1', y).attr('y2', y).attr('stroke', '#ece9e4');
+      // category strip under the axis
+      CATS.forEach(([kt], i) => {
+        const lo = kt * KT, hi = i + 1 < CATS.length ? CATS[i + 1][0] * KT : 85;
+        g.append('rect').attr('x', x(lo)).attr('width', Math.max(0, x(hi) - x(lo)) - 1).attr('y', ih + 3).attr('height', 5)
+          .attr('fill', CAT_COLOR[i]);
+      });
+      const axisText = (sel) => sel.attr('font-size', 10).attr('fill', '#8a8a8a').attr('font-family', 'Inter, system-ui, sans-serif');
+      g.append('g').selectAll('text').data(d3.range(0, 81, 10)).join('text')
+        .attr('x', x).attr('y', ih + 21).attr('text-anchor', 'middle').text(d => d).call(axisText);
+      g.append('text').attr('x', iw).attr('y', ih + 38).attr('text-anchor', 'end').text('maximum wind (m/s)').call(axisText);
+      g.append('g').selectAll('text').data([0, 0.25, 0.5, 0.75, 1]).join('text')
+        .attr('x', -6).attr('y', d => y(d) + 3).attr('text-anchor', 'end').text(d => `${d * 100}%`).call(axisText);
+      g.append('text').attr('x', 0).attr('y', -2).text('share of winds below').call(axisText);
+      const line = vals => d3.line()(vals.map((v, i) => [x(Math.min(v, 85)), y(i / (vals.length - 1))]));
+      for (const m of MODELS) {
+        g.append('path').attr('d', line(qmap.models[m])).attr('fill', 'none').attr('stroke', COLOR[m])
+          .attr('stroke-width', m === rk.model ? 2.5 : 1.2).attr('opacity', m === rk.model ? 1 : 0.35);
+      }
+      g.append('path').attr('d', line(qmap.ibtracs)).attr('fill', 'none').attr('stroke', INK).attr('stroke-width', 2.5);
+      // direct labels at the 75% height
+      const lab = (v, text, color) => g.append('text').attr('x', x(Math.min(v, 85)) + 5).attr('y', y(0.75) + 4)
+        .attr('font-size', 11).attr('font-weight', 600).attr('fill', color).text(text);
+      lab(qmap.models[rk.model][75], NAME[rk.model], COLOR[rk.model]);
+      lab(qmap.ibtracs[75], 'observed', INK);
+      // the path of the selected wind
+      const q = rankOf(rk.model, rk.w), w2 = observedAt(q);
+      const path = [[x(rk.w), ih], [x(rk.w), y(q)], [x(w2), y(q)], [x(w2), ih]];
+      g.append('path').attr('d', d3.line()(path)).attr('fill', 'none').attr('stroke', INK).attr('stroke-width', 1.3)
+        .attr('stroke-dasharray', '4 3');
+      g.append('path').attr('d', d3.line()([[x(w2) - 5, y(q) - 4], [x(w2), y(q)], [x(w2) - 5, y(q) + 4]]))
+        .attr('fill', 'none').attr('stroke', INK).attr('stroke-width', 1.3);
+      for (const [v, c] of [[rk.w, COLOR[rk.model]], [w2, INK]]) {
+        g.append('circle').attr('cx', x(v)).attr('cy', ih).attr('r', 5).attr('fill', c).attr('stroke', '#fff').attr('stroke-width', 1.5);
+      }
+      readout.replaceChildren(el('div', { class: 'big' }, `${rk.w.toFixed(0)} → ${w2.toFixed(0)} m/s`));
+      readout.append(el('div', {},
+        `A ${NAME[rk.model]} member with a maximum wind of ${rk.w.toFixed(0)} m/s (${category(rk.w / KT)}) is stronger than ` +
+        `${Math.round(100 * q)}% of all ${NAME[rk.model]} winds of 2025. ${Math.round(100 * q)}% of the observed winds are below ` +
+        `${w2.toFixed(0)} m/s, so in the player it is shown at ${w2.toFixed(0)} m/s: ${category(w2 / KT)}.`));
+      // pointer sets the wind
+      svgR.append('rect').attr('x', mg.l).attr('y', mg.t).attr('width', iw).attr('height', ih).attr('fill', 'transparent')
+        .on('pointermove pointerdown', e => {
+          const [px] = d3.pointer(e, g.node());
+          const w = Math.max(5, Math.min(qmap.models[rk.model][100], x.invert(px)));
+          if (Math.abs(w - rk.w) >= 0.25) { rk.w = Math.round(w * 2) / 2; drawRank(); }
+        });
+    }
+    drawRank();
+    window.addEventListener('resize', drawRank);
+  }
 
   // ---------------------------------------------------------------- 4. intensity
   Promise.all(['intensity_bias', 'pressure_wind'].map(n => fetch(`data/${n}.json`).then(r => r.ok ? r.json() : null).catch(() => null)))
