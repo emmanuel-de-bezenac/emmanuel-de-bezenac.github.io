@@ -654,6 +654,7 @@ article .gsheet p { max-width: 560px; margin: 8px 0 0; padding: 0; color: var(--
 
 /* closing question and end note */
 article p.closing { margin-top: 4.5rem; font-size: 1.35rem; line-height: 1.45; letter-spacing: -0.01em; color: var(--text-3); }
+article p.closing .accent { color: var(--red); }
 article p.endnote { margin-top: 2.5rem; }
 /* NLL schematic: closed by default, opened by its summary or by the "How NLL is computed" link */
 details.nll-fold { max-width: var(--max-w); margin: 0 auto 2.5rem; padding: 0 1.5rem; scroll-margin-top: 72px; }
@@ -914,7 +915,7 @@ window.THEME=t==="light"
 <line x1="198" y1="9" x2="216" y2="9" stroke-width="2" style="stroke:var(--fgn)"/>
 <text x="222" y="13" font-size="11" style="fill:var(--text)">FGN</text>
 <line x1="269" y1="9" x2="287" y2="9" stroke-width="2" stroke-dasharray="4 3" style="stroke:var(--text-3)"/>
-<text x="293" y="13" font-size="11" style="fill:var(--text)">ERA5</text>
+<text x="293" y="13" font-size="11"><tspan style="fill:var(--text)">ERA5</tspan><tspan style="fill:var(--text-3)">: pretraining data</tspan></text>
 <line x1="0" y1="24" x2="640" y2="24" stroke-width="0.8" style="stroke:var(--text)"/>
 <text x="0" y="42" font-size="10.5" style="fill:var(--text-3)">max wind bias (% of HRES-fc0)</text>
 <g stroke-width="1" style="stroke:var(--border)"><line x1="52" y1="262.0" x2="630" y2="262.0"/><line x1="52" y1="220.0" x2="630" y2="220.0"/><line x1="52" y1="178.0" x2="630" y2="178.0"/><line x1="52" y1="94.0" x2="630" y2="94.0"/><line x1="52" y1="52.0" x2="630" y2="52.0"/></g>
@@ -935,7 +936,7 @@ window.THEME=t==="light"
   <p>We also wanted to see where FGN might fail. Its loss does not directly enforce the joint distribution across variables: it could predict wind and pressure well separately without getting their relationship right. In cyclones, stronger winds generally accompany lower central pressure. Does FGN reproduce that?</p>
   <p>Once again, the empirical result was more encouraging than we expected. After accounting for biases in wind and pressure separately, FGN reproduces a dependence similar to the reference data, as does GenCast. The storms are too weak, but the wind–pressure relationship is retained, even without being directly enforced by the loss.</p>
 
-  <p class="closing">What would you trust more: a model that, say, gave better forecasts in 90% of past cases, or one that “respects the physics”? But what if the next storm is unlike anything in those past cases?</p>
+  <p class="closing">Which would you trust more: a model that gave the better forecast for 90% of past storms, or one that “respects the physics”? <span class="accent">And what if the next storm is unlike any of them?</span></p>
   <p class="note endnote"><a href="https://arxiv.org/abs/2610.22077" target="_blank">Read the paper</a> for the evaluation protocol, metric definitions, and full results across both model comparisons. Special thanks to Nathan Chalumeau, who did all of the work. We welcome comments and criticism. Please feel free to <a href="mailto:emmanuel.de-bezenac@inria.fr?subject=AI%20cyclone%20forecasts">reach out</a>!</p>
 </article>
 
