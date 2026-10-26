@@ -936,11 +936,10 @@ window.THEME=t==="light"
   </figure>
   
   <p>We also wanted to see where FGN might fail. Its loss does not directly enforce the joint distribution across variables: it could predict wind and pressure well separately without getting their relationship right. In cyclones, stronger winds generally accompany lower central pressure. Does FGN reproduce that?</p>
-  <p>Once again, the empirical result was more encouraging than we expected. After accounting for biases in wind and pressure separately, FGN reproduces a dependence similar to the reference data, as does GenCast. The storms are too weak, but the wind–pressure relationship is retained, even without being directly enforced by the loss.</p>
-
-  <p class="closing-lead">To finish, a question for you.</p>
-  <p class="closing"><span class="ink">Which would you trust more:</span> a model that gave the better forecast for 90% of past storms, or one that “respects the physics”? <span class="accent">And what if the next storm is unlike any of them?</span></p>
   <p class="note endnote"><a href="https://arxiv.org/abs/2610.22077" target="_blank">Read the paper</a> for the evaluation protocol, metric definitions, and full results across both model comparisons. Special thanks to Nathan Chalumeau, who did all of the work. We welcome comments and criticism. Please feel free to <a href="mailto:emmanuel.de-bezenac@inria.fr?subject=AI%20cyclone%20forecasts">reach out</a>!</p>
+
+  <p class="closing-lead">But the more important question is for you.</p>
+  <p class="closing"><span class="ink">Which would you trust more:</span> a model that gave the better forecast for 90% of past storms, or one that “respects the physics”? <span class="accent">And what if the next storm is unlike any of them?</span></p>
 </article>
 
 <footer>
