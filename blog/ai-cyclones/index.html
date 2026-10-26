@@ -762,7 +762,7 @@ window.THEME=t==="light"
   <p>We chose tropical cyclones to test whether improvements on global weather scores extend to extremes. Across <b>178 cyclones from 2021–2023 and 2025</b>, we examined tracks, intensity, and forecast uncertainty.</p>
 
   <h2 id="benchmark"><span class="num">1</span>The benchmark</h2>
-  <p>Earlier evaluations scored a single forecast track against the observed one. For an ensemble, we also need to know whether it assigns sensible probabilities to the possible outcomes: two ensembles can share the same average track and differ widely in uncertainty. So we built an evaluation framework combining probabilistic scores with cyclone-specific diagnostics. We measure the probability assigned to the observed track, whether storms are detected at all, and where the strongest winds and lowest pressures occur. We also check intensity, whether ensemble spread matches forecast errors, and the relationship between wind and pressure.</p>
+  <p>Earlier studies evaluated deterministic models with deterministic metrics. A probabilistic forecast is a distribution over possible outcomes and should be evaluated as one. We built a benchmark that does this for tropical cyclones, covering tracks, intensity and uncertainty.</p>
   <p>Here we'll focus on the 2025 operational forecasts: <a href="https://doi.org/10.1038/s41586-024-08252-9" target="_blank">GenCast</a> and <a href="https://arxiv.org/abs/2506.10772" target="_blank">FGN</a> from Google DeepMind, compared with ECMWF's <a href="https://www.ecmwf.int/en/forecasts/documentation-and-support/medium-range-forecasts" target="_blank">IFS-ENS</a>.</p>
 
   <p>We expected to find substantial limitations compared with physics-based models. Cyclones occupy only about <a href="https://arxiv.org/abs/2610.22077" target="_blank">0.5% of grid points in global climate simulations</a>. It didn't turn out quite how we expected.</p>
@@ -805,7 +805,7 @@ window.THEME=t==="light"
 
 
   <h2 id="forecasts"><span class="num">2</span>Look at the forecasts</h2>
-  <p>Each panel shows 49 forecasts of the same storm from one model. The dots mark predicted storm centres, coloured by the maximum wind nearby. The line shows the observed track. Track NLL is shown above each panel; lower is better. Only members in which the tracker detects and matches the storm enter the track score; detection rates are reported separately.</p>
+  <p>Each panel shows 49 forecasts of the same storm from one model. The dots mark predicted storm centres, coloured by the maximum wind nearby. The line shows the observed track. Track NLL is shown above each panel; lower is better. Only members in which the tracker finds the storm count towards the score; their number is shown above each panel.</p>
 
   <!-- hidden until clicked; contours are a Gaussian KDE of the drawn dots; same drawing style as #det-gen -->
   <details class="method nll-fold" id="nll-method">
@@ -935,11 +935,11 @@ window.THEME=t==="light"
     <figcaption>Mean over 53 storms of 2025 of the maximum 10 m wind, relative to the mean HRES-fc0 maximum wind (19.5 m/s).</figcaption>
   </figure>
   
-  <p>There’s more in the paper. Do the ensembles represent uncertainty well? Do the model rankings hold across years, ocean basins, and storm intensities? How do the earlier ERA5-trained models compare? And do the models reproduce the relationship between wind and pressure, even when their loss does not directly enforce it?</p>
+  <p>Do the ensembles represent uncertainty well? Do the model rankings hold across years, ocean basins, and storm intensities? How do the earlier ERA5-trained models compare? And do the models reproduce the relationship between wind and pressure, even when their loss does not directly enforce it?</p>
   <p>We examine these questions in <a href="https://arxiv.org/abs/2610.22077" target="_blank">the paper</a>, with the full benchmark and evaluation protocol.</p>
 
   <p class="closing-lead">That leaves you with a question.</p>
-  <p class="closing"><span class="ink">Which would you trust more:</span> a model that gave the better forecast for 90% of past storms, or one that “respects the physics”? <span class="accent">And what if the next storm is unlike any of them?</span></p>
+  <p class="closing"><span class="ink">Which would you trust more:</span> a model that gave the better forecast for 90% of past storms, or one that “respects the physics”? <span class="accent">And what if the next storm is unlike any seen before?</span></p>
   <p class="note endnote">Special thanks to Nathan Chalumeau, who did all of the work. We welcome comments and criticism. Please feel free to <a href="mailto:emmanuel.de-bezenac@inria.fr?subject=AI%20cyclone%20forecasts">reach out</a>!</p>
 </article>
 
