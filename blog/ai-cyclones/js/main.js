@@ -767,11 +767,12 @@ const ICON_PLAY = '<svg viewBox="0 0 16 16" width="15" height="15" aria-hidden="
     const beats = (a, b) => list.filter(s => s.nll[a] < s.nll[b]).length;
     const stats = document.getElementById('stats');
     stats.replaceChildren();
-    [[`${beats('fgn', 'ifsens_e2s')} / ${nStorms}`, 'storms on which FGN has a lower NLL than IFS-ENS'],
-     [`${beats('gencast_op', 'ifsens_e2s')} / ${nStorms}`, 'storms on which GenCast has a lower NLL than IFS-ENS'],
-     [`${beats('fgn', 'gencast_op')} / ${nStorms}`, 'storms on which FGN has a lower NLL than GenCast']]
+    [[`${beats('fgn', 'ifsens_e2s')} / ${nStorms}`, 'on which FGN has a lower NLL than IFS-ENS'],
+     [`${beats('gencast_op', 'ifsens_e2s')} / ${nStorms}`, 'on which GenCast has a lower NLL than IFS-ENS'],
+     [`${beats('fgn', 'gencast_op')} / ${nStorms}`, 'on which FGN has a lower NLL than GenCast']]
       .forEach(([v, k]) => {
         const d = el('div', { class: 'stat' }), big = el('div', { class: 'v' }, v);
+        big.append(' ', el('span', { class: 'u' }, 'storms'));
         d.append(big, el('div', { class: 'k' }, k)); stats.append(d);
       });
     const share = Object.fromEntries(MODELS.map(m => [m, list.filter(s => s.winner === m).length]));
