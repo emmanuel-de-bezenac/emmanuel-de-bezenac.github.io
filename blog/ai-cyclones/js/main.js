@@ -169,20 +169,43 @@ const ICON_PLAY = '<svg viewBox="0 0 16 16" width="15" height="15" aria-hidden="
   const ordered = [...CURATED.map(h => withTracks.find(s => s.hid === h)).filter(Boolean),
                    ...withTracks.filter(s => !CURATED.includes(s.hid)).sort((a, b) => a.start.localeCompare(b.start))];
   const chipFor = {};
-  ordered.forEach((s, i) => {
+  ordered.forEach(s => {
     const b = el('button', { class: 'chip', type: 'button', 'aria-pressed': 'false' }, s.name);
     b.addEventListener('click', () => selectStorm(s.hid, true));
     chipFor[s.hid] = b;
-    if (i < 8) chips.append(b);
   });
-  if (ordered.length > 8) {
+  // as many storm chips as fit on one line next to the "more storms" menu; the rest go in the menu
+  let nChips = 0;
+  function layoutChips() {
     const sel = el('select', { class: 'chip', 'aria-label': 'More storms' });
-    sel.append(el('option', { value: '' }, `${ordered.length - 8} more storms…`));
-    ordered.slice(8).forEach(s => sel.append(el('option', { value: s.hid }, `${s.name} (${s.start})`)));
+    // a menu is as wide as its widest option: measure it holding every storm, so that it cannot widen afterwards
+    const head = el('option', { value: '' }, `${ordered.length} more storms…`);
+    const opt = s => el('option', { value: s.hid }, s.name);
+    sel.append(head, ...ordered.map(opt));
+    chips.replaceChildren(sel);
+    nChips = 0;
+    // a box has wrapped when its top is below the middle of the first one
+    const wrapped = (x, first) => x.getBoundingClientRect().top > first.top + first.height / 2;
+    for (const s of ordered) {
+      const b = chipFor[s.hid];
+      chips.insertBefore(b, sel);
+      const first = chips.firstChild.getBoundingClientRect();
+      if (wrapped(b, first) || wrapped(sel, first)) { b.remove(); break; }
+      nChips++;
+    }
+    const rest = ordered.slice(nChips);
+    if (!rest.length) { sel.remove(); player.moreSelect = null; return; }
+    head.textContent = `${rest.length} more storms…`;
+    sel.replaceChildren(head, ...rest.map(opt));
     sel.addEventListener('change', () => { if (sel.value) selectStorm(sel.value, true); });
-    chips.append(sel);
+    if (rest.some(s => s.hid === player.hid)) sel.value = player.hid;
     player.moreSelect = sel;
   }
+  layoutChips();
+  if (document.fonts) document.fonts.ready.then(layoutChips);
+  window.addEventListener('load', layoutChips);
+  let chipTimer = 0;
+  window.addEventListener('resize', () => { clearTimeout(chipTimer); chipTimer = setTimeout(layoutChips, 150); });
 
   {
     // colour bar: one block per category (hover for its meaning), lower bounds in m/s below
@@ -202,21 +225,28 @@ const ICON_PLAY = '<svg viewBox="0 0 16 16" width="15" height="15" aria-hidden="
       if (i < 2) b.classList.add('light');
       if (i > 0) { const t = el('span', {}, String(Math.round(kt * KT))); t.style.left = `${100 * i / (CATS.length + 1)}%`; ticks.append(t); }
     });
-    block('no data', NO_WIND, 'No wind reported', [], 'IBTrACS has no wind from the USA agencies at these times, usually before the storm forms and after it becomes post-tropical.').classList.add('none');
+    block('no data', NO_WIND, 'No wind reported', [], 'IBTrACS has no wind from the USA agencies at these times.').classList.add('none');
     const unit = el('span', {}, 'm/s'); unit.style.left = `${100 * CATS.length / (CATS.length + 1)}%`; ticks.append(unit);
     bar.append(blocks, ticks);
     const seg = document.getElementById('windcorr'), explain = document.getElementById('wc-explain');
     const EXPLAIN = {
-      raw: 'Maximum 10 m wind within about 220 km of each member\'s storm centre. The 25 km model grid smooths the peak, so even an exact forecast is weaker than observed (figure below).',
-      rank: 'Each member\'s wind is replaced by the observed wind of the same rank among all 2025 winds of its model (section 4). This removes the model\'s overall bias and keeps which members are strong or weak.',
+      raw: 'Maximum 10 m wind within about 220 km of each member\'s storm centre, as the model gives it.',
+      rank: 'Winds are mapped to observed values of the same rank, matching the overall observed distribution. Predicted positions stay unchanged. This changes the display, not the forecast.',
     };
+    // both texts sit in the same grid cell and only one is visible, so the cell keeps the height of the longer one
+    const texts = Object.fromEntries(Object.entries(EXPLAIN).map(([k, t]) => [k, el('span', {}, t)]));
+    explain.classList.add('stack'); explain.replaceChildren(...Object.values(texts));
     const setMode = v => {
       player.corrected = v === 'rank';
       seg.querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', String(x.dataset.v === v)));
-      explain.textContent = EXPLAIN[v];
+      Object.entries(texts).forEach(([k, s]) => { s.style.visibility = k === v ? 'visible' : 'hidden'; });
     };
     setMode('raw');
-    seg.querySelectorAll('button').forEach(b => b.addEventListener('click', () => { setMode(b.dataset.v); draw(); }));
+    // a switch: clicking the selected side (or its half of the box) flips to the other state
+    const other = v => v === 'raw' ? 'rank' : 'raw';
+    seg.querySelectorAll('button').forEach(b => b.addEventListener('click', () => {
+      setMode(b.getAttribute('aria-pressed') === 'true' ? other(b.dataset.v) : b.dataset.v); draw();
+    }));
   }
   // "Guess the models" (names hidden until the reader answers) or "Show the models" (names shown, no questions)
   // the article shows the names; guessing them is the separate game page (game.html)
@@ -252,7 +282,8 @@ const ICON_PLAY = '<svg viewBox="0 0 16 16" width="15" height="15" aria-hidden="
   async function selectStorm(hid, scroll) {
     setPlaying(false);
     for (const [h, b] of Object.entries(chipFor)) b.setAttribute('aria-pressed', String(h === hid));
-    if (player.moreSelect) player.moreSelect.value = ordered.slice(8).some(s => s.hid === hid) ? hid : '';
+    player.hid = hid;
+    if (player.moreSelect) player.moreSelect.value = ordered.slice(nChips).some(s => s.hid === hid) ? hid : '';
     const storm = await loadStorm(hid);
     player.storm = storm;
     player.t = storm.start_h;
@@ -293,7 +324,6 @@ const ICON_PLAY = '<svg viewBox="0 0 16 16" width="15" height="15" aria-hidden="
     const head = document.getElementById('stormhead');
     head.replaceChildren(el('div', { class: 'name' }, storm.title || `${storm.name}, ${storm.init.slice(0, 4)}`),
       el('div', { class: 'init' }, `All forecasts started ${fmtDate(new Date(storm.init.replace('Z', ':00Z')))}`));
-    if (storm.impact) head.append(el('div', { class: 'impact' }, storm.impact));
     const clock = el('div', { class: 'clock' });
     player.clock = {
       day: document.getElementById('now-day'), date: document.getElementById('now-date'),
@@ -602,7 +632,8 @@ const ICON_PLAY = '<svg viewBox="0 0 16 16" width="15" height="15" aria-hidden="
     }
     return best;
   }
-  CASES.forEach((c, i) => {
+  // the explainer is optional: a page without its panels skips it
+  (exRoot ? CASES : []).forEach((c, i) => {
     const b = el('button', { class: 'chip', type: 'button', 'aria-pressed': String(i === 0) }, c.label);
     b.addEventListener('click', () => {
       exCases.querySelectorAll('.chip').forEach(x => x.setAttribute('aria-pressed', String(x === b)));
@@ -710,7 +741,7 @@ const ICON_PLAY = '<svg viewBox="0 0 16 16" width="15" height="15" aria-hidden="
       if (ex.marker) row('NLL at the light dot', (-logDensity(p.P, p.h, toKm(mk))).toFixed(2), false);
     }
   }
-  if (CASES.length) selectCase(CASES[0]);
+  if (exRoot && CASES.length) selectCase(CASES[0]);
 
   // ---------------------------------------------------------------- 3. season
   const BASINS = { all: 'All basins', WP: 'West Pacific', SI: 'South Indian', EP: 'East Pacific', NA: 'North Atlantic', SP: 'South Pacific', NI: 'North Indian' };
@@ -739,11 +770,13 @@ const ICON_PLAY = '<svg viewBox="0 0 16 16" width="15" height="15" aria-hidden="
     [[`${beats('fgn', 'ifsens_e2s')} / ${nStorms}`, 'storms on which FGN has a lower NLL than IFS-ENS'],
      [`${beats('gencast_op', 'ifsens_e2s')} / ${nStorms}`, 'storms on which GenCast has a lower NLL than IFS-ENS'],
      [`${beats('fgn', 'gencast_op')} / ${nStorms}`, 'storms on which FGN has a lower NLL than GenCast']]
-      .forEach(([v, k]) => { const d = el('div', { class: 'stat' }); d.append(el('div', { class: 'v' }, v), el('div', { class: 'k' }, k)); stats.append(d); });
+      .forEach(([v, k]) => {
+        const d = el('div', { class: 'stat' }), big = el('div', { class: 'v' }, v);
+        d.append(big, el('div', { class: 'k' }, k)); stats.append(d);
+      });
     const share = Object.fromEntries(MODELS.map(m => [m, list.filter(s => s.winner === m).length]));
     const bar = document.getElementById('sharebar'), leg = document.getElementById('sharelegend');
     bar.replaceChildren(); leg.replaceChildren();
-    document.querySelector('#sharebar').previousElementSibling.textContent = `Colour on the map: the model with the lowest NLL of the three, share of the ${nStorms} storms`;
     ['fgn', 'gencast_op', 'ifsens_e2s'].forEach(m => {
       if (!share[m]) return;
       const wide = share[m] / nStorms >= 0.12, lab = `${NAME[m]} ${Math.round(100 * share[m] / nStorms)}%`; const d = el('div', wide ? {} : { class: 'out' }, wide ? lab : null); if (!wide) { const t = el('span', {}, lab); t.style.color = COLOR[m]; d.append(t); }
@@ -814,7 +847,7 @@ const ICON_PLAY = '<svg viewBox="0 0 16 16" width="15" height="15" aria-hidden="
   // ---------------------------------------------------------------- 4b. rank rescaling
   // Share of winds below each speed for each model and for IBTrACS (wind_qmap.json); the selected wind
   // goes up to its model's curve, across to the observed curve and down to the rescaled wind.
-  {
+  if (document.getElementById('rank-chart')) {
     const rk = { model: 'fgn', w: 30 };
     const svgR = d3.select('#rank-chart'), readout = document.getElementById('rank-readout');
     const chipsR = document.getElementById('rank-models');
@@ -831,7 +864,7 @@ const ICON_PLAY = '<svg viewBox="0 0 16 16" width="15" height="15" aria-hidden="
       `Maximum winds of the 41 storms of 2025, all lead times pooled. Observed: IBTrACS, ${qmap.n.ibtracs} values. ` +
       `Models: the maximum 10 m wind within about 220 km of the tracked centre, in the members' track points inside the ` +
       `period with an observed wind (FGN ${qmap.n.fgn}, GenCast ${qmap.n.gencast_op}, IFS-ENS ${qmap.n.ifsens_e2s} values). ` +
-      'IBTrACS reports wind in steps of 5 kt, hence the steps in the observed curve. ' +
+      'Many agency estimates are in steps of 5 kt, hence the steps in the observed curve. ' +
       'The coloured strip under the axis gives the Saffir-Simpson category of each speed.';
     function drawRank() {
       const W = svgR.node().clientWidth, H = Math.round(Math.min(340, Math.max(240, W * 0.6)));
@@ -896,7 +929,7 @@ const ICON_PLAY = '<svg viewBox="0 0 16 16" width="15" height="15" aria-hidden="
   // ---------------------------------------------------------------- 4. intensity
   Promise.all(['intensity_bias', 'pressure_wind'].map(n => fetch(`data/${n}.json`).then(r => r.ok ? r.json() : null).catch(() => null)))
     .then(([bias, pw]) => {
-      if (!window.BlogIntensity) return;
+      if (!window.BlogIntensity || !document.getElementById('bias-chart')) return;
       if (bias) window.BlogIntensity.renderBias(document.getElementById('bias-chart'), bias);
       if (pw) window.BlogIntensity.renderPressureWind(document.getElementById('pw-chart'), pw);
     });

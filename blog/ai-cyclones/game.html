@@ -4,7 +4,10 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Spot the physics · 5 cyclones</title>
-<script>(function(){var t=null;try{t=localStorage.getItem("theme")}catch(e){}document.documentElement.dataset.theme=t==="light"?"light":"dark";})();</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Barlow+Semi+Condensed:wght@700&display=swap" rel="stylesheet">
+<script>(function(){var t=null;try{t=localStorage.getItem("theme")}catch(e){}document.documentElement.dataset.theme=t==="dark"?"dark":"light";})();</script>
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   /* same palette and rules as the blog: flat, no boxes, mono labels in red, space instead of lines */
@@ -150,18 +153,15 @@
   .rank .rn { font-size: 1.7rem; font-weight: 700; letter-spacing: -.02em; line-height: 1.15; }
   .appr { color: var(--para); max-width: 520px; margin: 4px 0 26px; opacity: 0; }
   #result.on .appr { animation: fadeup .6s 1.9s both; }
-  .cmp { margin: 0 0 30px; opacity: 0; }
-  #result.on .cmp { animation: fadeup .5s 2.1s both; }
-  .duel { display: flex; align-items: center; gap: 28px; margin: 12px 0 8px; }
-  .duel .side { color: var(--text-3); }
-  .duel .side.win { color: var(--text); }
-  .duel .who { font-family: var(--mono); font-size: 12px; }
-  .duel .side.win .who { color: var(--red); }
-  .duel .num { font-family: var(--mono); font-size: 2.6rem; line-height: 1.05; }
-  .duel .pts { font-family: var(--mono); font-size: 11.5px; color: var(--text-3); }
-  .duel .vs { font-family: var(--mono); font-size: 12px; color: var(--text-4); }
-  #result.on .duel .side { animation: fadeup .5s both; } #result.on .duel .side:last-child { animation-delay: 2.5s; } #result.on .duel .side:first-child { animation-delay: 2.2s; }
-  .cmpt { color: var(--text); font-weight: 700; font-size: 1.05rem; margin-top: 6px; }
+  /* rank ladder: five rungs, lowest on the left; yours lit in red, the ones below it filled */
+  .ladder { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 4px; margin: 10px 0 14px; max-width: 640px; }
+  .rung i { display: block; height: 6px; background: var(--border); }
+  .rung span { display: block; font-family: var(--mono); font-size: 11px; color: var(--text-4); margin-top: 6px; line-height: 1.3; }
+  .rung.past i { background: var(--text-3); }
+  .rung.me i { background: var(--red); }
+  .rung.me span { color: var(--red); }
+  #result.on .rung i { animation: rung .35s both; animation-delay: calc(1.6s + var(--i) * .12s); }
+  @keyframes rung { from { transform: scaleX(0); transform-origin: left; } to { transform: scaleX(1); transform-origin: left; } }
   .rows { margin-bottom: 26px; opacity: 0; }
   #result.on .rows { animation: fadeup .6s 2.5s both; }
   .rrow { display: grid; grid-template-columns: 22px 1fr auto 60px; gap: 12px; align-items: baseline; padding: 3px 0; font-size: .95rem; }
@@ -197,32 +197,116 @@
     #intro.on { grid-template-columns: 1fr; gap: 24px; }
     #intro .introfig { order: 0; }
   }
+
+  /* ---------- engineering sheet, as the game block in the article: a title-block status line, a double frame
+     with zone letters and crop marks, condensed titles, numbered balloons, dark square buttons ---------- */
+  :root { --cond: 'Barlow Semi Condensed', 'Helvetica Neue', Helvetica, Arial, sans-serif; }
+  #hud { padding-bottom: 12px; }
+  #hud .wrap { padding-top: 12px; padding-bottom: 0; gap: 0; }
+  #hud .tb { display: flex; width: 100%; border: 1.5px solid var(--text); background: var(--bg); }
+  #hud .cell { display: flex; flex-direction: column; justify-content: center; padding: 4px 12px 6px; border-left: 1px solid var(--text); color: var(--text); text-decoration: none; text-align: left; white-space: nowrap; }
+  #hud .cell:first-child { border-left: 0; }
+  #hud .cell small { font-size: 9.5px; color: var(--text-3); letter-spacing: .08em; text-transform: uppercase; line-height: 1.4; }
+  #hud .grow { flex: 1; }
+  #hud .back { border-bottom: 0; transition: background .15s, color .15s; }
+  #hud .back:hover, #hud .themeb:hover { background: var(--text); color: var(--bg); }
+  #hud .back:hover small, #hud .themeb:hover small { color: var(--bg); }
+  #hud .themeb { font: inherit; cursor: pointer; transition: background .15s, color .15s; }
+  .dots { gap: 14px; }
+  #streak { opacity: 1; color: var(--red); }
+  #streak:empty::before { content: '—'; color: var(--text-4); }
+  .stat b { color: var(--text); }
+
+  .sheet { position: relative; border: 1px solid var(--text); padding: 6px; margin: 30px 0 46px; }
+  .sheet > .inner { position: relative; border: 1.5px solid var(--text); padding: 4px 30px 0; }
+  .sheet .zones { position: absolute; left: 0; right: 0; top: -23px; line-height: 1; display: flex; justify-content: space-around; font-family: var(--mono); font-size: 10px; color: var(--text-3); }
+  .sheet .zonesv { position: absolute; top: 0; bottom: 0; left: -16px; display: flex; flex-direction: column; justify-content: space-around; font-family: var(--mono); font-size: 10px; color: var(--text-3); }
+  .sheet .reg { position: absolute; width: 18px; height: 18px; }
+  .sheet .reg::before, .sheet .reg::after { content: ''; position: absolute; background: var(--text); }
+  .sheet .reg::before { left: 8px; top: 0; width: 1px; height: 18px; } .sheet .reg::after { top: 8px; left: 0; height: 1px; width: 18px; }
+  .sheet .r1 { left: -26px; top: -26px; } .sheet .r2 { right: -26px; top: -26px; } .sheet .r3 { left: -26px; bottom: -26px; } .sheet .r4 { right: -26px; bottom: -26px; }
+  .screen { padding: 26px 0 34px; }
+
+  h1, .roundhead .nm, .rank .rn, .vmsg, .rv .mn { font-family: var(--cond); letter-spacing: 0; }
+  h1 { font-size: clamp(2.4rem, 6vw, 3.6rem); line-height: 1.02; }
+  .roundhead .nm { font-size: clamp(1.8rem, 4vw, 2.4rem); line-height: 1.05; }
+  .rank .rn { font-size: 2rem; }
+  .steps li { align-items: center; }
+  .steps li span { display: grid; place-items: center; width: 20px; height: 20px; padding: 0; border: 1px solid var(--text); border-radius: 50%; color: var(--text); font-size: 10.5px; }
+  .cta, .solid { background: var(--text); color: var(--bg); font-family: var(--cond); letter-spacing: .02em; transition: background .15s; }
+  .cta { font-size: 1.5rem; padding: 10px 30px; }
+  .solid { font-size: 1.15rem; }
+  .cta:hover, .solid:hover { background: var(--red); opacity: 1; }
+  .outl { color: var(--text); border: 1.5px solid var(--text); font-family: var(--cond); font-size: 1.15rem; letter-spacing: .02em; }
+  .outl:hover { background: var(--text); color: var(--bg); }
+  #intro .introfig canvas { outline: 1px solid var(--text); outline-offset: 4px; }
+  #intro .introfig figcaption { margin-top: 12px; }
+  /* intro: who is who (the physics model, then the two AI models), and a start bar along the bottom of the sheet, as in the article */
+  #intro { padding-bottom: 0; }
+  #intro .startbar { grid-column: 1 / -1; order: 3; display: flex; align-items: stretch; justify-content: space-between; margin: 6px -30px 0;
+    border-top: 1.5px solid var(--text); font-family: var(--mono); font-size: 11.5px; color: var(--text-3); }
+  #intro .startbar > span { align-self: center; padding: 0 12px; }
+  #intro .startbar .cta { padding: 10px 28px; }
+  .cta span { display: inline-block; transition: transform .15s; }
+  .cta:hover span { transform: translateX(4px); }
+  .who { display: grid; grid-template-columns: 1fr 2fr; gap: 0 22px; margin: 4px 0 18px; }
+  .who .gk { font-family: var(--mono); font-size: 11px; color: var(--text-3); margin-bottom: 6px; white-space: nowrap; }
+  .who .gk b { font-weight: 400; color: var(--red); text-transform: uppercase; letter-spacing: .06em; }
+  .who .ms { display: flex; gap: 10px; padding-top: 8px; border-top: 1px solid var(--text); position: relative; }
+  .who .ms::before, .who .ms::after { content: ''; position: absolute; top: -1px; width: 1px; height: 7px; background: var(--text); }
+  .who .ms::before { left: 0; } .who .ms::after { right: 0; }
+  .who .m { flex: 1; border: 2px solid var(--c); padding: 3px 9px 4px; }
+  .who .m b { display: block; font-family: var(--cond); font-size: 1.2rem; line-height: 1.15; }
+  .who .m span { font-family: var(--mono); font-size: 10px; color: var(--text-3); }
+  #hud .cell { flex-direction: row; align-items: center; gap: 6px; padding: 9px 14px; font-family: var(--mono); font-size: 12px; }
+  #hud .stat { color: var(--text-3); }
+  #hud .stat b { font-size: 14px; }
+  #streak { margin-left: 8px; }
+  #streak:empty::before { content: none; }
+  @media (max-width: 560px) { .who { grid-template-columns: 1fr; gap: 12px; } .who .ms { flex-wrap: wrap; } #intro .startbar { margin: 6px -16px 0; } }
+  .phead { display: inline-grid; place-items: center; width: 24px; height: 24px; border: 1px solid var(--text); border-radius: 50%; font-family: var(--mono); font-weight: 400; font-size: 12px; }
+  .panel canvas.map { outline-color: var(--text-4); }
+  .panel:not(.locked) canvas.map:hover { outline-color: var(--text); }
+  .bar { height: 7px; border: 1px solid var(--text); background: repeating-linear-gradient(90deg, transparent 0 calc(10% - 1px), var(--text-4) calc(10% - 1px) 10%); }
+  .why { border-top: 1px solid var(--text); padding-top: 12px; }
+  @media (max-width: 760px) {
+    .sheet > .inner { padding: 4px 16px 0; }
+    .sheet .zonesv, .sheet .reg { display: none; }
+    #hud .cell { padding: 4px 8px 6px; }
+    #hud .hide-s { display: none; }
+  }
 </style>
 </head>
 <body>
 
-<div id="hud"><div class="wrap">
-  <a class="back" href="index.html">← Article</a>
-  <div class="dots" id="dots"></div>
-  <div id="streak"></div>
-  <div class="stat">score <b id="score">0</b></div>
-</div></div>
+<div id="hud"><div class="wrap"><div class="tb">
+  <a class="back cell" href="index.html">← Article</a>
+  <div class="cell grow"><div class="dots" id="dots"></div></div>
+  <div class="cell stat">score <b id="score">0</b><span id="streak"></span></div>
+  <button class="cell themeb" id="themeb" type="button"><span id="themel"></span></button>
+</div></div></div>
 
-<main class="wrap">
+<main class="wrap"><div class="sheet">
+  <div class="inner">
 
   <section class="screen on" id="intro">
     <figure class="introfig"><canvas id="introcv"></canvas><figcaption>Erin, August 2025. AI or physics?</figcaption></figure>
     <div class="txt">
-      <div class="lab">5 cyclones · 2 minutes</div>
       <h1>Spot the <em>physics</em> model.</h1>
       <p class="lede">Three forecasts of the same cyclone. Two are AI, one is physics. Find it.</p>
-      <ol class="steps">
-        <li><span>→</span>Faster answers score more.</li>
-        <li><span>→</span>Streaks score more.</li>
-      </ol>
-      <button class="cta" id="start" type="button">Start →</button>
-      <div class="fine">Chance gets 1.7 of 5.</div>
+      <div class="who">
+        <div class="grp">
+          <div class="gk"><b>Physics</b> · solves the equations</div>
+          <div class="ms"><div class="m" style="--c:#378ADD"><b>IFS-ENS</b><span>ECMWF</span></div></div>
+        </div>
+        <div class="grp">
+          <div class="gk"><b>AI</b> · learned from past weather</div>
+          <div class="ms"><div class="m" style="--c:#1D9E75"><b>GenCast</b><span>Google DeepMind</span></div><div class="m" style="--c:#E24B4A"><b>FGN</b><span>Google DeepMind</span></div></div>
+        </div>
+      </div>
+      <p class="fine">Faster answers and streaks score more.</p>
     </div>
+    <div class="startbar"><span>5 cyclones · about 2 minutes</span><button class="cta" id="start" type="button">Start <span aria-hidden="true">→</span></button></div>
   </section>
 
   <section class="screen" id="round">
@@ -251,7 +335,20 @@
   </section>
 
   <section class="screen" id="result"></section>
-</main>
+  </div>
+</div></main>
+<script>
+// light / dark, shared with the article through localStorage; the maps read their colours at draw time, so reload
+(function () {
+  var r = document.documentElement, l = document.getElementById('themel');
+  l.textContent = r.dataset.theme === 'dark' ? 'Light' : 'Dark';
+  document.getElementById('themeb').addEventListener('click', function () {
+    var t = r.dataset.theme === 'dark' ? 'light' : 'dark';
+    try { localStorage.setItem('theme', t); } catch (e) {}
+    location.reload();
+  });
+})();
+</script>
 
 <canvas id="fx"></canvas>
 
@@ -386,9 +483,11 @@
     tick('m/s', CATS.length);
     $('windbar').append(blocks, ticks);
   }
+  // a switch: clicking the selected side (or its half of the box) flips to the other state
   document.querySelectorAll('#wtog button').forEach(b => b.addEventListener('click', () => {
-    G.corrected = b.dataset.v === 'rank';
-    document.querySelectorAll('#wtog button').forEach(x => x.setAttribute('aria-pressed', String(x === b)));
+    const v = b.getAttribute('aria-pressed') === 'true' ? (b.dataset.v === 'raw' ? 'rank' : 'raw') : b.dataset.v;
+    G.corrected = v === 'rank';
+    document.querySelectorAll('#wtog button').forEach(x => x.setAttribute('aria-pressed', String(x.dataset.v === v)));
   }));
   $('start').addEventListener('click', () => { G.i = 0; G.score = 0; G.streak = 0; G.results = []; G.shownScore = 0; $('score').textContent = '0'; setStreak(); startRound(); });
 
@@ -583,60 +682,33 @@
     if (G.i < storms.length - 1) { G.i++; startRound(); } else endGame();
   }
 
-  // ------------------------------------------------------------ comparison
-  // The opponent is a one-line rule: pick the panel whose members have the strongest median peak wind.
-  // It answers at the end of the clip, so it gets no speed bonus.
-  function windRule() {
-    let s = 0, streak = 0, n = 0;
-    for (const st of storms) {
-      const pk = m => median(st.models[m].map(([mb, p]) => Math.max(...p.map(q => q[3] ?? 0))).filter(x => x > 0));
-      const best = st.order.reduce((a, m) => pk(m) > pk(a) ? m : a);
-      if (MODEL[best].phys) { s += BASE + STREAK * streak; streak++; n++; } else streak = 0;
-    }
-    return { s, n };
-  }
-  // a head-to-head against the rule: correct answers, then points, and one line on what it means
-  function compare(score, n) {
-    const rule = windRule();
-    const verdict = score > rule.s
-      ? (n === 5 ? 'You beat the rule. Real forecaster instincts.' : 'You beat the rule on speed. Nice.')
-      : n >= rule.n ? 'Same eye as the rule, slower trigger. Play again, faster.'
-      : n >= 3 ? 'Good instincts. The rule just looks at the winds: the AI storms are weaker.'
-      : 'The rule wins. Its secret: the AI storms are weaker. Look at the colours and try again.';
-    $('cmp').innerHTML = `
-      <div class="lab">You vs a one-line rule: <i>pick the strongest winds</i></div>
-      <div class="duel">
-        <div class="side ${score > rule.s ? 'win' : ''}"><div class="who">You</div><div class="num">${n}/5</div><div class="pts">${score.toLocaleString('en-US')} pts</div></div>
-        <div class="vs">vs</div>
-        <div class="side ${score > rule.s ? '' : 'win'}"><div class="who">Wind rule</div><div class="num">${rule.n}/5</div><div class="pts">${rule.s.toLocaleString('en-US')} pts</div></div>
-      </div>
-      <p class="cmpt">${verdict}</p>`;
-  }
-
   // ------------------------------------------------------------ end
+  // ranks by correct answers, lowest first; the ladder shows all five with yours lit
   const RANKS = [
-    [5, 'Storm whisperer', 'Perfect.'],
-    [4, 'Senior forecaster', 'One slipped through.'],
-    [3, 'Hurricane hunter', 'Beats chance.'],
-    [2, 'Storm chaser in training', 'A bit above chance.'],
-    [0, 'Coin flipper', 'Chance does 1.7. Another go?'],
+    [5, 'Storm whisperer', 'Perfect. You read these forecasts like a forecaster.'],
+    [4, 'Senior forecaster', 'Sharp. One got past you.'],
+    [3, 'Hurricane hunter', 'Good eye.'],
+    [2, 'Storm chaser', 'Watch the colours next time.'],
+    [0, 'Coin flipper', 'Chance does 1.7. Tip: watch the colours.'],
   ];
   function endGame() {
     G.phase = 'end'; renderDots();
     const n = G.results.filter(r => r.ok).length, rk = RANKS.find(r => n >= r[0]);
+    // best score, shown in the game box of the article
+    try { const b = JSON.parse(localStorage.getItem('spotPhysicsBest')); if (!b || G.score > b.score) localStorage.setItem('spotPhysicsBest', JSON.stringify({ score: G.score, n, rank: rk[1] })); } catch (e) {}
     const r = $('result');
     r.innerHTML = `
       <div class="lab">Final score</div>
       <div class="rscore" id="rs">0</div>
       <div class="rof">${n}/${storms.length} correct · max 6,000</div>
-      <div class="rank"><div class="lab">Rank</div><div class="rn">${rk[1]}</div></div>
+      <div class="rank"><div class="lab">Rank</div>
+        <div class="ladder">${RANKS.slice().reverse().map((x, i, a) => `<div class="rung ${x === rk ? 'me' : i < a.indexOf(rk) ? 'past' : ''}" style="--i:${i}"><i></i><span>${x[1]}</span></div>`).join('')}</div>
+        <div class="rn">${rk[1]}</div></div>
       <p class="appr">${rk[2]}</p>
-      <div class="cmp" id="cmp"></div>
       <div class="rows">${G.results.map(x => `<div class="rrow"><span class="mk ${x.ok ? 'ok' : 'no'}">${x.ok ? '✓' : '✗'}</span><span>${x.name}</span><span class="sm">${x.ok ? 'physics found' : 'picked ' + MODEL[x.picked].name}</span><span class="pt">+${x.pts}</span></div>`).join('')}</div>
       <div class="btns"><button class="solid" id="share" type="button">Share my score</button><button class="outl" id="again" type="button">Play again</button></div>
-      <div class="why"><span class="lab">Why it is hard</span>The AIs track storms as well as physics, often better. Their tell: storms too weak, winds 15–20% low. <a href="index.html#forecasts">Read the story →</a></div>`;
+      <div class="why"><span class="lab">Why it is hard</span>The AIs track storms as well as physics, often better. Their tell: their storms are too weak. <a href="index.html#forecasts">Read the story →</a></div>`;
     show('result'); r.classList.remove('on'); void r.offsetWidth; r.classList.add('on');
-    compare(G.score, n);
     const el = $('rs'), t0 = performance.now(), dur = 1500;
     (function step(now) { const f = Math.min(1, (now - t0) / dur); el.textContent = Math.round(G.score * (1 - Math.pow(1 - f, 3))).toLocaleString('en-US'); if (f < 1) requestAnimationFrame(step); })(t0);
     setTimeout(() => { if (n >= 3) confetti(innerWidth / 2, innerHeight * .35, 90); }, 1500);
