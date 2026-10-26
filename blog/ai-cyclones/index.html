@@ -15,7 +15,7 @@
 <meta name="description" content="Interactive companion to the paper 'Can AI Forecast the Extremes?': ensemble track forecasts of GenCast, FGN and ECMWF's IFS-ENS for the tropical cyclones of 2025.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=Inter:wght@300;400;500;600&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Barlow+Semi+Condensed:wght@700&display=swap" rel="stylesheet">
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -127,27 +127,45 @@
   .map-wrap { position: relative; border: 1px solid var(--border); border-radius: 6px; overflow: hidden; background: var(--ocean); }
   .map-wrap canvas { display: block; width: 100%; }
   .infobox {
-    position: absolute; top: 8px; right: 8px; background: rgba(255,255,255,0.92);
-    border: 1px solid var(--border); border-radius: 6px; padding: 0.3rem 0.55rem;
-    font-size: 0.72rem; line-height: 1.45; color: var(--text-2); text-align: right; pointer-events: none;
+    display: flex; justify-content: space-between; flex-wrap: wrap; column-gap: 0.8rem;
+    font-size: 0.72rem; line-height: 1.45; color: var(--text-2); min-height: 2.9em; margin-bottom: 0.3rem;
   }
-  .infobox b { color: var(--text); font-weight: 600; }
-  .clock { display: grid; grid-template-columns: 1.15fr 1fr 1.1fr; gap: 1.4rem; margin-top: 1.1rem; align-items: start; }
-  .clock > div { display: flex; flex-direction: column; }
+  .infobox b { color: var(--text); font-weight: 600; font-variant-numeric: tabular-nums; }
+  .hist { display: block; width: 100%; margin-top: 0.45rem; }
+  .histnote { font-size: 0.72rem; color: var(--text-2); min-height: 2.9em; line-height: 1.45; }
+  .histnote b { color: var(--text); font-weight: 600; font-variant-numeric: tabular-nums; }
+  .stormhead { display: flex; justify-content: space-between; align-items: baseline; gap: 0.4rem 1.5rem; flex-wrap: wrap; margin: 0.4rem 0 0.9rem; }
+  .stormhead .name { font-family: var(--grotesk); font-weight: 700; font-size: 1.35rem; letter-spacing: -0.01em; line-height: 1.25; }
+  .stormhead .impact { flex-basis: 100%; order: 3; color: #b02a1a; font-size: 0.88rem; line-height: 1.5; }
+  .stormhead .init { color: var(--text-3); font-size: 0.8rem; }
+  .windcard { display: grid; grid-template-columns: 1fr 1.15fr; gap: 1rem 1.8rem; align-items: start; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 0.9rem 1.1rem; margin-bottom: 1.1rem; }
+  .wc-label { font-size: 0.68rem; color: var(--text-3); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.35rem; }
+  .seg.big { margin-bottom: 0.5rem; }
+  .seg.big button { font-size: 0.86rem; padding: 0.42rem 1.05rem; font-weight: 500; }
+  .wc-explain { font-size: 0.8rem; color: var(--text-2); line-height: 1.55; min-height: 3.1em; }
+  .wc-legend { display: flex; flex-wrap: wrap; gap: 0.2rem 1.1rem; font-size: 0.74rem; color: var(--text-2); margin-top: 0.35rem; }
+  .wc-legend span:last-child { color: var(--text-3); }
+  .clock { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr); gap: 0.4rem 1.4rem; margin-top: 0.7rem; align-items: start; }
+  .transport .now { display: flex; flex-direction: column; line-height: 1.15; min-width: 8.5rem; }
+  .transport .now .day { font-family: var(--grotesk); font-weight: 700; font-size: 1.35rem; }
+  .transport .now .date { color: var(--text-2); font-size: 0.78rem; }
   .clock .day { font-family: var(--grotesk); font-weight: 700; font-size: 2.2rem; line-height: 1.1; }
   .clock .date { color: var(--text-2); font-size: 0.95rem; margin-top: 0.2rem; }
-  .clock .obs { font-weight: 600; font-size: 0.9rem; margin-top: 0.5rem; min-height: 1.4em; }
-  .clock .caption { color: var(--text-2); font-size: 0.86rem; line-height: 1.55; min-height: 4.6em; }
-  .clock .legend { padding-top: 0.6rem; font-size: 0.76rem; color: var(--text-2); line-height: 1.9; }
-  .key-line { display: inline-block; width: 22px; height: 2px; background: var(--text); vertical-align: middle; margin-right: 0.45rem; position: relative; }
-  .key-line::after { content: ''; position: absolute; right: -3px; top: -3px; width: 8px; height: 8px; border-radius: 50%; background: var(--text); }
-  .key-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--blind); margin: 0 0.6rem 0 0.4rem; vertical-align: middle; }
+  .clock .obs { font-weight: 600; font-size: 0.9rem; min-height: 1.4em; }
+  .clock .caption { color: var(--text-2); font-size: 0.86rem; line-height: 1.55; min-height: 3.1em; }
+  .key-line { display: inline-block; width: 22px; height: 5px; background: #e8641f; border: 1.2px solid #2b2b2b; border-radius: 3px; vertical-align: middle; margin-right: 0.45rem; }
+  .obs-sw { display: inline-block; width: 10px; height: 10px; border-radius: 50%; border: 1.5px solid #222; margin-right: 0.4rem; vertical-align: -1px; }
+  .key-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--text-3); margin: 0 0.6rem 0 0.4rem; vertical-align: middle; }
   .transport { display: flex; align-items: center; gap: 0.8rem; margin-top: 1rem; }
   .transport input[type=range] { flex: 1; accent-color: var(--text); }
   .guess { margin-top: 1.2rem; padding: 1rem 1.1rem; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; }
   .guess .q { font-weight: 500; font-size: 0.92rem; margin-bottom: 0.6rem; }
   .guess .opts { display: flex; gap: 0.5rem; flex-wrap: wrap; }
   .guess .opts .btn { font-family: var(--grotesk); font-weight: 700; font-size: 0.9rem; padding: 0.35rem 1.3rem; }
+  .guess .step { font-size: 0.72rem; color: var(--text-3); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 0.2rem; }
+  .guess .hint { font-size: 0.8rem; color: var(--text-2); margin: -0.2rem 0 0.6rem; }
+  .guess .skip { font-size: 0.76rem; color: var(--text-3); background: none; border: none; text-decoration: underline; cursor: pointer; margin-left: 0.6rem; font-family: var(--sans); }
+  .guess .tally { font-size: 0.78rem; color: var(--text-3); margin-top: 0.4rem; }
   .verdict { margin-top: 0.8rem; font-size: 0.9rem; }
   .scores { width: 100%; border-collapse: collapse; margin-top: 0.8rem; font-size: 0.82rem; }
   .scores td, .scores th { padding: 0.35rem 0.4rem; text-align: left; border-top: 1px solid var(--border); vertical-align: top; }
@@ -156,13 +174,35 @@
   .swatch { display: inline-block; width: 14px; height: 2px; vertical-align: middle; margin-right: 0.45rem; }
 
   /* explainer */
-  .explain { display: grid; grid-template-columns: 3fr 2fr; gap: 1.2rem; align-items: start; }
-  .explain .map-wrap { cursor: crosshair; touch-action: none; }
-  .readout { font-size: 0.86rem; color: var(--text-2); }
-  .readout .big { font-family: var(--grotesk); font-weight: 700; font-size: 2rem; color: var(--text); line-height: 1.1; font-variant-numeric: tabular-nums; }
-  .readout .row { margin-top: 0.9rem; }
-  .readout .lbl { font-size: 0.72rem; color: var(--text-3); text-transform: uppercase; letter-spacing: 0.06em; }
 
+  .explain3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.9rem; }
+  .explain3 .map-wrap { cursor: crosshair; touch-action: none; }
+  .exstats { width: 100%; border-collapse: collapse; margin-top: 0.4rem; font-size: 0.76rem; color: var(--text-2); }
+  .exstats td { padding: 0.2rem 0; border-top: 1px solid var(--border); vertical-align: top; }
+  .exstats td.num { text-align: right; color: var(--text); font-variant-numeric: tabular-nums; white-space: nowrap; padding-left: 0.6rem; }
+  article .explain-text { padding: 0; max-width: none; margin: 0.9rem 0 0; font-size: 0.9rem; color: var(--text-2); line-height: 1.6; }
+  .rankfig { display: grid; grid-template-columns: 3fr 2fr; gap: 1.4rem; align-items: center; }
+  #rank-chart { width: 100%; display: block; touch-action: none; cursor: crosshair; }
+  .rankfig .readout { font-size: 0.9rem; color: var(--text-2); line-height: 1.6; }
+  .rankfig .readout .big { font-family: var(--grotesk); font-weight: 700; font-size: 1.6rem; color: var(--text); line-height: 1.2; font-variant-numeric: tabular-nums; margin-bottom: 0.4rem; }
+  .fig-title { font-family: var(--grotesk); font-weight: 700; font-size: 1.08rem; letter-spacing: -0.01em; line-height: 1.35; margin-bottom: 0.8rem; }
+  .tldr { max-width: var(--max-w); margin: 2rem auto 0; padding: 0 1.5rem; }
+  .tldr > * { background: var(--surface); }
+  .tldr { background: none; }
+  .tldr-h, .tldr ol, .tldr-f { border-left: 1px solid var(--border); border-right: 1px solid var(--border); padding-left: 1.2rem; padding-right: 1.2rem; }
+  .tldr-h { border-top: 1px solid var(--border); border-radius: 8px 8px 0 0; padding-top: 1rem; font-family: var(--grotesk); font-size: 0.7rem; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-3); }
+  .tldr ol { list-style: none; counter-reset: k; margin: 0; padding-top: 0.5rem; padding-bottom: 0.2rem; }
+  article .tldr li { counter-increment: k; position: relative; max-width: none; margin: 0 0 0.7rem; padding: 0 0 0 2rem; font-size: 0.95rem; line-height: 1.6; color: #2b2b2b; }
+  article .tldr li::before { content: counter(k); position: absolute; left: 0; top: 0; font-family: var(--grotesk); font-weight: 700; color: var(--text-4); }
+  .tldr li a { font-weight: 600; text-decoration: none; color: var(--text); border-bottom: 1px solid var(--text-4); }
+  .tldr-f { border-bottom: 1px solid var(--border); border-radius: 0 0 8px 8px; padding-bottom: 1rem; font-size: 0.82rem; color: var(--text-2); }
+  .tldr-f a { color: var(--text-2); }
+  details.fold { max-width: var(--wide-w); margin: 0 auto 2rem; padding: 0 1.5rem; }
+  details.fold > summary { cursor: pointer; font-size: 0.86rem; color: var(--text-2); padding: 0.55rem 0.9rem; border: 1px solid var(--border); border-radius: 8px; background: var(--surface); list-style: none; }
+  details.fold > summary::-webkit-details-marker { display: none; }
+  details.fold > summary::before { content: '+'; display: inline-block; width: 1.1rem; color: var(--text-3); font-weight: 600; }
+  details.fold[open] > summary::before { content: '−'; }
+  details.fold[open] > summary { margin-bottom: 1rem; }
   /* scoreboard */
   .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 1.5rem; }
   .stat .v { font-family: var(--grotesk); font-weight: 700; font-size: 2rem; line-height: 1.1; font-variant-numeric: tabular-nums; }
@@ -196,12 +236,13 @@
   .rho { font-size: 0.8rem; color: var(--text-2); margin-top: 0.6rem; }
   .rho span { margin-right: 1rem; white-space: nowrap; }
 
-  .windkey { display: flex; align-items: center; gap: 0.8rem; font-size: 0.74rem; color: var(--text-2); margin-top: 0.6rem; flex-wrap: wrap; }
-  .windkey .ramp { display: inline-flex; align-items: center; gap: 0.4rem; }
-  .windkey .ramp i { display: inline-block; width: 140px; height: 8px; border-radius: 2px; }
-  .ctrl { margin-top: 1.2rem; display: flex; flex-direction: column; gap: 0.4rem; font-size: 0.82rem; color: var(--text-2); }
-  .ctrl input[type=range] { accent-color: var(--text); width: 100%; }
-  .ctrl input[type=checkbox] { accent-color: var(--text); margin-right: 0.35rem; }
+  .windbar { font-size: 0.74rem; }
+  .windbar .blocks { display: flex; gap: 2px; }
+  .windbar .blocks span { flex: 1; text-align: center; font-weight: 600; color: #fff; line-height: 1.7; border-radius: 2px; cursor: help; }
+  .windbar .blocks span.light { color: var(--text); }
+  .windbar .blocks span.none { font-weight: 400; }
+  .windbar .ticks { position: relative; height: 1.2rem; }
+  .windbar .ticks span { position: absolute; top: 0.1rem; transform: translateX(-50%); color: var(--text-3); font-variant-numeric: tabular-nums; }
   .btn[aria-pressed="true"] { border-color: var(--text); color: var(--text); font-weight: 500; }
   footer {
     max-width: var(--max-w); margin: 5rem auto 0; padding: 2.5rem 1.5rem 3rem;
@@ -214,84 +255,411 @@
     header.post h1 { font-size: 2rem; }
     .player { grid-template-columns: 1fr; }
     .clock { grid-template-columns: 1fr; gap: 0.6rem; }
-    .explain { grid-template-columns: 1fr; }
+    .windcard { grid-template-columns: 1fr; }
+    .explain3 { grid-template-columns: 1fr; }
+    .rankfig { grid-template-columns: 1fr; }
     .stats { grid-template-columns: 1fr; }
     .nav-links { display: none; }
     .clock .caption { min-height: 0; }
   }
+
+/* ── black theme, retro diagram details ── */
+:root { --bg: #141311; --surface: #1b1a17; --text: #e8e2d5; --text-2: #c9c2b5; --text-3: #8c867b; --text-4: #56514a; --border: #2e2b27;
+  --ocean: #283035; --land: #59544b; --red: #d65a3c; --para: #d6cfc2; --sel: #5a2a1c; --tip: #1f1e1b; --obs: #ece6da;
+  --grotesk: 'Helvetica Neue', Helvetica, Arial, sans-serif; --sans: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  --mono: 'IBM Plex Mono', ui-monospace, monospace; }
+body { font-size: 16.5px; line-height: 1.6; }
+::selection { background: var(--sel); }
+a { color: var(--text); text-decoration-color: var(--red); text-underline-offset: 3px; }
+a:hover { color: var(--red); }
+article p, article li { color: var(--para); }
+.lead { color: var(--text); font-size: 1.12rem; }
+.mono { font-family: var(--mono); }
+
+/* header: same layout as the front page, with a diagram on the right */
+.bh { border-bottom: 1px solid var(--border); }
+.bh nav { position: static; background: none; backdrop-filter: none; -webkit-backdrop-filter: none; border-bottom: 1px solid var(--border); }
+.bh .w { max-width: 1160px; margin: 0 auto; padding: 0 clamp(16px, 4vw, 48px); }
+.bh .navrow { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 0.3rem 1.5rem; padding-top: 18px; padding-bottom: 14px; font-size: 14.5px; }
+.bh .navrow a { text-decoration: none; color: var(--text-3); }
+.bh .navrow a:hover { color: var(--text); }
+.bh .navrow .nm { color: var(--text); font-weight: 700; }
+.bh .links { display: flex; flex-wrap: wrap; gap: 0.2rem 1.3rem; }
+.bhd { display: grid; grid-template-columns: repeat(12, 1fr); column-gap: 24px; padding-top: 48px; padding-bottom: 48px; align-items: center; }
+.bhd .txt { grid-column: 1 / span 9; }
+.bhd .kicker { font-family: var(--mono); font-size: 12px; color: var(--red); margin-bottom: 14px; text-transform: none; letter-spacing: 0; }
+.bhd h1 { font-weight: 700; font-size: 2.1rem; line-height: 1.12; letter-spacing: -0.02em; margin-bottom: 16px; }
+.bhd .byline { font-size: 14.5px; color: var(--text-3); line-height: 1.5; max-width: 40rem; }
+.bhd .byline a { color: var(--text-2); }
+.bhd figure { grid-column: 9 / span 4; }
+.bhd .draw { width: 100%; height: auto; display: block; }
+.bhd figcaption { font-family: var(--mono); font-size: 10.5px; color: var(--text-3); margin-top: 8px; line-height: 1.5; }
+.bhd figcaption b { color: var(--red); font-weight: 400; }
+
+/* section headings: red mono number, plain bold title */
+article h2 { font-size: 1.4rem; font-weight: 700; letter-spacing: -0.01em; margin-top: 4.5rem; padding-top: 1.2rem; border-top: 1px solid var(--border); }
+article h2 .num { display: block; font-family: var(--mono); font-weight: 400; font-size: 12px; color: var(--red); margin: 0 0 4px; }
+article h2 .num::before { content: '0'; }
+
+/* figures numbered like plates */
+article { counter-reset: fig; }
+.fig-title { font-family: var(--sans); font-weight: 700; font-size: 1.12rem; line-height: 1.35; color: var(--text); }
+.fig-title::before { counter-increment: fig; content: 'Fig. ' counter(fig); display: block; font-family: var(--mono); font-weight: 400; font-size: 11.5px; color: var(--text-3); margin-bottom: 3px; }
+figcaption { font-family: var(--mono); font-size: 11.5px; line-height: 1.6; color: var(--text-3); border-top: 1px solid var(--border); padding-top: 8px; }
+
+/* small labels: mono, no uppercase tracking */
+.kicker, .tldr-h, .wc-label, .guess .step { text-transform: none !important; letter-spacing: 0 !important; font-family: var(--mono) !important; font-size: 12px !important; font-weight: 400 !important; color: var(--red) !important; }
+
+/* summary: a ruled note instead of a card */
+.tldr > * { background: transparent !important; border: 0 !important; border-radius: 0 !important; border-left: 2px solid var(--red) !important; }
+.tldr-h { padding-top: 0.2rem !important; color: var(--text-3) !important; }
+.tldr-f { padding-bottom: 0.2rem !important; color: var(--text-3) !important; }
+article .tldr li { color: var(--para); }
+article .tldr li::before { font-family: var(--mono); font-weight: 400; font-size: 12px; color: var(--text-3); top: 0.15rem; }
+.tldr li a { border-bottom-color: var(--red); }
+
+.map-wrap, #worldmap { border-radius: 2px; border-color: var(--border); }
+.tooltip, .bs-tip, .bi-tip { background: var(--tip) !important; border: 1px solid var(--border) !important; box-shadow: none !important; border-radius: 2px !important; }
+.stormhead .impact { color: var(--text-2); }
+.key-line { border-color: var(--obs); border-radius: 1px; }
+.obs-sw { border-color: var(--obs); }
+
+/* chart text in mono, like plotter output */
+svg text, .bs-svg text, .bi-svg text { font-family: var(--mono) !important; }
+
+.plate .draw { width: 100%; height: auto; display: block; margin: 6px 0 4px; }
+/* the game, stripped down */
+.wc-label { display: none !important; }
+.wc-legend > span:last-child { display: none; }
+article { padding-top: 2.4rem; }
+.wc-legend { color: var(--text-3); }
+.infobox, .histnote { font-size: 0.7rem; color: var(--text-3); min-height: 0; }
+.infobox b, .histnote b { color: var(--text-2); font-weight: 500; }
+.panel-head { font-size: 0.95rem; }
+.guess { background: transparent; border: 0; border-radius: 0; padding: 0; margin-top: 0; }
+details.method { margin-top: 0.9rem; }
+details.method figcaption { border-top: 0; padding-top: 6px; }
+/* minimal: no decorative lines, space separates sections */
+.bh, .bh nav { border-bottom: 0 !important; }
+article h2 { border-top: 0 !important; padding-top: 0 !important; margin-top: 5rem !important; }
+figcaption, details.method figcaption { border-top: 0 !important; padding-top: 4px !important; }
+.tldr > * { border-left: 0 !important; padding-left: 0 !important; }
+footer { border-top: 0 !important; }
+
+/* controls drawn as line diagrams: the shape shows what the control does */
+:where(.chip, .btn, .seg button, select, summary, .skip, .bi-leg, .bi-check input, input[type=range]):focus-visible { outline: 1px solid var(--text); outline-offset: 3px; }
+
+/* two-way choice: a slide switch. label, track with a square knob on the selected side, label.
+   Each button draws its half of the track, so clicking a half selects that side. */
+.seg, .seg.big { display: inline-flex; align-items: center; gap: 0; padding: 0; margin: 0 0 0.8rem; background: none; border: 0; border-radius: 0; overflow: visible; box-shadow: none; }
+.seg button, .seg.big button { position: relative; background: none; border: 0; border-radius: 0; box-shadow: none; padding: 0.25rem 0; font-family: var(--sans); font-size: 0.84rem; font-weight: 400; line-height: 1.4; color: var(--text-3); cursor: pointer; transition: color .12s; }
+.seg button:first-child { padding-right: 26px; }
+.seg button:last-child { padding-left: 26px; }
+.seg button:first-child::after, .seg button:last-child::before { content: ''; position: absolute; top: 50%; width: 17px; height: 14px; margin-top: -7px; box-sizing: border-box; border: 1px solid var(--text-3); }
+.seg button:first-child::after { right: 0; border-right: 0; border-radius: 2px 0 0 2px; }
+.seg button:last-child::before { left: 0; border-left: 0; border-radius: 0 2px 2px 0; }
+.seg button[aria-pressed="true"], .seg.big button[aria-pressed="true"] { color: var(--text); background: none; font-weight: 400; }
+.seg button:first-child[aria-pressed="true"]::before, .seg button:last-child[aria-pressed="true"]::after { content: ''; position: absolute; top: 50%; width: 10px; height: 8px; margin-top: -4px; background: var(--red); }
+.seg button:first-child[aria-pressed="true"]::before { right: 4px; }
+.seg button:last-child[aria-pressed="true"]::after { left: 3px; }
+.seg button:hover { color: var(--text); }
+.seg:hover button:first-child::after, .seg:hover button:last-child::before { border-color: var(--text); }
+
+/* one of many: radio selectors, an outlined circle before each label, filled when selected */
+.chips { gap: 0.3rem 1.25rem; align-items: center; }
+.chip { position: relative; background: none; border: 0; border-radius: 0; box-shadow: none; padding: 0.2rem 0 0.2rem 17px; font-family: var(--sans); font-size: 0.84rem; font-weight: 400; color: var(--text-3); cursor: pointer; transition: color .12s; }
+.chip::before { content: ''; position: absolute; left: 0; top: 50%; width: 10px; height: 10px; margin-top: -5px; box-sizing: border-box; border: 1px solid var(--text-3); border-radius: 50%; }
+.chip:hover { color: var(--text); }
+.chip:hover::before { border-color: var(--text); }
+.chip[aria-pressed="true"] { color: var(--text); font-weight: 400; }
+.chip[aria-pressed="true"]::before { background: var(--red); border-color: var(--red); }
+.chip .done { color: var(--text-3); font-family: var(--mono); font-size: 0.75em; margin-left: 0.3rem; }
+
+/* menus: an outlined box with a thin chevron */
+select, select.chip, .bs-root .bs-controls select { -webkit-appearance: none; appearance: none; position: static; font-family: var(--sans); font-size: 0.82rem; color: var(--text-2);
+  background: transparent url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M0.5 0.5 L5 5 L9.5 0.5' fill='none' stroke='%23c9c2b5' stroke-width='1'/%3E%3C/svg%3E") no-repeat right 9px center;
+  border: 1px solid var(--text-4); border-radius: 2px; padding: 0.25rem 28px 0.25rem 0.6rem; cursor: pointer; box-shadow: none; }
+select:hover, select.chip:hover, .bs-root .bs-controls select:hover { border-color: var(--text); color: var(--text); }
+select option { background: var(--surface); color: var(--text); }
+.bs-root .bs-controls { font-family: var(--mono); font-size: 11.5px; color: var(--text-3); gap: 0.6rem; }
+
+/* push buttons: outlined keys */
+.btn { background: none; border: 1px solid var(--text-3); border-radius: 2px; box-shadow: none; color: var(--text-2); font-family: var(--sans); font-size: 0.82rem; font-weight: 400; padding: 0.3rem 0.85rem; cursor: pointer; transition: color .12s, border-color .12s; }
+.btn:hover { border-color: var(--text); color: var(--text); }
+.btn:active { background: var(--text); border-color: var(--text); color: var(--bg); }
+.guess .opts { gap: 0.55rem; align-items: center; }
+.guess .opts .btn { font-family: var(--mono); font-weight: 400; font-size: 0.95rem; width: 2.5rem; height: 2.25rem; padding: 0; display: inline-flex; align-items: center; justify-content: center; }
+.guess .skip { font-family: var(--mono); font-size: 11.5px; color: var(--text-3); text-decoration-color: var(--text-4); text-underline-offset: 3px; margin-left: 0.8rem; }
+.guess .skip:hover { color: var(--text); text-decoration-color: var(--red); }
+
+/* play / pause: a transport symbol, outlined circle with a line-drawn triangle or two bars */
+#play.btn { width: 36px; height: 36px; flex: none; padding: 0; border-radius: 50%; border: 1px solid var(--text-2); background: none; color: var(--text);
+  display: inline-flex; align-items: center; justify-content: center; opacity: 1; }
+#play.btn:hover { border-color: var(--red); color: var(--red); background: none; }
+#play.btn:active { background: none; }
+#play svg { display: block; }
+
+/* time: a hairline track with a small outlined marker */
+.transport { gap: 1rem; margin-top: 1.1rem; }
+.transport input[type=range] { -webkit-appearance: none; appearance: none; flex: 1; height: 22px; margin: 0; background: none; cursor: pointer; accent-color: auto; }
+.transport input[type=range]::-webkit-slider-runnable-track { height: 1px; background: var(--text-3); border: 0; }
+.transport input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 9px; height: 16px; margin-top: -8px; box-sizing: border-box; background: var(--bg); border: 1px solid var(--text); border-radius: 0; }
+.transport input[type=range]:hover::-webkit-slider-thumb, .transport input[type=range]:focus-visible::-webkit-slider-thumb { border-color: var(--red); }
+.transport input[type=range]::-moz-range-track { height: 1px; background: var(--text-3); border: 0; }
+.transport input[type=range]::-moz-range-progress { height: 1px; background: var(--text); }
+.transport input[type=range]::-moz-range-thumb { width: 9px; height: 16px; box-sizing: border-box; background: var(--bg); border: 1px solid var(--text); border-radius: 0; }
+.transport input[type=range]:hover::-moz-range-thumb { border-color: var(--red); }
+.transport .now .day { font-size: 1.2rem; }
+.transport .now .date { font-family: var(--mono); font-size: 11px; color: var(--text-3); }
+
+/* folded sections: an outlined box with + or − before the label */
+article details > summary, article details.fold > summary { list-style: none; cursor: pointer; display: inline-flex; align-items: center; gap: 0.6rem; padding: 0.2rem 0;
+  font-family: var(--mono); font-size: 11.5px; color: var(--text-3); background: none; border: 0; border-radius: 0; }
+article details > summary::-webkit-details-marker { display: none; }
+article details > summary::before, article details.fold > summary::before { content: '+'; flex: none; width: 13px; height: 13px; box-sizing: border-box; border: 1px solid var(--text-3); border-radius: 2px;
+  display: inline-flex; align-items: center; justify-content: center; font-family: var(--mono); font-size: 11px; font-weight: 400; line-height: 1; color: var(--text-2); }
+article details[open] > summary::before, article details.fold[open] > summary::before { content: '−'; }
+article details > summary:hover { color: var(--text); }
+article details > summary:hover::before { border-color: var(--text); color: var(--text); }
+article details.fold > summary { font-family: var(--sans); font-size: 0.9rem; color: var(--text-2); padding: 0.2rem 0; }
+article details.fold > summary:hover { color: var(--text); }
+article details.fold[open] > summary { margin-bottom: 1rem; }
+
+/* series toggles and the spread check box of section 4 */
+.bi-row .bi-leg { border-radius: 2px; }
+.bi-row .bi-leg:hover { border-color: var(--text-3); }
+.bi-row .bi-check input { -webkit-appearance: none; appearance: none; width: 11px; height: 11px; margin: 0; box-sizing: border-box; border: 1px solid var(--text-3); border-radius: 0; background: none; cursor: pointer; }
+.bi-row .bi-check:hover input { border-color: var(--text); }
+.bi-row .bi-check input:checked { background: var(--red); border-color: var(--red); }
+
+/* player layout: storm choice and heading on top, then the wind scale and the wind toggle, then the maps
+   and the wind histograms, then time controls, then the guess. */
+.player { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); column-gap: 0.9rem; row-gap: 0; }
+.player > div:not(#windkey) { display: contents; }
+.player > div:nth-child(1) > * { grid-column: 1; }
+.player > div:nth-child(2) > * { grid-column: 2; }
+.player > div:nth-child(3) > * { grid-column: 3; }
+.player .panel-head { grid-row: 1; }
+.player .infobox { grid-row: 2; }
+.player .map-wrap { grid-row: 3; }
+.player .hist { grid-row: 4; margin-top: 0.3rem; }
+.player .histnote { grid-row: 5; }
+#windkey.windcard { display: grid; grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr); gap: 0.5rem 2.2rem; align-items: start;
+  background: none; border: 0; border-radius: 0; padding: 0; margin: 0 0 1.3rem; }
+#windkey .wc-explain { font-size: 0.76rem; line-height: 1.5; color: var(--text-3); min-height: 0; margin-top: 0.35rem; max-width: 26rem; }
+#windkey .wc-legend { margin-top: 0.15rem; font-size: 0.74rem; color: var(--text-3); }
+#windkey .key-dot { margin: 0 0.45rem 0 0.1rem; }
+.windbar .blocks span { border-radius: 0; font-family: var(--mono); font-weight: 500; font-size: 0.7rem; }
+.windbar .ticks span { font-family: var(--mono); font-size: 0.68rem; }
+.windbar .blocks span.light { color: #141311; }
+.bs-root p.bs-head { padding: 0; max-width: none; }
+/* screen-reader tables are wider than a phone; fixed position keeps them out of the page width */
+body .bs-sr, body .bi-sr { position: fixed !important; left: 0; top: 0; }
+#player-fig > .chips { margin-bottom: 0.4rem; }
+#player-fig .stormhead { margin: 0.5rem 0 1.1rem; }
+#clockrow .clock { margin-top: 0.5rem; }
+#player-fig .guessbar { margin: 1.6rem 0 0.4rem; }
+#windkey .seg { margin: 0; }
+/* game: switch and score on top, a guess row on each map */
+#player-fig .guessbar { display: flex; align-items: center; gap: 0.7rem; margin: 0 0 0.9rem !important; }
+#player-fig .guessbar .seg { margin: 0 !important; }
+.guessbar .gl { font-family: var(--mono); font-size: 12px; color: var(--text-3); }
+#gscore { font-family: var(--mono); font-size: 12px; color: var(--text); margin-left: 0.6rem; }
+.map-wrap { position: relative; }
+.pguess { position: absolute; left: 6px; top: 6px; right: 6px; display: flex; flex-wrap: wrap; gap: 4px; z-index: 2; }
+.pguess button { font-family: var(--mono); font-size: 11px; line-height: 1.2; padding: 3px 7px; cursor: pointer; border-radius: 2px;
+  color: var(--text-2); background: color-mix(in srgb, var(--bg) 85%, transparent); border: 1px solid var(--text-4); }
+.pguess button:hover { color: var(--text); border-color: var(--text); }
+.pguess button[aria-pressed="true"] { color: #fff; background: var(--red); border-color: var(--red); }
+.pguess.ok, .pguess.no, .pguess.shown { right: auto; align-items: center; gap: 6px; padding: 3px 8px; font-family: var(--mono); font-size: 11.5px;
+  color: var(--text); background: color-mix(in srgb, var(--bg) 88%, transparent); border: 1px solid var(--text-3); border-radius: 2px; }
+.pguess.no { border-color: var(--red); }
+.pguess .mark { font-weight: 600; }
+.pguess.no .mark { color: var(--red); }
+.guess .btn:disabled { opacity: 0.45; cursor: default; }
+#guess-box .opts .btn { width: auto !important; height: auto !important; min-width: 0 !important; white-space: nowrap; padding: 0.35rem 0.9rem !important; font-family: var(--mono); font-size: 12px; }
+#guess-box .opts .count { font-family: var(--mono); font-size: 12px; color: var(--text-3); }
+#guess-box .opts { align-items: center; gap: 1rem; margin-top: 0.6rem; }
+.guess .q { font-size: 0.9rem; color: var(--text-2); }
+
+.player .panel-head .who .kind { display: none; }
+#stormhead .init { display: none; }
+.seg button:active, .themesw button:active { opacity: 0.6; }
+.models3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.9rem; margin-bottom: 2.6rem !important; }
+.models3 .mn { font-weight: 700; font-size: 1rem; display: flex; align-items: center; gap: 0.5rem; }
+.models3 .sw { display: inline-block; width: 14px; height: 3px; }
+.models3 .mk { font-family: var(--mono); font-size: 11.5px; color: var(--text-3); margin: 2px 0 6px; }
+article .models3 p { font-size: 0.86rem; line-height: 1.5; color: var(--text-2); margin: 0; padding: 0; max-width: none; }
+@media (max-width: 760px) { .models3 { grid-template-columns: 1fr; } }
+#windkey .wc-legend { display: none !important; }
+/* simplified player: letter and counts on one line, no explanation paragraphs */
+.player .panel-head { grid-row: 1; justify-self: start; }
+.player .infobox { grid-row: 1; justify-self: end; align-self: center; display: flex; gap: 1rem; margin: 0; min-height: 0; font-family: var(--mono); font-size: 0.68rem; }
+.player .histnote { display: none !important; }
+#windkey .wc-explain, #windkey .wc-label, #windkey .wc-legend > span:last-child { display: none !important; }
+#windkey.windcard { align-items: start !important; }
+#windkey .wk-toggle { margin-top: -2px; }
+#windkey .wk-toggle { justify-self: end; }
+#clockrow .caption { color: var(--text-3); }
+@media (max-width: 760px) {
+  .player { display: block; }
+  .player > div:not(#windkey) { display: block; margin-bottom: 1.4rem; }
+  #windkey.windcard { grid-template-columns: 1fr; margin: 0 0 1.2rem; }
+  .seg button, .seg.big button { font-size: 0.8rem; }
+}
+
+/* share bar: labels of narrow segments sit above the bar */
+.sharebar { overflow: visible; margin-top: 1.5rem; }
+.sharebar { border-radius: 0; }
+.sharebar div:first-child, .sharebar div:last-child { border-radius: 0; }
+.sharebar div.out { position: relative; overflow: visible; }
+.sharebar div.out span { position: absolute; right: 0; bottom: calc(100% + 4px); font-size: 0.72rem; font-weight: 600; white-space: nowrap; }
+
+/* more room after titles */
+.bhd { padding-bottom: 64px !important; }
+article { padding-top: 3.6rem !important; }
+article h2 { margin-bottom: 1.6rem !important; }
+.fig-title { margin-bottom: 1.1rem !important; }
+footer { border-top: 1px solid var(--border); font-family: var(--mono); font-size: 11.5px; color: var(--text-3); }
+@media (max-width: 760px) {
+  .bhd .txt, .bhd figure { grid-column: 1 / -1; }
+  .bhd figure { margin-top: 28px; max-width: 320px; }
+  .bhd h1 { font-size: 1.7rem; }
+}
+
+/* light mode */
+:root[data-theme="light"] { --bg: #eee8dc; --surface: #e6dfd1; --text: #1d1b18; --text-2: #3d3933; --text-3: #6c665d; --text-4: #a9a196;
+  --border: #d6cec0; --ocean: #dde4e3; --land: #cfc6b4; --red: #c4472a; --para: #2b2824; --sel: #f0c9b8; --tip: #f4efe5; --obs: #1d1b18; }
+
+.themesw { display: inline-flex; align-items: center; gap: 6px; margin-left: 0.6rem; font-family: 'IBM Plex Mono', monospace; font-size: 12px; }
+.themesw button { background: none; border: 0; padding: 0; font: inherit; color: var(--text-3); cursor: pointer; }
+.themesw button:hover { color: var(--text); }
+:root[data-theme="dark"] .themesw [data-t="dark"], :root[data-theme="light"] .themesw [data-t="light"] { color: var(--text); }
+.themesw .trk { position: relative; width: 24px; height: 12px; border: 1px solid var(--text-3); border-radius: 1px; }
+.themesw .trk i { position: absolute; top: 2px; left: 2px; width: 6px; height: 6px; background: var(--red); transition: left .15s; }
+:root[data-theme="light"] .themesw .trk i { left: 14px; }
+.themesw button:focus-visible { outline: 1px solid var(--text); outline-offset: 2px; }
+
+/* game launcher: the homepage's Writing entry (final_d.html .entry: red rule on the left, condensed title), linking to game.html */
+.playcard { max-width: var(--max-w); margin: 2.6rem auto 1.4rem; padding: 0 1.5rem; }
+.playcard .entry { display: grid; text-decoration: none; color: var(--text); border-left: 2px solid var(--red); padding: 4px 0 4px 18px; transition: border-color .15s; }
+.playcard .entry .d { font-family: var(--mono); font-size: 12px; color: var(--red); }
+.playcard .entry .t { font-family: 'Barlow Semi Condensed', var(--sans); font-weight: 700; font-size: 1.7rem; line-height: 1.08; margin: 4px 0 8px; color: var(--text); }
+.playcard .entry .x { color: var(--text-3); font-size: 15.5px; }
+.playcard .entry:hover { border-color: var(--text); }
 </style>
+<script>(function(){var t=null;try{t=localStorage.getItem("theme")}catch(e){}
+if(t!=="light"&&t!=="dark"){t="dark"}
+document.documentElement.dataset.theme=t;
+window.THEME=t==="light"
+ ?{bg:"#eee8dc",ocean:"#dde4e3",land:"#cfc6b4",coast:"#9b9384",ink:"#1d1b18",rule:"#d6cec0",mute:"#6c665d",dens:"55, 55, 90"}
+ :{bg:"#141311",ocean:"#283035",land:"#59544b",coast:"#948d80",ink:"#ece6da",rule:"#2e2b27",mute:"#8c867b",dens:"236, 230, 218"};})();</script>
 </head>
 <body>
 
-<nav>
-  <div class="nav-inner">
-    <a class="nav-name" href="../../">EdB</a>
-    <div class="nav-links">
-      <a href="#guess">Guess</a>
-      <a href="#score">Scoring</a>
-      <a href="#season">2025 season</a>
-      <a href="#intensity">Intensity</a>
-      <a href="#limits">Limits</a>
-    </div>
-  </div>
-</nav>
 
-<header class="post">
-  <div class="kicker">Blog · Weather forecasting</div>
-  <h1>Where will the storm go? AI weather models and the tropical cyclones of 2025</h1>
-  <p class="byline">Emmanuel de Bézenac · October 2026 · Companion to the paper
+
+<div class="bh">
+<nav><div class="w navrow">
+  <a class="nm" href="../../">Emmanuel de Bézenac</a>
+  <span class="links"><a href="#forecasts">Forecasts</a><a href="#score">Scoring</a><a href="#season">2025 season</a><a href="#intensity">Intensity</a><a href="#limits">Limits</a><span class="themesw" role="group" aria-label="Colour theme"><button type="button" data-t="dark">Dark</button><button type="button" class="trk" aria-label="Switch between dark and light"><i></i></button><button type="button" data-t="light">Light</button></span></span>
+</div></nav>
+<header class="w bhd">
+  <div class="txt"><div class="kicker">Writing · October 2026</div><h1>Where will the storm go? AI weather models and the tropical cyclones of 2025</h1><p class="byline">Companion to the paper
     <a href="https://arxiv.org/abs/2610.22077" target="_blank">Can AI Forecast the Extremes? Evaluating Probabilistic Weather Models on Tropical Cyclones</a>,
-    joint work with Nathan Chalumeau and co-authors</p>
+    joint work with Nathan Chalumeau and co-authors</p></div>
 </header>
+</div>
 
 <article>
   <p class="lead">AI weather models now match or beat the best physics-based forecasts on average scores. Whether they also work for rare, extreme events, where forecasts matter most, is still debated.</p>
   <p>In our paper we compare three AI ensemble models (GenCast, FourCastNet&nbsp;3 and FGN) with ECMWF's operational physics-based ensemble, IFS-ENS, on 178 tropical cyclones between 2021 and 2025. This page shows the 2025 part of that comparison, using the forecasts themselves. It covers GenCast, FGN and IFS-ENS, in the versions that run operationally.</p>
+  <aside class="tldr">
+    <div class="tldr-h">In short</div>
+    <ol>
+      <li><a href="#season">The AI models forecast the track better.</a> FGN gives the observed storm positions more probability than IFS-ENS on 37 of the 41 storms of 2025, GenCast on 32.</li>
+      <li><a href="#intensity">They make the storms too weak.</a> Both underestimate the maximum wind by about 15 to 20% between 2 and 9 days ahead; IFS-ENS stays within about 10%.</li>
+      <li><a href="#intensity">The weak storms still behave like cyclones.</a> Once the difference in intensity is removed, wind depends on pressure in the same way in every model as in the observations.</li>
+    </ol>
+    <div class="tldr-f">To score an ensemble of 49 tracks we treat it as a probability distribution (<a href="#score">section 2</a>). But first, <a href="#forecasts">the forecasts themselves</a>.</div>
+  </aside>
 
-  <h2 id="guess"><span class="num">1</span>Guess the physics model</h2>
-  <p>Each panel is a 15-day ensemble forecast started about 12 hours before the storm was first observed. Each orange dot is the storm centre in one of the 49 members of the ensemble, and the black line is the observed track. One panel is IFS-ENS, ECMWF's physics-based ensemble. The other two are AI models from Google DeepMind: GenCast and FGN. Play the forecast, then choose the panel you think is the physics model.</p>
+  <div class="playcard" id="playcard">
+    <a class="entry" href="game.html">
+      <span class="d">Game · 2 minutes</span>
+      <span class="t">Can you spot the physics model?</span>
+      <span class="x">Five cyclones, three forecasts each, one of them physics-based. Find it fast and get a score.</span>
+    </a>
+  </div>
 
+  <h2 id="forecasts"><span class="num">1</span>Similar tracks, weaker storms</h2>
+  <p>Each panel is a 15-day forecast of 49 members, started about 12 hours before the storm was first observed: IFS-ENS, ECMWF's physics-based ensemble, and two AI models from Google DeepMind, GenCast and FGN. Dots are the storm centre in each member, the outlined line is the observed track, and colours give the maximum wind, on the same scale for forecasts and observation.</p>
+  <p>The three ensembles send the storms along similar paths. The colours differ: the AI members are usually paler than the observed track and than IFS-ENS, because their winds are weaker. Switch to <i>Rescaled to observations</i> to remove that difference and compare the tracks alone.</p>
+
+  <figure class="wide models3">
+    <div class="m"><div class="mn"><span class="sw" style="background:#378ADD"></span>IFS-ENS</div><div class="mk">physics · ECMWF</div>
+      <p>Numerical model that solves the equations of the atmosphere; perturbed initial conditions and model physics give the members.</p></div>
+    <div class="m"><div class="mn"><span class="sw" style="background:#1D9E75"></span>GenCast</div><div class="mk">AI · Google DeepMind</div>
+      <p>Diffusion model: generates each member by iteratively denoising. Trained on ERA5, fine-tuned on ECMWF analyses.</p></div>
+    <div class="m"><div class="mn"><span class="sw" style="background:#E24B4A"></span>FGN</div><div class="mk">AI · Google DeepMind</div>
+      <p>Neural network trained with a probabilistic score (CRPS); members come from learned perturbations of the network. Google WeatherNext 2.</p></div>
+  </figure>
   <figure class="wide" id="player-fig">
     <div class="chips" id="storm-chips" role="group" aria-label="Storm"></div>
+    <div class="stormhead" id="stormhead"></div>
+    
+    <div class="windcard" id="windkey">
+      <div class="wk-scale">
+        <div class="windbar" id="windbar"></div>
+        <div class="wc-legend">
+          <span><span class="key-line"></span>observed track and wind</span>
+          <span><span class="key-dot"></span>storm centre in one member</span>
+          <span>Hover over a category for what it means.</span>
+        </div>
+      </div>
+      <div class="wk-toggle">
+        <div class="wc-label">Forecast wind shown as</div>
+        <div class="seg big" id="windcorr" role="group" aria-label="Forecast wind shown as">
+          <button type="button" data-v="raw" aria-pressed="true">Model winds</button>
+          <button type="button" data-v="rank" aria-pressed="false">Rescaled to observations</button>
+        </div>
+        <div class="wc-explain" id="wc-explain"></div>
+      </div>
+    </div>
     <div class="player" id="player"></div>
     <div class="transport">
-      <button class="btn dark" id="play" type="button">Play</button>
+      <button class="btn dark" id="play" type="button" aria-label="Play"><svg viewBox="0 0 16 16" width="15" height="15" aria-hidden="true"><path d="M5.5 3.5 L12.5 8 L5.5 12.5 Z" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linejoin="miter"/></svg></button>
+      <div class="now"><span class="day" id="now-day"></span><span class="date" id="now-date"></span></div>
       <input type="range" id="scrub" min="0" max="1" step="1" value="0" aria-label="Forecast time">
-      <button class="btn" id="windmode" type="button" aria-pressed="false">Colour by wind speed</button>
-    </div>
-    <div class="windkey" id="windkey" hidden>
-      <span>Maximum 10&nbsp;m wind near the storm centre in each member</span>
-      <span class="ramp" id="windramp"></span>
     </div>
     <div id="clockrow"></div>
-    <div class="guess" id="guess-box"></div>
-    <figcaption>Storm positions are found in each member with the TempestExtremes tracker and matched to the observed IBTrACS track. Members in which the storm is not found are not shown; the percentage in each panel counts the members in which it is. Panel order changes between storms. With "Colour by wind speed", each member's dot shows the strongest 10&nbsp;m wind the tracker finds near its storm centre; this is a hint, since the physics model makes stronger storms.</figcaption>
+    <div id="guess-box" hidden></div>
+    <details class="method"><summary>How this figure is made</summary><figcaption>Storm positions are found in each member with the TempestExtremes tracker and matched to the observed track. Members in which the storm is not found are not shown and not counted in the histograms. Observed: IBTrACS track and maximum 1-minute sustained wind (USA agencies); the track is grey where IBTrACS reports no wind, usually before the storm forms and after it becomes post-tropical. Model winds: the maximum 10&nbsp;m wind speed within 2° (about 220&nbsp;km) of the storm centre found by the tracker in each member. Rescaled to observations: the rank of each member's wind among all the winds of its model (41 storms, all lead times) is kept, and the value is replaced by the observed wind of the same rank; the rescaling is the same at every lead time. Histograms: members by wind at the time shown, 2.5&nbsp;m/s per bar, one vertical scale for the three panels; the light line is the observed wind. Dashed grey line: the wind of the member whose storm centre is closest to the observed position at that time.</figcaption></details>
   </figure>
+  <figure class="text-w plate">
+    <div class="fig-title">Why a forecast on a 25 km grid shows a weaker peak</div>
+    <svg viewBox="0 0 640 300" class="draw" role="img" aria-label="A wind profile with a narrow peak and its average over 25 km cells"><line x1="60" y1="218.6" x2="610" y2="218.6" stroke="#2e2b27" stroke-width="1"/><text x="52" y="222.1" font-size="10" fill="#8c867b" text-anchor="end">10</text><line x1="60" y1="187.1" x2="610" y2="187.1" stroke="#2e2b27" stroke-width="1"/><text x="52" y="190.6" font-size="10" fill="#8c867b" text-anchor="end">20</text><line x1="60" y1="155.7" x2="610" y2="155.7" stroke="#2e2b27" stroke-width="1"/><text x="52" y="159.2" font-size="10" fill="#8c867b" text-anchor="end">30</text><line x1="60" y1="124.3" x2="610" y2="124.3" stroke="#2e2b27" stroke-width="1"/><text x="52" y="127.8" font-size="10" fill="#8c867b" text-anchor="end">40</text><line x1="60" y1="92.9" x2="610" y2="92.9" stroke="#2e2b27" stroke-width="1"/><text x="52" y="96.4" font-size="10" fill="#8c867b" text-anchor="end">50</text><line x1="60" y1="61.4" x2="610" y2="61.4" stroke="#2e2b27" stroke-width="1"/><text x="52" y="64.9" font-size="10" fill="#8c867b" text-anchor="end">60</text><line x1="60" y1="30.0" x2="610" y2="30.0" stroke="#2e2b27" stroke-width="1"/><text x="52" y="33.5" font-size="10" fill="#8c867b" text-anchor="end">70</text><line x1="60.0" y1="250" x2="60.0" y2="30" stroke="#2e2b27" stroke-width="1" stroke-dasharray="2 3"/><text x="60.0" y="266" font-size="10" fill="#8c867b" text-anchor="middle">0</text><line x1="128.8" y1="250" x2="128.8" y2="30" stroke="#2e2b27" stroke-width="1" stroke-dasharray="2 3"/><text x="128.8" y="266" font-size="10" fill="#8c867b" text-anchor="middle">25</text><line x1="197.5" y1="250" x2="197.5" y2="30" stroke="#2e2b27" stroke-width="1" stroke-dasharray="2 3"/><text x="197.5" y="266" font-size="10" fill="#8c867b" text-anchor="middle">50</text><line x1="266.2" y1="250" x2="266.2" y2="30" stroke="#2e2b27" stroke-width="1" stroke-dasharray="2 3"/><text x="266.2" y="266" font-size="10" fill="#8c867b" text-anchor="middle">75</text><line x1="335.0" y1="250" x2="335.0" y2="30" stroke="#2e2b27" stroke-width="1" stroke-dasharray="2 3"/><text x="335.0" y="266" font-size="10" fill="#8c867b" text-anchor="middle">100</text><line x1="403.8" y1="250" x2="403.8" y2="30" stroke="#2e2b27" stroke-width="1" stroke-dasharray="2 3"/><text x="403.8" y="266" font-size="10" fill="#8c867b" text-anchor="middle">125</text><line x1="472.5" y1="250" x2="472.5" y2="30" stroke="#2e2b27" stroke-width="1" stroke-dasharray="2 3"/><text x="472.5" y="266" font-size="10" fill="#8c867b" text-anchor="middle">150</text><line x1="541.2" y1="250" x2="541.2" y2="30" stroke="#2e2b27" stroke-width="1" stroke-dasharray="2 3"/><text x="541.2" y="266" font-size="10" fill="#8c867b" text-anchor="middle">175</text><line x1="610.0" y1="250" x2="610.0" y2="30" stroke="#2e2b27" stroke-width="1" stroke-dasharray="2 3"/><text x="610.0" y="266" font-size="10" fill="#8c867b" text-anchor="middle">200</text><path d="M60 30 V250 H610" fill="none" stroke="#8c867b" stroke-width="1"/><path d="M60.0 139.2 L128.8 139.2 L128.8 114.3 L197.5 114.3 L197.5 148.7 L266.2 148.7 L266.2 166.0 L335.0 166.0 L335.0 176.9 L403.8 176.9 L403.8 184.6 L472.5 184.6 L472.5 190.4 L541.2 190.4 L541.2 194.9 L610.0 194.9" fill="none" stroke="#e8e2d5" stroke-width="1.6"/><path d="M60.0 250.0 L61.4 245.3 L62.8 240.6 L64.1 235.9 L65.5 231.1 L66.9 226.4 L68.2 221.7 L69.6 217.0 L71.0 212.3 L72.4 207.6 L73.8 202.9 L75.1 198.1 L76.5 193.4 L77.9 188.7 L79.2 184.0 L80.6 179.3 L82.0 174.6 L83.4 169.9 L84.8 165.1 L86.1 160.4 L87.5 155.7 L88.9 151.0 L90.2 146.3 L91.6 141.6 L93.0 136.9 L94.4 132.1 L95.8 127.4 L97.1 122.7 L98.5 118.0 L99.9 113.3 L101.2 108.6 L102.6 103.9 L104.0 99.1 L105.4 94.4 L106.8 89.7 L108.1 85.0 L109.5 80.3 L110.9 75.6 L112.2 70.9 L113.6 66.1 L115.0 61.4 L116.4 64.0 L117.8 66.4 L119.1 68.8 L120.5 71.1 L121.9 73.3 L123.2 75.4 L124.6 77.4 L126.0 79.4 L127.4 81.3 L128.8 83.2 L130.1 85.0 L131.5 86.8 L132.9 88.5 L134.2 90.1 L135.6 91.7 L137.0 93.3 L138.4 94.8 L139.8 96.3 L141.1 97.7 L142.5 99.1 L143.9 100.5 L145.2 101.8 L146.6 103.1 L148.0 104.4 L149.4 105.6 L150.8 106.8 L152.1 108.0 L153.5 109.2 L154.9 110.3 L156.2 111.4 L157.6 112.5 L159.0 113.5 L160.4 114.5 L161.8 115.6 L163.1 116.5 L164.5 117.5 L165.9 118.5 L167.2 119.4 L168.6 120.3 L170.0 121.2 L171.4 122.1 L172.8 122.9 L174.1 123.8 L175.5 124.6 L176.9 125.4 L178.2 126.2 L179.6 127.0 L181.0 127.8 L182.4 128.5 L183.8 129.3 L185.1 130.0 L186.5 130.7 L187.9 131.4 L189.2 132.1 L190.6 132.8 L192.0 133.5 L193.4 134.2 L194.8 134.8 L196.1 135.4 L197.5 136.1 L198.9 136.7 L200.2 137.3 L201.6 137.9 L203.0 138.5 L204.4 139.1 L205.8 139.7 L207.1 140.2 L208.5 140.8 L209.9 141.4 L211.2 141.9 L212.6 142.4 L214.0 143.0 L215.4 143.5 L216.8 144.0 L218.1 144.5 L219.5 145.0 L220.9 145.5 L222.2 146.0 L223.6 146.5 L225.0 146.9 L226.4 147.4 L227.8 147.9 L229.1 148.3 L230.5 148.8 L231.9 149.2 L233.2 149.7 L234.6 150.1 L236.0 150.5 L237.4 151.0 L238.8 151.4 L240.1 151.8 L241.5 152.2 L242.9 152.6 L244.2 153.0 L245.6 153.4 L247.0 153.8 L248.4 154.2 L249.8 154.6 L251.1 155.0 L252.5 155.3 L253.9 155.7 L255.2 156.1 L256.6 156.4 L258.0 156.8 L259.4 157.1 L260.8 157.5 L262.1 157.8 L263.5 158.2 L264.9 158.5 L266.2 158.8 L267.6 159.2 L269.0 159.5 L270.4 159.8 L271.8 160.2 L273.1 160.5 L274.5 160.8 L275.9 161.1 L277.2 161.4 L278.6 161.7 L280.0 162.0 L281.4 162.3 L282.8 162.6 L284.1 162.9 L285.5 163.2 L286.9 163.5 L288.2 163.8 L289.6 164.1 L291.0 164.4 L292.4 164.6 L293.8 164.9 L295.1 165.2 L296.5 165.5 L297.9 165.7 L299.2 166.0 L300.6 166.3 L302.0 166.5 L303.4 166.8 L304.8 167.0 L306.1 167.3 L307.5 167.5 L308.9 167.8 L310.2 168.0 L311.6 168.3 L313.0 168.5 L314.4 168.8 L315.8 169.0 L317.1 169.3 L318.5 169.5 L319.9 169.7 L321.2 170.0 L322.6 170.2 L324.0 170.4 L325.4 170.6 L326.8 170.9 L328.1 171.1 L329.5 171.3 L330.9 171.5 L332.2 171.8 L333.6 172.0 L335.0 172.2 L336.4 172.4 L337.8 172.6 L339.1 172.8 L340.5 173.0 L341.9 173.2 L343.2 173.4 L344.6 173.6 L346.0 173.8 L347.4 174.0 L348.8 174.2 L350.1 174.4 L351.5 174.6 L352.9 174.8 L354.2 175.0 L355.6 175.2 L357.0 175.4 L358.4 175.6 L359.8 175.8 L361.1 176.0 L362.5 176.2 L363.9 176.3 L365.2 176.5 L366.6 176.7 L368.0 176.9 L369.4 177.1 L370.8 177.2 L372.1 177.4 L373.5 177.6 L374.9 177.8 L376.2 177.9 L377.6 178.1 L379.0 178.3 L380.4 178.5 L381.8 178.6 L383.1 178.8 L384.5 179.0 L385.9 179.1 L387.2 179.3 L388.6 179.5 L390.0 179.6 L391.4 179.8 L392.8 179.9 L394.1 180.1 L395.5 180.2 L396.9 180.4 L398.2 180.6 L399.6 180.7 L401.0 180.9 L402.4 181.0 L403.8 181.2 L405.1 181.3 L406.5 181.5 L407.9 181.6 L409.2 181.8 L410.6 181.9 L412.0 182.1 L413.4 182.2 L414.8 182.4 L416.1 182.5 L417.5 182.6 L418.9 182.8 L420.2 182.9 L421.6 183.1 L423.0 183.2 L424.4 183.3 L425.8 183.5 L427.1 183.6 L428.5 183.8 L429.9 183.9 L431.2 184.0 L432.6 184.2 L434.0 184.3 L435.4 184.4 L436.8 184.6 L438.1 184.7 L439.5 184.8 L440.9 185.0 L442.2 185.1 L443.6 185.2 L445.0 185.3 L446.4 185.5 L447.8 185.6 L449.1 185.7 L450.5 185.8 L451.9 186.0 L453.2 186.1 L454.6 186.2 L456.0 186.3 L457.4 186.5 L458.8 186.6 L460.1 186.7 L461.5 186.8 L462.9 186.9 L464.2 187.0 L465.6 187.2 L467.0 187.3 L468.4 187.4 L469.8 187.5 L471.1 187.6 L472.5 187.7 L473.9 187.9 L475.2 188.0 L476.6 188.1 L478.0 188.2 L479.4 188.3 L480.8 188.4 L482.1 188.5 L483.5 188.6 L484.9 188.7 L486.2 188.9 L487.6 189.0 L489.0 189.1 L490.4 189.2 L491.8 189.3 L493.1 189.4 L494.5 189.5 L495.9 189.6 L497.2 189.7 L498.6 189.8 L500.0 189.9 L501.4 190.0 L502.8 190.1 L504.1 190.2 L505.5 190.3 L506.9 190.4 L508.2 190.5 L509.6 190.6 L511.0 190.7 L512.4 190.8 L513.8 190.9 L515.1 191.0 L516.5 191.1 L517.9 191.2 L519.2 191.3 L520.6 191.4 L522.0 191.5 L523.4 191.6 L524.8 191.7 L526.1 191.8 L527.5 191.9 L528.9 192.0 L530.2 192.1 L531.6 192.2 L533.0 192.3 L534.4 192.3 L535.8 192.4 L537.1 192.5 L538.5 192.6 L539.9 192.7 L541.2 192.8 L542.6 192.9 L544.0 193.0 L545.4 193.1 L546.8 193.2 L548.1 193.2 L549.5 193.3 L550.9 193.4 L552.2 193.5 L553.6 193.6 L555.0 193.7 L556.4 193.8 L557.8 193.9 L559.1 193.9 L560.5 194.0 L561.9 194.1 L563.2 194.2 L564.6 194.3 L566.0 194.4 L567.4 194.4 L568.8 194.5 L570.1 194.6 L571.5 194.7 L572.9 194.8 L574.2 194.9 L575.6 194.9 L577.0 195.0 L578.4 195.1 L579.8 195.2 L581.1 195.3 L582.5 195.3 L583.9 195.4 L585.2 195.5 L586.6 195.6 L588.0 195.6 L589.4 195.7 L590.8 195.8 L592.1 195.9 L593.5 196.0 L594.9 196.0 L596.2 196.1 L597.6 196.2 L599.0 196.3 L600.4 196.3 L601.8 196.4 L603.1 196.5 L604.5 196.6 L605.9 196.6 L607.2 196.7 L608.6 196.8 L610.0 196.9" fill="none" stroke="#d65a3c" stroke-width="2"/><line x1="115.0" y1="61.4" x2="115.0" y2="114.3" stroke="#e8e2d5" stroke-width="0.8" stroke-dasharray="3 2"/><text x="123.0" y="90.9" font-size="10.5" fill="#e8e2d5">peak lost: 60 to 43 m/s</text><text x="252.5" y="145.3" font-size="10.5" fill="#d65a3c">profile of the storm</text><text x="390.0" y="201.6" font-size="10.5" fill="#e8e2d5">average over 25 km cells</text><text x="610" y="284" font-size="10.5" fill="#8c867b" text-anchor="end">distance from the centre (km)</text><text x="16" y="18" font-size="10.5" fill="#8c867b">wind (m/s)</text></svg>
+    <figcaption>A wind profile with a narrow peak at 20 km from the centre (red), and the same profile averaged over 25 km cells (steps). The average lowers the maximum, so a model on a 25 km grid shows a weaker peak even when it places the storm correctly. Schematic: a modified Rankine vortex, averaged along the radius only.</figcaption>
+  </figure>
+
 
   <h2 id="score"><span class="num">2</span>Scoring a forecast made of 49 storms</h2>
   <p>An ensemble does not give one track. It gives 49 possible positions at each time. Earlier evaluations average the members into a mean track and measure its distance to the observed storm. This discards the spread: two ensembles with the same mean can differ completely, and when the members split into two groups the mean can fall between them, where no member is.</p>
-  <p>We score the ensemble as a probability distribution instead. The member positions are smoothed into a probability density (kernel density estimation), and the score is minus the logarithm of that density at the observed position: the negative log-likelihood, or NLL. Lower is better. A forecast scores badly when it is confident and wrong, and also when it is spread so widely that it says little. Drag the black dot to see how the score changes with the position of the storm. The smoothing width also matters: too narrow and the density is a set of spikes around each member, too wide and every position gets a similar score.</p>
+  <p>We score the ensemble as a probability distribution instead. The member positions are smoothed into a probability density, and the score is minus the logarithm of that density at the observed position: the negative log-likelihood, or NLL. Lower is better. A forecast scores badly when it is confident and wrong, and also when it is spread so widely that it says little. The two examples below are times at which the two scores disagree: the model whose mean is closest to the storm has the highest NLL.</p>
 
   <figure class="wide">
-    <div class="chips" id="explain-models" role="group" aria-label="Model"></div>
-    <div class="explain">
-      <div class="map-wrap" id="explain-wrap"><canvas id="explain-canvas"></canvas></div>
-      <div>
-        <div class="readout" id="explain-readout"></div>
-        <div class="ctrl">
-          <label><input type="checkbox" id="show-mean"> Show the ensemble mean position</label>
-          <label for="bw">Smoothing width: <b id="bw-val"></b></label>
-          <input type="range" id="bw" min="0.4" max="3" step="0.05" value="1">
-        </div>
-      </div>
-    </div>
-    <figcaption id="explain-caption"></figcaption>
+    <div class="fig-title">When the closest mean gets the worst score</div>
+    <div class="chips" id="explain-cases" role="group" aria-label="Example"></div>
+    <div class="explain3" id="explain-panels"></div>
+    <p class="explain-text" id="explain-text"></p>
+    <details class="method"><summary>How this figure is made</summary><figcaption>Dots: storm centre in each member. Shading: the smoothed density, on one scale for the three maps. Cross: mean position of the members. Dashed ring: observed position (IBTrACS). Drag the light dot, in any of the three maps, to see the NLL each model would get if the storm had been there. The smoothing width is chosen for each model and time by cross-validation, as in the paper; the numbers are computed in your browser and can differ from the paper's in the second decimal.</figcaption></details>
   </figure>
 
   <h2 id="season"><span class="num">3</span>The 2025 season: 41 storms</h2>
   <p>We scored every 2025 storm that reached 64&nbsp;kt and that all three models tracked in at least 10 members at 5 or more common times: 41 storms in total. For each storm, the NLL is averaged over these times.</p>
 
   <figure class="wide">
+    <div class="fig-title">Track NLL of the three models on each storm</div>
     <div class="chips" id="basin-filter" role="group" aria-label="Basin"></div>
     <div class="stats" id="stats"></div>
     <div class="note">Lowest NLL of the three models, share of the 41 storms</div>
@@ -302,28 +670,47 @@
     <details class="table"><summary>Table of the 41 storms</summary><table id="storm-table"></table></details>
   </figure>
 
-  <p>FGN, the most recent model, puts more probability on the observed positions than IFS-ENS for 90% of the storms. GenCast does so for 78%. No model is best everywhere: IFS-ENS is best on three storms, and the ranking between FGN and GenCast changes from storm to storm. Choose two models below to compare them storm by storm.</p>
+  <p>No model is best everywhere: IFS-ENS has the lowest NLL on three storms, and the order of FGN and GenCast changes from storm to storm.</p>
 
-  <figure class="wide"><div id="duel"></div></figure>
+  <details class="fold wide"><summary>Compare two models storm by storm</summary><div id="duel"></div></details>
 
-  <p>The advantage also depends on how far ahead the forecast is. Each scored time of each storm counts once below, grouped by forecast day.</p>
+  <p>The ranking does not depend on how far ahead the forecast is. Below, each scored time of each storm counts once, grouped by forecast day.</p>
 
-  <figure class="wide"><div id="leadtime"></div></figure>
+  <figure class="wide">
+    <div class="fig-title">FGN has the lowest NLL at about half of the times, on every day up to day 10</div>
+    <div id="leadtime"></div>
+  </figure>
 
-  <p>From day 1 to day 10, FGN has the lowest NLL at about half of the scored times, GenCast at 33 to 48%, and IFS-ENS at 4 to 13%. After day 10 few storms are still being tracked by all three models, so those columns rest on a few cases.</p>
+  <p>From day 1 to day 10, FGN has the lowest NLL at 45 to 60% of the scored times, GenCast at 33 to 48%, and IFS-ENS at 4 to 13%. After day 10 few storms are still tracked by all three models, so those columns rest on a few cases.</p>
 
   <h2 id="intensity"><span class="num">4</span>The right place, but too weak</h2>
   <p>The damage a cyclone does depends on its intensity as much as on its position. Here the AI models are weaker than the reference. Compared with HRES-fc0, the ECMWF analysis on which both were fine-tuned, FGN and GenCast underestimate the maximum 10&nbsp;m wind by about 15 to 20% between 2 and 9 days of lead time. IFS-ENS stays within about 10%. The AI models' bias is close to that of ERA5, the older reanalysis on which they were first trained. This suggests that the training data play a role, but our evaluation does not establish it.</p>
 
-  <figure class="wide"><div id="bias-chart"></div></figure>
+  <figure class="wide">
+    <div class="fig-title">The AI models' maximum winds are 15 to 20% too weak, closer to ERA5 than to IFS-ENS</div>
+    <div id="bias-chart"></div>
+  </figure>
 
   <p>Do the weak storms still behave like cyclones? In a cyclone, lower central pressure goes with stronger wind. Below, each source contributes the minimum pressure and maximum wind of every member at every time. The AI models and ERA5 sit at weaker winds and higher pressures than HRES-fc0 and the observations. Replacing each value by its rank within its own dataset removes these differences in intensity. What remains is how wind varies with pressure, and it is nearly the same for every source.</p>
 
-  <figure class="wide"><div id="pw-chart"></div>
-    <figcaption>2025 storms, all lead times pooled, at times matched to IBTrACS observations. For each source the contours enclose about 70% (dashed) and 30% (solid) of its points; the curves along the axes are the distributions of pressure and wind alone. "Ranks only" replaces each value by its rank within its own source, which removes the differences in intensity and keeps how wind depends on pressure.</figcaption>
+  <figure class="wide">
+    <div class="fig-title">With the differences in intensity removed, wind depends on pressure in the same way for every source</div>
+    <div id="pw-chart"></div>
+    <details class="method"><summary>How this figure is made</summary><figcaption>2025 storms, all lead times pooled, at times matched to IBTrACS observations. For each source the contours enclose about 70% (dashed) and 30% (solid) of its points; the curves along the axes are the distributions of pressure and wind alone. "Ranks only" replaces each value by its rank within its own source, which removes the differences in intensity and keeps how wind depends on pressure.</figcaption></details>
   </figure>
 
   <p>The models therefore reproduce how wind depends on pressure, and their error is in intensity. This holds for FGN, whose training loss scores each variable at each grid point separately and does not constrain how variables depend on each other.</p>
+  <p>The same ranks put the forecast winds on the observed scale, which is what "Rescaled to observations" does in the player of section 1. For each source, the curves below give the share of its 2025 maximum winds that are below each speed. A member's wind is moved from its model's curve to the observed curve at the same height: it gets the observed wind with the same rank. The strongest winds of a model become the strongest observed winds, the median becomes the observed median, and so on. Choose a model and move the pointer over the chart.</p>
+
+  <figure class="wide">
+    <div class="fig-title">How the player puts forecast winds on the observed scale</div>
+    <div class="chips" id="rank-models" role="group" aria-label="Model"></div>
+    <div class="rankfig">
+      <svg id="rank-chart" role="img" aria-label="Share of winds below each speed, for each model and for the observations"></svg>
+      <div class="readout" id="rank-readout"></div>
+    </div>
+    <figcaption id="rank-caption"></figcaption>
+  </figure>
 
   <h2 id="limits"><span class="num">5</span>What this shows and what it does not</h2>
   <ul>
@@ -346,8 +733,18 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/topojson/3.0.2/topojson.min.js"></script>
-<script src="js/intensity.js"></script>
-<script src="js/season-extra.js"></script>
-<script src="js/main.js"></script>
+<script src="js/intensity.js?v=11"></script>
+<script src="js/season-extra.js?v=11"></script>
+<script src="js/main.js?v=12"></script>
+<script>(function(){var r=document.documentElement;function set(t){if(t===r.dataset.theme)return;try{localStorage.setItem("theme",t)}catch(e){}r.dataset.theme=t;location.reload();}document.querySelectorAll(".themesw [data-t]").forEach(function(b){b.addEventListener("click",function(){set(b.dataset.t)})});document.querySelector(".themesw .trk").addEventListener("click",function(){set(r.dataset.theme==="light"?"dark":"light")});})();</script>
+<script>
+document.addEventListener('click', function (e) {
+  var b = e.target.closest('.seg button');
+  if (!b || b.getAttribute('aria-pressed') !== 'true') return;
+  var other = Array.prototype.filter.call(b.parentElement.querySelectorAll('button'), function (x) { return x !== b; });
+  if (other.length !== 1) return;
+  e.stopPropagation(); e.preventDefault(); other[0].click();
+}, true);
+</script>
 </body>
 </html>

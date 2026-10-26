@@ -8,7 +8,7 @@
 
   const COLOR = {
     fgn: '#E24B4A', gencast_op: '#1D9E75', ifsens_e2s: '#378ADD',
-    hres: '#8E44AD', era5: '#C2670F', ibtracs: '#1a1a1a',
+    hres: '#8E44AD', era5: '#C2670F', ibtracs: window.THEME.ink,
   };
   const LABEL = {
     fgn: 'FGN', gencast_op: 'GenCast', ifsens_e2s: 'IFS-ENS',
