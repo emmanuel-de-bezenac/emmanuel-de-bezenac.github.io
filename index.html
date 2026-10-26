@@ -1,551 +1,236 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-GDL2746PEE"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-GDL2746PEE');
-</script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Emmanuel de Bézenac</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=Inter:wght@300;400;500&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Archivo:wdth,wght@62..125,400..800&family=Barlow:wght@400;500;600&family=Barlow+Semi+Condensed:wght@500;600;700&family=Barlow+Condensed:wght@600;700&display=swap" rel="stylesheet">
 <style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body { background: var(--paper); color: var(--ink); -webkit-font-smoothing: antialiased; }
+body::after { content: ''; position: fixed; inset: 0; pointer-events: none; z-index: 100; opacity: var(--grain, 0.10); background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.25 0 0 0 0 0.18 0 0 0 0 0.1 0 0 0 1 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); }
+a { color: inherit; }
+ul { list-style: none; }
+.w { max-width: 1160px; margin: 0 auto; padding: 0 clamp(16px, 4vw, 48px); }
+.mono { font-family: 'IBM Plex Mono', ui-monospace, monospace; }
+svg text { font-family: 'IBM Plex Mono', ui-monospace, monospace; }
 
-  :root {
-    --bg:      #faf9f7;
-    --text:    #1a1a1a;
-    --text-2:  #555;
-    --text-3:  #999;
-    --text-4:  #bbb;
-    --border:  #ece9e4;
-    --max-w:   800px;
-    --grotesk: 'Space Grotesk', system-ui, sans-serif;
-    --sans:    'Inter', system-ui, sans-serif;
-    --serif:   'EB Garamond', Georgia, serif;
-  }
+:root { --paper: #f0eadf; --ink: #1e1c19; --mute: #6c665d; --red: #cc4b2c; --fill: #e5dccb; --grain: 0.11; }
+body { font-family: 'Barlow', 'Helvetica Neue', Arial, sans-serif; font-size: 17.5px; line-height: 1.55; }
+a { text-decoration-color: var(--red); text-underline-offset: 3px; }
+a:hover { color: var(--red); }
+.nav { background: var(--ink); color: var(--paper); }
+.navrow { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 0.3rem 1.5rem; padding-top: 10px; padding-bottom: 10px; font-family: 'Barlow Semi Condensed', sans-serif; font-weight: 500; }
+.nav a { text-decoration: none; color: var(--paper); }
+.nav a:hover { color: #f0a27f; }
+.nm { font-weight: 700; }
+.links { display: flex; flex-wrap: wrap; gap: 0.2rem 1.4rem; font-size: 15.5px; }
+.hd { display: grid; grid-template-columns: repeat(12, 1fr); column-gap: 28px; padding-top: 56px; padding-bottom: 48px; }
+.hd .txt { grid-column: 1 / span 6; align-self: center; }
+.hd .plate { grid-column: 7 / span 6; align-self: center; justify-self: start; margin-left: 40px; width: 100%; max-width: 320px; }
+#flow { aspect-ratio: 1; touch-action: none; }
+.hint { font-size: 11px; color: var(--mute); text-align: center; margin-top: 4px; opacity: 0.8; }
+.plate .ph { display: flex; justify-content: space-between; font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--mute); border-bottom: 1px solid var(--ink); padding-bottom: 6px; margin-bottom: 10px; }
+.plate .ph b { color: var(--red); font-weight: 500; }
+.draw { width: 100%; height: auto; display: block; }
+.plate .cap { font-size: 13.5px; color: var(--mute); border-top: 1px solid var(--ink); padding-top: 8px; margin-top: 6px; line-height: 1.4; }
+.hd h1 { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: clamp(2.4rem, 4.6vw, 3.7rem); line-height: 0.95; text-transform: uppercase; letter-spacing: -0.005em; padding-bottom: 14px; border-bottom: 1px solid var(--ink); }
+.hd .tag { font-size: 1.1rem; line-height: 1.45; max-width: 30ch; font-weight: 400; margin-top: 18px; }
+.hd .meta { font-size: 15.5px; margin-top: 14px; color: var(--mute); }
+.hd .meta a { color: var(--ink); }
+main section { display: grid; grid-template-columns: repeat(12, 1fr); column-gap: 28px; padding: 30px 0 38px; border-top: 1px solid var(--ink); }
+h2 { grid-column: 1 / span 3; font-family: 'Barlow Semi Condensed', sans-serif; font-weight: 700; font-size: 1.5rem; line-height: 1.1; text-transform: uppercase; }
+h2 .n { display: block; font-family: 'IBM Plex Mono', monospace; font-weight: 500; font-size: 13px; color: var(--red); margin-bottom: 4px; text-transform: none; }
+.b { grid-column: 4 / span 7; }
+.b p { margin-bottom: 0.9rem; }
+.fields { margin-top: 1.2rem; display: grid; grid-template-columns: 6rem 1fr; font-size: 15.5px; border-top: 1px solid var(--ink); padding-top: 10px; }
+.fields dt, .contact dt { font-family: 'Barlow Semi Condensed', sans-serif; font-weight: 600; text-transform: uppercase; font-size: 14px; color: var(--mute); }
+.entry { display: grid; grid-template-columns: 1fr; text-decoration: none; background: var(--ink); color: var(--paper); padding: 16px 20px 18px; }
+.entry .d { font-size: 12px; color: #f0a27f; }
+.entry .t { font-family: 'Barlow Semi Condensed', sans-serif; font-weight: 700; font-size: 1.7rem; line-height: 1.08; margin: 4px 0 8px; }
+.entry .x { color: #cfc6b7; font-size: 15.5px; }
+.entry:hover { background: var(--red); color: var(--paper); }
+.entry:hover .d, .entry:hover .x { color: var(--paper); }
+.pubs li { display: grid; grid-template-columns: 4rem 1fr; padding: 10px 0; border-top: 1px dotted var(--ink); }
+.pubs li:first-child { border-top: 0; padding-top: 0; }
+.pubs .y { font-size: 13px; color: var(--red); padding-top: 3px; }
+.pubs .t { font-weight: 600; text-decoration: none; }
+.pubs .t:hover { color: var(--red); }
+.pubs .m { font-size: 15px; color: var(--mute); margin-top: 1px; }
+.pubs .m b { color: var(--ink); }
+.pubs .aw { color: var(--red); font-weight: 600; }
+.more { margin-top: 1rem; font-size: 15.5px; }
+.cta { display: inline-block; background: var(--red); color: var(--paper); text-decoration: none; font-family: 'Barlow Semi Condensed', sans-serif; font-weight: 700; text-transform: uppercase; font-size: 15.5px; padding: 9px 20px; }
+.cta:hover { background: var(--ink); color: var(--paper); }
+.contact { display: flex; gap: 3rem; flex-wrap: wrap; }
+.foot { display: flex; justify-content: space-between; padding-top: 14px; padding-bottom: 44px; border-top: 6px solid var(--ink); font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: var(--mute); }
+@media (max-width: 760px) {
+  .hd .txt, .hd .plate, h2, .b { grid-column: 1 / -1; }
+  .hd .plate { margin-top: 32px; }
+  h2 { margin-bottom: 12px; }
+}
 
-  html { scroll-behavior: smooth; }
 
-  body {
-    font-family: var(--sans);
-    font-size: 15px;
-    color: var(--text);
-    background: var(--bg);
-    line-height: 1.75;
-    -webkit-font-smoothing: antialiased;
-  }
-
-  ::selection { background: #e4ddd5; }
-
-  a { color: var(--text); }
-
-  /* ── Nav ── */
-  nav {
-    position: sticky; top: 0; z-index: 10;
-    background: rgba(250,249,247,0.9);
-    backdrop-filter: blur(14px);
-    -webkit-backdrop-filter: blur(14px);
-  }
-
-  .nav-inner {
-    max-width: var(--max-w);
-    margin: 0 auto;
-    padding: 0 2rem;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    height: 56px;
-  }
-
-  .nav-name {
-    font-family: var(--grotesk);
-    font-size: 0.85rem;
-    font-weight: 700;
-    letter-spacing: -0.01em;
-  }
-
-  .nav-links { display: flex; gap: 1.8rem; }
-
-  .nav-links a {
-    font-size: 0.72rem;
-    font-weight: 400;
-    color: var(--text-3);
-    text-decoration: none;
-    letter-spacing: 0.03em;
-    transition: color 0.2s;
-  }
-
-  .nav-links a:hover { color: var(--text); }
-
-  .nav-toggle { display: none; background: none; border: none; cursor: pointer; }
-  .nav-toggle svg { width: 20px; height: 20px; stroke: var(--text); }
-
-  /* ── Hero ── */
-  .hero {
-    max-width: var(--max-w);
-    margin: 0 auto;
-    padding: 6rem 2rem 5rem;
-  }
-
-  .hero h1 {
-    font-family: var(--grotesk);
-    font-weight: 700;
-    font-size: 3.4rem;
-    line-height: 1.08;
-    letter-spacing: -0.03em;
-    margin-bottom: 1.4rem;
-  }
-
-  .hero .tagline {
-    font-size: 1rem;
-    color: var(--text-2);
-    font-weight: 300;
-    line-height: 1.65;
-    max-width: 520px;
-  }
-
-  .hero-meta {
-    margin-top: 1.6rem;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    flex-wrap: wrap;
-    font-size: 0.78rem;
-    color: var(--text-3);
-  }
-
-  .hero-meta a {
-    color: var(--text-3);
-    text-decoration: none;
-    transition: color 0.2s;
-  }
-
-  .hero-meta a:hover { color: var(--text); }
-
-  .hero-meta .sep { color: var(--text-4); }
-
-  /* ── Sections ── */
-  section {
-    max-width: var(--max-w);
-    margin: 0 auto;
-    padding: 4.5rem 2rem;
-  }
-
-  .section-label {
-    font-family: var(--grotesk);
-    font-size: 0.68rem;
-    font-weight: 500;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: var(--text-4);
-    margin-bottom: 2rem;
-    padding-bottom: 0.8rem;
-    border-bottom: 1px solid var(--border);
-  }
-
-  /* ── About ── */
-  .about p {
-    font-size: 0.92rem;
-    color: var(--text-2);
-    margin-bottom: 1rem;
-    line-height: 1.85;
-    max-width: 620px;
-  }
-
-  .about a {
-    color: var(--text);
-    text-decoration: none;
-    border-bottom: 1px solid var(--border);
-    transition: border-color 0.25s;
-  }
-
-  .about a:hover { border-color: var(--text); }
-
-  .tags {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-    margin-top: 1.8rem;
-  }
-
-  .tags span {
-    font-size: 0.68rem;
-    font-weight: 400;
-    padding: 0.3rem 0.75rem;
-    border: 1px solid var(--border);
-    border-radius: 100px;
-    color: var(--text-2);
-    transition: border-color 0.2s;
-  }
-
-  .tags span:hover { border-color: var(--text-3); }
-
-  /* ── Publications ── */
-  .pub-list { list-style: none; }
-
-  .pub-item { padding: 1.1rem 0; }
-
-  .pub-item + .pub-item { border-top: 1px solid var(--border); }
-
-  .pub-title {
-    font-family: var(--serif);
-    font-size: 1.05rem;
-    font-weight: 400;
-    line-height: 1.4;
-    margin-bottom: 0.25rem;
-  }
-
-  .pub-title a {
-    color: var(--text);
-    text-decoration: none;
-    transition: color 0.2s;
-  }
-
-  .pub-title a:hover { color: var(--text-3); }
-
-  .pub-meta {
-    font-size: 0.74rem;
-    color: var(--text-3);
-    line-height: 1.5;
-  }
-
-  .pub-meta .venue { font-style: italic; }
-
-  .pub-meta .me {
-    color: var(--text);
-    font-weight: 500;
-  }
-
-  .pub-meta .award {
-    font-weight: 500;
-    font-style: normal;
-  }
-
-  .pub-links { margin-top: 0.35rem; }
-
-  .pub-links a {
-    font-size: 0.68rem;
-    color: var(--text-3);
-    text-decoration: none;
-    margin-right: 0.9rem;
-    transition: color 0.2s;
-  }
-
-  .pub-links a:hover { color: var(--text); }
-
-  .all-pubs {
-    margin-top: 1.8rem;
-    font-size: 0.78rem;
-  }
-
-  .all-pubs a {
-    color: var(--text-3);
-    text-decoration: none;
-    transition: color 0.2s;
-  }
-
-  .all-pubs a:hover { color: var(--text); }
-
-  /* ── Positions ── */
-  .positions p {
-    font-size: 0.92rem;
-    color: var(--text-2);
-    line-height: 1.85;
-    max-width: 560px;
-    margin-bottom: 1.5rem;
-  }
-
-  .positions .cta {
-    display: inline-block;
-    font-family: var(--grotesk);
-    font-size: 0.78rem;
-    font-weight: 500;
-    color: var(--bg);
-    text-decoration: none;
-    padding: 0.6rem 1.6rem;
-    background: var(--text);
-    border-radius: 100px;
-    transition: opacity 0.2s;
-  }
-
-  .positions .cta:hover { opacity: 0.75; }
-
-  /* ── Blog ── */
-  .blog-empty {
-    font-size: 0.88rem;
-    color: var(--text-3);
-    font-style: italic;
-  }
-
-  /* ── Contact ── */
-  .contact-items {
-    display: flex;
-    gap: 3rem;
-    flex-wrap: wrap;
-    font-size: 0.85rem;
-  }
-
-  .contact-item a {
-    color: var(--text-2);
-    text-decoration: none;
-    border-bottom: 1px solid var(--border);
-    transition: border-color 0.25s;
-  }
-
-  .contact-item a:hover { border-color: var(--text); }
-
-  .contact-item .label {
-    font-size: 0.65rem;
-    font-weight: 500;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: var(--text-4);
-    margin-bottom: 0.2rem;
-  }
-
-  /* ── Footer ── */
-  footer {
-    max-width: var(--max-w);
-    margin: 0 auto;
-    padding: 3rem 2rem;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-size: 0.68rem;
-    color: var(--text-4);
-  }
-
-  footer .inria-link {
-    display: inline-block;
-  }
-
-  footer .inria-link img {
-    height: 18px;
-    opacity: 0.45;
-    transition: opacity 0.2s;
-  }
-
-  footer .inria-link:hover img { opacity: 0.8; }
-
-  /* Fallback if logo image is missing */
-  footer .inria-fallback {
-    font-family: var(--grotesk);
-    font-weight: 700;
-    font-size: 0.8rem;
-    color: var(--text-4);
-    text-decoration: none;
-    letter-spacing: -0.01em;
-    transition: color 0.2s;
-  }
-
-  footer .inria-fallback:hover { color: var(--text-3); }
-
-  /* ── Responsive ── */
-  @media (max-width: 640px) {
-    .hero { padding: 4rem 1.5rem 3.5rem; }
-    .hero h1 { font-size: 2.4rem; }
-    section { padding: 3.5rem 1.5rem; }
-    .nav-inner { padding: 0 1.5rem; }
-    footer { padding: 2.5rem 1.5rem; }
-    .nav-links { display: none; }
-    .nav-links.open {
-      display: flex;
-      flex-direction: column;
-      position: absolute;
-      top: 56px; left: 0; right: 0;
-      background: rgba(250,249,247,0.98);
-      backdrop-filter: blur(14px);
-      padding: 1.2rem 1.5rem;
-      gap: 0.9rem;
-    }
-    .nav-toggle { display: block; }
-  }
+/* Plainer elements below the header (section headings and nav stay as in option 4): blog card as an orange line on its left,
+   publication years grey, button as an underlined link, thin footer rule. */
+.entry { background: transparent; color: var(--ink); border-left: 2px solid var(--red); padding: 4px 0 4px 18px; }
+.entry .d { color: var(--red); } .entry .x { color: var(--mute); }
+.entry:hover { background: transparent; color: var(--ink); border-color: var(--ink); }
+.entry:hover .d { color: var(--red); } .entry:hover .x { color: var(--mute); }
+.pubs .y { color: var(--mute); }
+.cta { background: transparent; color: var(--ink); padding: 0; text-transform: none; font-family: 'Barlow', sans-serif; font-weight: 500; text-decoration: underline; text-decoration-color: var(--red); text-underline-offset: 3px; }
+.cta:hover { background: transparent; color: var(--red); }
+.foot { border-top: 0; position: relative; }
+.foot::before { content: ''; position: absolute; top: 0; left: clamp(16px, 4vw, 48px); right: clamp(16px, 4vw, 48px); border-top: 1px solid var(--ink); }   /* line spans the content width, not the padding */
 </style>
 </head>
 <body>
-
-<nav>
-  <div class="nav-inner">
-    <span class="nav-name">EdB</span>
-    <button class="nav-toggle" onclick="document.querySelector('.nav-links').classList.toggle('open')" aria-label="Menu">
-      <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round"><line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="17" x2="20" y2="17"/></svg>
-    </button>
-    <div class="nav-links">
-      <a href="#about">About</a>
-      <a href="#publications">Publications</a>
-      <a href="#talks">Talks</a>
-      <a href="#positions">Positions</a>
-      <a href="#blog">Blog</a>
-      <a href="#contact">Contact</a>
-    </div>
-  </div>
-</nav>
-
-<header class="hero">
-  <h1>Emmanuel<br>de Bézenac</h1>
-  <p class="tagline">Permanent researcher at INRIA Paris, working on deep learning for weather forecasting and generative models.</p>
-  <div class="hero-meta">
-    <a href="https://team.inria.fr/arches/" target="_blank">ARCHES</a>
-    <span class="sep">·</span>
-    <a href="https://www.inria.fr" target="_blank">INRIA Paris</a>
-    <span class="sep">·</span>
-    <a href="https://scholar.google.com/citations?user=KvZw5gYAAAAJ" target="_blank">Scholar</a>
-    <span class="sep">·</span>
-    <a href="https://www.linkedin.com/in/emmanuel-de-b%C3%A9zenac-446789220/" target="_blank">LinkedIn</a>
-  </div>
+<nav class="nav"><div class="w navrow">
+  <a class="nm" href="#">Emmanuel de Bézenac</a>
+  <span class="links"><a href="#about">About</a><a href="#writing">Writing</a><a href="#publications">Publications</a><a href="#talks">Talks</a><a href="#positions">Positions</a><a href="#contact">Contact</a></span>
+</div></nav>
+<header class="w hd">
+  <div class="txt"><h1>Emmanuel de Bézenac</h1><p class="tag">Permanent researcher at INRIA Paris, working on deep learning for weather forecasting and generative models.</p><p class="meta"><a href="https://team.inria.fr/arches/">ARCHES</a> · <a href="https://www.inria.fr">INRIA Paris</a> · <a href="https://scholar.google.com/citations?user=KvZw5gYAAAAJ">Scholar</a> · <a href="https://www.linkedin.com/in/emmanuel-de-b%C3%A9zenac-446789220/">LinkedIn</a></p></div>
+  <figure class="plate"><canvas id="flow" class="draw" role="img" aria-label="Animated field of short lines bent by circular poles"></canvas></figure>
 </header>
+<main class="w">
+<section id="about"><h2><span class="n">1.0</span>About</h2><div class="b">
+  <p>I am a permanent researcher (ISFP) at INRIA Paris in the <a href="https://team.inria.fr/arches/">ARCHES</a> team, led by <a href="https://project.inria.fr/arches/claire-monteleoni/">Claire Monteleoni</a>.</p>
+  <p>My current work focuses on building AI weather forecasting models. I am also broadly interested in generative models — including diffusion models, flow matching, and consistency models — and in developing deep learning methods that leverage the structure of physical systems.</p>
+  <p>Previously, I was a postdoctoral researcher at ETH Zürich with <a href="https://math.ethz.ch/sam/the-institute/people/siddhartha-mishra.html">Siddhartha Mishra</a>, where I worked on neural PDE solvers, scaling them to large-scale problems, and investigating the theoretical foundations of these approaches — including variable-resolution operators and the fundamental difficulties of physics-informed deep learning.</p>
+  <p>I obtained my PhD from Sorbonne Université, supervised by <a href="https://pages.isir.upmc.fr/gallinari/">Patrick Gallinari</a>, where I have been working since 2017 on modeling physical processes with deep learning, developing models that embed prior scientific knowledge and PDEs.</p>
+  <dl class="fields"><dt>Fields</dt><dd>Weather forecasting · Generative models · Neural PDE solvers · Physics-informed machine learning</dd></dl>
+</div></section>
 
-<section id="about" class="about">
-  <div class="section-label">About</div>
-  <p>
-    I am a permanent researcher (ISFP) at INRIA Paris in the
-    <a href="https://team.inria.fr/arches/" target="_blank">ARCHES</a> team,
-    led by <a href="https://project.inria.fr/arches/claire-monteleoni/" target="_blank">Claire Monteleoni</a>.
-  </p>
-  <p>
-    My current work focuses on building AI weather forecasting models. I am also broadly interested
-    in generative models — including diffusion models, flow matching, and consistency models — and
-    in developing deep learning methods that leverage the structure of physical systems.
-  </p>
-  <p>
-    Previously, I was a postdoctoral researcher at ETH Zürich with
-    <a href="https://math.ethz.ch/sam/the-institute/people/siddhartha-mishra.html" target="_blank">Siddhartha Mishra</a>,
-    where I worked on neural PDE solvers, scaling them to large-scale problems, and
-    investigating the theoretical foundations of these approaches — including variable-resolution
-    operators and the fundamental difficulties of physics-informed deep learning.
-  </p>
-  <p>
-    I obtained my PhD from Sorbonne Université, supervised by
-    <a href="https://pages.isir.upmc.fr/gallinari/" target="_blank">Patrick Gallinari</a>,
-    where I have been working since 2017 on modeling physical processes with deep learning,
-    developing models that embed prior scientific knowledge and PDEs.
-  </p>
-  <div class="tags">
-    <span>Weather Forecasting</span>
-    <span>Generative Models</span>
-    <span>Neural PDE Solvers</span>
-    <span>Physics-Informed ML</span>
-  </div>
-</section>
+<section id="writing"><h2><span class="n">2.0</span>Writing</h2><div class="b">
+  <a class="entry" href="blog/ai-cyclones/">
+    <span class="d mono">October 2026</span>
+    <span class="t">Where will the storm go? AI weather models and the tropical cyclones of 2025</span>
+    <span class="x">Interactive companion to the paper <i>Can AI Forecast the Extremes?</i></span>
+  </a>
+</div></section>
 
-<section id="publications">
-  <div class="section-label">Selected Publications</div>
-  <ul class="pub-list">
-
-    <li class="pub-item">
-      <div class="pub-title"><a href="https://arxiv.org/abs/2405.19101" target="_blank">Poseidon: Efficient Foundation Models for PDEs</a></div>
-      <div class="pub-meta">M. Herde, B. Raonic, T. Rohner, R. Käppeli, R. Molinaro, <span class="me">E. de Bézenac</span>, S. Mishra · <span class="venue">NeurIPS 2024</span></div>
-      <div class="pub-links"><a href="https://arxiv.org/abs/2405.19101" target="_blank">arXiv</a></div>
-    </li>
-
-    <li class="pub-item">
-      <div class="pub-title"><a href="https://arxiv.org/abs/2310.05801" target="_blank">An Operator Preconditioning Perspective on Training in Physics-Informed Machine Learning</a></div>
-      <div class="pub-meta"><span class="me">E. de Bézenac</span>, T. De Ryck, F. Bonnet, S. Mishra · <span class="venue">ICLR 2024</span></div>
-      <div class="pub-links"><a href="https://arxiv.org/abs/2310.05801" target="_blank">arXiv</a></div>
-    </li>
-
-    <li class="pub-item">
-      <div class="pub-title"><a href="https://arxiv.org/abs/2305.16150" target="_blank">Unifying GANs and Score-Based Diffusion as Generative Particle Models</a></div>
-      <div class="pub-meta">J.-Y. Franceschi, M. Gartrell, L. Dos Santos, T. Issenhuth, <span class="me">E. de Bézenac</span>, M. Chen, A. Rakotomamonjy · <span class="venue">NeurIPS 2023</span></div>
-      <div class="pub-links"><a href="https://arxiv.org/abs/2305.16150" target="_blank">arXiv</a> <a href="https://github.com/White-Link/gpm" target="_blank">code</a></div>
-    </li>
-
-    <li class="pub-item">
-      <div class="pub-title"><a href="https://arxiv.org/abs/2302.01178" target="_blank">Convolutional Neural Operators for Robust and Accurate Learning of PDEs</a></div>
-      <div class="pub-meta">B. Raonic, R. Molinaro, <span class="me">E. de Bézenac</span>, T. Rohner, S. Mishra · <span class="venue">NeurIPS 2023</span></div>
-      <div class="pub-links"><a href="https://arxiv.org/abs/2302.01178" target="_blank">arXiv</a></div>
-    </li>
-
-    <li class="pub-item">
-      <div class="pub-title"><a href="https://arxiv.org/abs/2010.04456" target="_blank">Augmenting Physical Models with Deep Networks for Complex Dynamics Forecasting</a></div>
-      <div class="pub-meta">Y. Yin, V. Le Guen, J. Donà, <span class="me">E. de Bézenac</span>, I. Ayed, N. Thome, P. Gallinari · <span class="venue">ICLR 2021</span> <span class="award">· Oral</span></div>
-      <div class="pub-links"><a href="https://arxiv.org/abs/2010.04456" target="_blank">arXiv</a></div>
-    </li>
-
-    <li class="pub-item">
-      <div class="pub-title"><a href="https://proceedings.neurips.cc/paper/2020/hash/1f47cef5e38c952f94c5d61726027439-Abstract.html" target="_blank">Normalizing Kalman Filters for Multivariate Time Series Analysis</a></div>
-      <div class="pub-meta"><span class="me">E. de Bézenac</span>, S. S. Rangapuram, K. Benidis, M. Bohlke-Schneider, R. Kurle, L. Stella, H. Hasson, P. Gallinari, T. Januschowski · <span class="venue">NeurIPS 2020</span></div>
-      <div class="pub-links"><a href="https://proceedings.neurips.cc/paper/2020/hash/1f47cef5e38c952f94c5d61726027439-Abstract.html" target="_blank">paper</a></div>
-    </li>
-
-    <li class="pub-item">
-      <div class="pub-title"><a href="https://arxiv.org/abs/1711.07970" target="_blank">Deep Learning for Physical Processes: Incorporating Prior Scientific Knowledge</a></div>
-      <div class="pub-meta"><span class="me">E. de Bézenac</span>, A. Pajot, P. Gallinari · <span class="venue">ICLR 2018</span></div>
-      <div class="pub-links"><a href="https://arxiv.org/abs/1711.07970" target="_blank">arXiv</a></div>
-    </li>
-
+<section id="publications"><h2><span class="n">3.0</span>Selected publications</h2><div class="b">
+  <ul class="pubs">
+    <li><span class="y mono">2024</span><div><a class="t" href="https://arxiv.org/abs/2405.19101">Poseidon: Efficient Foundation Models for PDEs</a><div class="m">M. Herde, B. Raonic, T. Rohner, R. Käppeli, R. Molinaro, <b>E. de Bézenac</b>, S. Mishra · <i>NeurIPS 2024</i></div></div></li>
+    <li><span class="y mono">2024</span><div><a class="t" href="https://arxiv.org/abs/2310.05801">An Operator Preconditioning Perspective on Training in Physics-Informed Machine Learning</a><div class="m"><b>E. de Bézenac</b>, T. De Ryck, F. Bonnet, S. Mishra · <i>ICLR 2024</i></div></div></li>
+    <li><span class="y mono">2023</span><div><a class="t" href="https://arxiv.org/abs/2305.16150">Unifying GANs and Score-Based Diffusion as Generative Particle Models</a><div class="m">J.-Y. Franceschi, M. Gartrell, L. Dos Santos, T. Issenhuth, <b>E. de Bézenac</b>, M. Chen, A. Rakotomamonjy · <i>NeurIPS 2023</i> · <a href="https://github.com/White-Link/gpm">code</a></div></div></li>
+    <li><span class="y mono">2023</span><div><a class="t" href="https://arxiv.org/abs/2302.01178">Convolutional Neural Operators for Robust and Accurate Learning of PDEs</a><div class="m">B. Raonic, R. Molinaro, <b>E. de Bézenac</b>, T. Rohner, S. Mishra · <i>NeurIPS 2023</i></div></div></li>
+    <li><span class="y mono">2021</span><div><a class="t" href="https://arxiv.org/abs/2010.04456">Augmenting Physical Models with Deep Networks for Complex Dynamics Forecasting</a><div class="m">Y. Yin, V. Le Guen, J. Donà, <b>E. de Bézenac</b>, I. Ayed, N. Thome, P. Gallinari · <i>ICLR 2021</i> · <span class="aw">Oral</span></div></div></li>
+    <li><span class="y mono">2020</span><div><a class="t" href="https://proceedings.neurips.cc/paper/2020/hash/1f47cef5e38c952f94c5d61726027439-Abstract.html">Normalizing Kalman Filters for Multivariate Time Series Analysis</a><div class="m"><b>E. de Bézenac</b>, S. S. Rangapuram, K. Benidis, M. Bohlke-Schneider, R. Kurle, L. Stella, H. Hasson, P. Gallinari, T. Januschowski · <i>NeurIPS 2020</i></div></div></li>
+    <li><span class="y mono">2018</span><div><a class="t" href="https://arxiv.org/abs/1711.07970">Deep Learning for Physical Processes: Incorporating Prior Scientific Knowledge</a><div class="m"><b>E. de Bézenac</b>, A. Pajot, P. Gallinari · <i>ICLR 2018</i></div></div></li>
   </ul>
-  <p class="all-pubs"><a href="https://scholar.google.com/citations?user=KvZw5gYAAAAJ" target="_blank">All publications →</a></p>
-</section>
+  <p class="more"><a href="https://scholar.google.com/citations?user=KvZw5gYAAAAJ">All publications on Google Scholar</a></p>
+</div></section>
 
-<section id="talks">
-  <div class="section-label">Selected Talks</div>
-  <ul class="pub-list">
-
-    <li class="pub-item">
-      <div class="pub-title"><a href="reno_presentation_pavia.pdf" target="_blank">Some Insights into Neural Operators for Solving PDEs</a></div>
-      <div class="pub-meta"><span class="me">E. de Bézenac</span></div>
-      <div class="pub-links"><a href="reno_presentation_pavia.pdf" target="_blank">slides (pdf)</a></div>
-    </li>
-
-    <li class="pub-item">
-      <div class="pub-title"><a href="pinns_presentation.pdf" target="_blank">Physics Informed Neural Networks: Some Insights and Limitations</a></div>
-      <div class="pub-meta"><span class="me">E. de Bézenac</span></div>
-      <div class="pub-links"><a href="pinns_presentation.pdf" target="_blank">slides (pdf)</a></div>
-    </li>
-
+<section id="talks"><h2><span class="n">4.0</span>Selected talks</h2><div class="b">
+  <ul class="pubs">
+    <li><span class="y mono">pdf</span><div><a class="t" href="reno_presentation_pavia.pdf">Some Insights into Neural Operators for Solving PDEs</a></div></li>
+    <li><span class="y mono">pdf</span><div><a class="t" href="pinns_presentation.pdf">Physics Informed Neural Networks: Some Insights and Limitations</a></div></li>
   </ul>
-</section>
+</div></section>
 
-<section id="positions" class="positions">
-  <div class="section-label">Open Positions</div>
-  <p>
-    Our team may have openings for postdocs, PhD students, and M2 research interns.
-    If the topics on this page resonate with you and you're genuinely excited about this
-    line of research, feel free to reach out.
-  </p>
-  <a href="mailto:emmanuel.de-bezenac@inria.fr?subject=Research%20Position%20Inquiry" class="cta">Get in touch</a>
-</section>
+<section id="positions"><h2><span class="n">5.0</span>Open positions</h2><div class="b">
+  <p>Our team may have openings for postdocs, PhD students, and M2 research interns. If the topics on this page resonate with you and you're genuinely excited about this line of research, feel free to reach out.</p>
+  <a class="cta" href="mailto:emmanuel.de-bezenac@inria.fr?subject=Research%20Position%20Inquiry">Get in touch</a>
+</div></section>
 
-<section id="blog">
-  <div class="section-label">Blog</div>
-  <ul class="pub-list">
-    <li class="pub-item">
-      <div class="pub-title"><a href="blog/ai-cyclones/">Where will the storm go? AI weather models and the tropical cyclones of 2025</a></div>
-      <div class="pub-meta">October 2026 · Interactive companion to <span class="venue">Can AI Forecast the Extremes?</span></div>
-    </li>
-  </ul>
-</section>
+<section id="contact"><h2><span class="n">6.0</span>Contact</h2><div class="b">
+  <dl class="contact"><div><dt>Email</dt><dd><a href="mailto:emmanuel.de-bezenac@inria.fr">emmanuel.de-bezenac@inria.fr</a></dd></div>
+  <div><dt>Team</dt><dd><a href="https://team.inria.fr/arches/">ARCHES, INRIA Paris</a></dd></div></dl>
+</div></section>
+</main>
+<footer class="w foot"><span>© 2026 Emmanuel de Bézenac</span><a href="https://www.inria.fr">INRIA</a></footer>
+<script>
+// The line field from option C (short lines on concentric rings whose angles follow a wave travelling out of the centre; crest
+// lines are red-orange) with poles. Each pole is a hollow circle: orange is +, black is -, strength proportional to its radius.
+// Lines align with the summed field of the poles and follow the wave where the field is weak.
+// Without the mouse: every pole drifts slowly on its own closed path around its home position and its radius changes by
+// +-10%, so the field keeps rearranging. With the mouse: lines turn to circle around the cursor and get up to 60% longer, by an
+// amount 1 / (1 + (d / 70)^2) of the distance d, and each line turns gradually, the far ones more slowly than the near ones, so the turn spreads
+// outward from the cursor. Click to place a pole, drag a placed pole to move it, double-click to reset.
+const INK = "#1e1c19", RED = "#cc4b2c", TAU = 2 * Math.PI;
+const cv = document.getElementById("flow"), ctx = cv.getContext("2d");
+const VW = 400, VH = 400, STEP = 19, GAIN = 2500, LONG = 0.026, EPS2 = 18 * 18, MAXP = 14, DRIFT = 26;
+const still = matchMedia("(prefers-reduced-motion: reduce)").matches;
+const wrap = a => a - Math.PI * Math.round(a / Math.PI);
+const NEXT = [[10, 1], [6, -1], [15, -1], [8, 1], [4.5, 1], [12, -1], [17, 1], [7, -1]];   // [radius, sign] for successive clicks
+let W = 0, D = 1;
+function fit() { D = devicePixelRatio || 1; W = cv.clientWidth; cv.width = W * D; cv.height = W * D; }
+fit(); addEventListener("resize", fit);
 
-<section id="contact">
-  <div class="section-label">Contact</div>
-  <div class="contact-items">
-    <div class="contact-item">
-      <div class="label">Email</div>
-      <a href="mailto:emmanuel.de-bezenac@inria.fr">emmanuel.de-bezenac@inria.fr</a>
-    </div>
-    <div class="contact-item">
-      <div class="label">Team</div>
-      <a href="https://team.inria.fr/arches/" target="_blank">ARCHES @ INRIA</a>
-    </div>
-  </div>
-</section>
+// Lines on concentric rings STEP apart, each ring holding as many lines as fit at spacing STEP, so the disc has a clean edge.
+const pts = [[0, 0]];
+for (let r = STEP; r <= 190; r += STEP) { const m = Math.round(TAU * r / STEP); for (let i = 0; i < m; i++) pts.push([r * Math.cos(i * TAU / m + r), r * Math.sin(i * TAU / m + r)]); }
 
-<footer>
-  <span>© 2026 Emmanuel de Bézenac</span>
-  <!-- To use the real INRIA logo: download it from https://www.inria.fr/en/charter-use-visual-identity-inria
-       save as inria-logo.svg next to index.html, then uncomment the line below and remove the fallback -->
-  <!-- <a href="https://www.inria.fr" target="_blank" class="inria-link"><img src="inria-logo.svg" alt="INRIA"></a> -->
-  <a href="https://www.inria.fr" target="_blank" class="inria-fallback">INRIA</a>
-</footer>
+const pole = (hx, hy, r, q) => ({ hx, hy, r, q, x: hx, y: hy, ph: Math.random() * TAU, f: 0.07 + 0.06 * Math.random() });
+let poles, next, hover = null, grab = -1;
+const off = new Float32Array(pts.length), grow = new Float32Array(pts.length);   // per-line angle offset and length gain from the cursor, eased over time
+function reset() { poles = [pole(-55, 12, 11, 1), pole(70, -30, 6, -1), pole(20, 95, 8, -1)].slice(0, 1); next = 0; }
+reset();
+const pos = e => { const b = cv.getBoundingClientRect(); return { x: (e.clientX - b.left) / b.width * VW - VW / 2, y: (e.clientY - b.top) / b.height * VH - VH / 2 }; };
+const hit = q => poles.findIndex(o => Math.hypot(o.x - q.x, o.y - q.y) < o.r + 5);
+cv.addEventListener("pointermove", e => {
+  const q = pos(e);
+  hover = q;
+  if (grab >= 0) { const o = poles[grab]; o.hx += q.x - o.x; o.hy += q.y - o.y; }
+  cv.style.cursor = grab >= 0 ? "grabbing" : hit(q) >= 0 ? "grab" : "crosshair";
+});
+cv.addEventListener("pointerleave", () => { if (grab < 0) hover = null; });
+cv.addEventListener("pointerdown", e => {
+  const q = pos(e); hover = q; cv.setPointerCapture(e.pointerId);
+  grab = hit(q);
+  if (grab < 0 && poles.length < MAXP) { const [r, s] = NEXT[next++ % NEXT.length]; poles.push(pole(q.x, q.y, r, s)); }
+});
+const up = () => { grab = -1; }; cv.addEventListener("pointerup", up); cv.addEventListener("pointercancel", up);
+cv.addEventListener("dblclick", reset);
 
+function circle(x, y, r, q, alpha) {
+  ctx.globalAlpha = alpha; ctx.lineWidth = 1.6; ctx.strokeStyle = q > 0 ? RED : INK;
+  ctx.beginPath(); ctx.arc(x, y, r, 0, TAU); ctx.stroke(); ctx.globalAlpha = 1;
+}
+let prev = 0;
+function frame(ms) {
+  const t = still ? 0 : ms / 1000, dt = Math.min(0.05, t - prev); prev = t;
+  for (const o of poles) {
+    o.x = o.hx + DRIFT * Math.cos(o.f * t + o.ph); o.y = o.hy + DRIFT * 0.8 * Math.sin(o.f * 1.3 * t + 2 * o.ph);
+    o.rr = o.r * (1 + 0.1 * Math.sin(o.f * 2.1 * t + o.ph));
+  }
+
+  const k = W / VW;
+  ctx.setTransform(D * k, 0, 0, D * k, D * W / 2, D * W / 2);
+  ctx.clearRect(-VW / 2, -VH / 2, VW, VH);
+  ctx.lineWidth = 1.4; ctx.lineCap = "round";
+  const ink = new Path2D(), red = new Path2D();
+  for (let n = 0; n < pts.length; n++) {
+    const [x, y] = pts[n];
+    let ex = 0, ey = 0, covered = false;
+    for (const o of poles) {
+      const dx = x - o.x, dy = y - o.y, d2 = dx * dx + dy * dy, m = GAIN * o.q * (o.rr / 12) / Math.pow(d2 + EPS2, 1.5);
+      if (d2 < (o.rr + 5) * (o.rr + 5)) covered = true;
+      ex += m * dx; ey += m * dy;
+    }
+    if (covered) continue;
+    const d = Math.hypot(x, y), w = Math.sin(d * 0.032 - t * 0.7), p = 1 - Math.exp(-Math.hypot(ex, ey));
+    let ang = Math.atan2(y, x) + Math.PI / 2 + w * 0.7;
+    ang += p * wrap(Math.atan2(ey, ex) - ang);
+    let want = 0, wantG = 0, rate = 1.5;
+    if (hover && grab < 0) {
+      const hd = Math.hypot(hover.x - x, hover.y - y), wt = 1 / (1 + (hd / 70) ** 2);
+      want = wt * wrap(Math.atan2(hover.y - y, hover.x - x) + Math.PI / 2 - ang); wantG = wt; rate = 1.5 + 8 * wt;
+    }
+    const e = 1 - Math.exp(-dt * rate);
+    off[n] += (want - off[n]) * e; grow[n] += (wantG - grow[n]) * e;
+    ang += off[n];
+    const path = w > 0.93 && p < 0.5 && Math.abs(off[n]) < 0.3 ? red : ink, L = 5 * (1 + 0.6 * grow[n]), c = L * Math.cos(ang), s = L * Math.sin(ang);
+    path.moveTo(x - c, y - s); path.lineTo(x + c, y + s);
+  }
+  ctx.strokeStyle = INK; ctx.stroke(ink); ctx.strokeStyle = RED; ctx.stroke(red);
+  poles.forEach(o => circle(o.x, o.y, o.rr, o.q, 1));
+  requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+</script>
 </body>
 </html>
