@@ -231,22 +231,20 @@ const ICON_PLAY = '<svg viewBox="0 0 16 16" width="15" height="15" aria-hidden="
     const seg = document.getElementById('windcorr'), explain = document.getElementById('wc-explain');
     const EXPLAIN = {
       raw: 'Maximum 10 m wind within about 220 km of each member\'s storm centre, as the model gives it.',
-      rank: 'Winds are mapped to observed values of the same rank, matching the overall observed distribution. Predicted positions stay unchanged. This changes the display, not the forecast.',
+      rank: 'The forecast winds are weaker than the actual winds. Each forecast wind is replaced by the actual wind of the same rank: the weakest forecast winds become the weakest actual winds, and so on. Positions stay unchanged.',
     };
     // both texts sit in the same grid cell and only one is visible, so the cell keeps the height of the longer one
     const texts = Object.fromEntries(Object.entries(EXPLAIN).map(([k, t]) => [k, el('span', {}, t)]));
     explain.classList.add('stack'); explain.replaceChildren(...Object.values(texts));
     const setMode = v => {
       player.corrected = v === 'rank';
-      seg.querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', String(x.dataset.v === v)));
+      seg.setAttribute('aria-pressed', String(player.corrected));
+      seg.textContent = player.corrected ? 'Wind strength de-biased ✓' : 'De-bias wind strength';
       Object.entries(texts).forEach(([k, s]) => { s.style.visibility = k === v ? 'visible' : 'hidden'; });
     };
     setMode('raw');
-    // a switch: clicking the selected side (or its half of the box) flips to the other state
-    const other = v => v === 'raw' ? 'rank' : 'raw';
-    seg.querySelectorAll('button').forEach(b => b.addEventListener('click', () => {
-      setMode(b.getAttribute('aria-pressed') === 'true' ? other(b.dataset.v) : b.dataset.v); draw();
-    }));
+    // one button: a click applies the correction, a second click shows the winds as forecast again
+    seg.addEventListener('click', () => { setMode(player.corrected ? 'raw' : 'rank'); draw(); });
   }
   // "Guess the models" (names hidden until the reader answers) or "Show the models" (names shown, no questions)
   // the article shows the names; guessing them is the separate game page (game.html)
@@ -310,7 +308,7 @@ const ICON_PLAY = '<svg viewBox="0 0 16 16" width="15" height="15" aria-hidden="
         const who = el('span', { class: 'who' }, NAME[m]);
         who.style.color = COLOR[m];
         who.append(el('span', { class: 'kind' }, KIND[m]));
-        head.append(who);
+        head.append(el('span', { class: m === 'ifsens_e2s' ? 'role phys' : 'role' }, m === 'ifsens_e2s' ? 'Physics' : 'AI'), who);
       }
       const wrapEl = el('div', { class: 'map-wrap' });
       const canvas = el('canvas');
@@ -388,7 +386,7 @@ const ICON_PLAY = '<svg viewBox="0 0 16 16" width="15" height="15" aria-hidden="
     if (obsMs != null) {
       const x = Math.min(W - 1, X(Math.min(obsMs, HIST_MAX)));
       ctx.fillStyle = THEME.ink; ctx.fillRect(x - 1, HIST_TOP - 2, 2, base - HIST_TOP + 2);
-      obsLab = label(x, 'observed', '600 10px IBM Plex Mono, ui-monospace, monospace', THEME.ink);
+      obsLab = label(x, 'actual', '600 10px IBM Plex Mono, ui-monospace, monospace', THEME.ink);
       obsLab.draw();
     }
     // the member closest to the observed position: thin dashed grey line, label on the side away
@@ -447,7 +445,7 @@ const ICON_PLAY = '<svg viewBox="0 0 16 16" width="15" height="15" aria-hidden="
         ctx.fillStyle = windColor(w); ctx.fill(); ctx.lineWidth = 0.8; ctx.strokeStyle = THEME.bg; ctx.stroke();
       }
       ctx.globalAlpha = 1;
-      // observed track: dark casing, then each segment in the wind colour of its first point
+      // actual track: dark casing, then each segment in the wind colour of its first point
       const seg = [];
       for (const q of obsPts) { if (q[0] > t) break; seg.push([F.X(q[1]), F.Y(q[2]), q[3]]); }
       const o = posAt(obsPts, t);
@@ -474,10 +472,19 @@ const ICON_PLAY = '<svg viewBox="0 0 16 16" width="15" height="15" aria-hidden="
         }
       }
       if (o && seg.length) {
+        // current position, named on the first map
         const [x, y] = seg[seg.length - 1];
         ctx.beginPath(); ctx.arc(x, y, 6.5, 0, 2 * Math.PI);
         const kt = obsWindAt(storm.obs, t);
         ctx.fillStyle = windColor(kt == null ? null : kt * KT); ctx.fill(); ctx.lineWidth = 2; ctx.strokeStyle = THEME.ink; ctx.stroke();
+        if (p === player.panels[0]) {
+          // above the ring, clear of the track behind it
+          ctx.font = '600 11px IBM Plex Mono, ui-monospace, monospace'; ctx.textBaseline = 'bottom'; ctx.textAlign = 'center';
+          const ty = y > 24 ? y - 10 : y + 24;
+          ctx.lineWidth = 3; ctx.strokeStyle = OCEAN; ctx.strokeText('actual', x, ty);
+          ctx.fillStyle = INK; ctx.fillText('actual', x, ty);
+          ctx.textAlign = 'left'; ctx.textBaseline = 'alphabetic';
+        }
       }
       // infobox
       const n = members.size;
@@ -492,7 +499,7 @@ const ICON_PLAY = '<svg viewBox="0 0 16 16" width="15" height="15" aria-hidden="
       p.histNote.replaceChildren();
       if (obsMs != null && winds.length) {
         const weaker = winds.filter(w => w < obsMs).length;
-        p.histNote.append(document.createTextNode('observed above '),
+        p.histNote.append(document.createTextNode('actual above '),
           el('b', {}, weaker === winds.length ? `all ${winds.length}` : `${weaker} of ${winds.length}`));
       }
       if (closest && closest.w != null) {
@@ -511,7 +518,7 @@ const ICON_PLAY = '<svg viewBox="0 0 16 16" width="15" height="15" aria-hidden="
     c.obs.replaceChildren();
     if (kt != null) {
       const sw = el('span', { class: 'obs-sw' }); sw.style.background = windColor(kt * KT);
-      c.obs.append(sw, document.createTextNode(`Observed: ${category(kt)}, ${Math.round(kt * KT)} m/s (${Math.round(kt)} kt)`));
+      c.obs.append(sw, document.createTextNode(`Actual storm: ${category(kt)}, ${Math.round(kt * KT)} m/s (${Math.round(kt)} kt)`));
     }
     const ev = storm.events.filter(e => e[0] <= t).pop();
     c.caption.textContent = ev ? ev[1] : '';
@@ -762,33 +769,38 @@ const ICON_PLAY = '<svg viewBox="0 0 16 16" width="15" height="15" aria-hidden="
   const subset = () => basin === 'all' ? index : index.filter(s => basinOf(s) === basin);
 
   const svg = d3.select('#worldmap');
+  // the models compared: all three (lowest NLL of the three) or one pair; the number, the bar,
+  // the legend and the map colours all follow this choice
+  const CMPS = [['fgn', 'gencast_op', 'ifsens_e2s'], ['fgn', 'ifsens_e2s'], ['gencast_op', 'ifsens_e2s'], ['gencast_op', 'fgn']];
+  let cmp = CMPS[0];
+  const winnerOf = s => cmp.reduce((a, b) => s.nll[b] < s.nll[a] ? b : a);
   function renderSeason() {
     const list = subset(), nStorms = list.length;
-    const beats = (a, b) => list.filter(s => s.nll[a] < s.nll[b]).length;
     const stats = document.getElementById('stats');
     stats.replaceChildren();
-    [[`${beats('fgn', 'ifsens_e2s')} / ${nStorms}`, 'on which FGN has a lower NLL than IFS-ENS'],
-     [`${beats('gencast_op', 'ifsens_e2s')} / ${nStorms}`, 'on which GenCast has a lower NLL than IFS-ENS'],
-     [`${beats('fgn', 'gencast_op')} / ${nStorms}`, 'on which FGN has a lower NLL than GenCast']]
-      .forEach(([v, k]) => {
-        const d = el('div', { class: 'stat' }), big = el('div', { class: 'v' }, v);
-        big.append(' ', el('span', { class: 'u' }, 'storms'));
-        d.append(big, el('div', { class: 'k' }, k)); stats.append(d);
-      });
-    const share = Object.fromEntries(MODELS.map(m => [m, list.filter(s => s.winner === m).length]));
-    const bar = document.getElementById('sharebar'), leg = document.getElementById('sharelegend');
-    bar.replaceChildren(); leg.replaceChildren();
-    ['fgn', 'gencast_op', 'ifsens_e2s'].forEach(m => {
+    const row = el('div', { class: 'chips cmp-pick', role: 'group', 'aria-label': 'Models compared' });
+    CMPS.forEach(c => {
+      const b = el('button', { class: 'chip', type: 'button', 'aria-pressed': String(c === cmp) });
+      if (c.length === 3) b.append('All three');
+      else c.forEach((m, i) => { if (i) b.append(' vs '); const t = el('span', {}, NAME[m]); t.style.color = COLOR[m]; b.append(t); });
+      b.addEventListener('click', () => { cmp = c; renderSeason(); });
+      row.append(b);
+    });
+    const share = Object.fromEntries(MODELS.map(m => [m, 0]));
+    for (const s of list) share[winnerOf(s)]++;
+    const all = cmp.length === 3;
+    const d = el('div', { class: 'stat cmp' });
+    d.append(row); stats.append(d);
+    const order = all ? ['fgn', 'gencast_op', 'ifsens_e2s'] : cmp;
+    const bar = document.getElementById('sharebar');
+    bar.replaceChildren();
+    order.forEach(m => {
       if (!share[m]) return;
       const wide = share[m] / nStorms >= 0.12, lab = `${NAME[m]} ${Math.round(100 * share[m] / nStorms)}%`; const d = el('div', wide ? {} : { class: 'out' }, wide ? lab : null); if (!wide) { const t = el('span', {}, lab); t.style.color = COLOR[m]; d.append(t); }
       d.style.flex = String(share[m]); d.style.background = COLOR[m];
-      d.addEventListener('pointermove', e => showTip(e, NAME[m], [['storms with the lowest NLL', `${share[m]} of ${nStorms}`, COLOR[m]]]));
+      d.addEventListener('pointermove', e => showTip(e, NAME[m], [[all ? 'storms with the lowest NLL' : 'storms with the lower NLL', `${share[m]} of ${nStorms}`, COLOR[m]]]));
       d.addEventListener('pointerleave', hideTip);
       bar.append(d);
-    });
-    ['fgn', 'gencast_op', 'ifsens_e2s'].forEach(m => {
-      const l = el('span'); const sw = el('span', { class: 'swatch' }); sw.style.background = COLOR[m]; sw.style.height = '8px'; sw.style.width = '12px';
-      l.append(sw, document.createTextNode(`${NAME[m]}: ${share[m]} storm${share[m] === 1 ? '' : 's'} (${Math.round(100 * share[m] / nStorms)}%)`)); leg.append(l);
     });
     drawWorld(list);
     const table = document.getElementById('storm-table');
@@ -821,7 +833,7 @@ const ICON_PLAY = '<svg viewBox="0 0 16 16" width="15" height="15" aria-hidden="
     const shown = list.filter(s => s.obs && s.obs.length > 1);
     const geo = s => ({ type: 'LineString', coordinates: s.obs });
     const tracks = g.selectAll('path.track').data(shown).join('path').attr('class', 'track')
-      .attr('d', s => path(geo(s))).attr('stroke', s => COLOR[s.winner]);
+      .attr('d', s => path(geo(s))).attr('stroke', s => COLOR[winnerOf(s)]);
     g.selectAll('path.hit').data(shown).join('path').attr('class', 'hit').attr('d', s => path(geo(s)))
       .attr('tabindex', 0).attr('role', 'button').attr('aria-label', s => `${s.name}, ${s.start}`)
       .on('pointermove focus', (e, s) => {

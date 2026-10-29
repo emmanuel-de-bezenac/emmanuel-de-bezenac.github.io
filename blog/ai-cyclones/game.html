@@ -51,8 +51,15 @@
   #intro .introfig figcaption { font-family: var(--mono); font-size: 11px; color: var(--text-3); margin-top: 8px; line-height: 1.5; }
   #intro .txt { position: relative; z-index: 1; max-width: 560px; }
   h1 { font-size: clamp(2rem, 5.5vw, 3rem); line-height: 1.1; letter-spacing: -.02em; font-weight: 700; margin: 10px 0 16px; }
-  h1 em { font-style: normal; color: var(--red); }
+  h1 em { font-style: normal; color: #378ADD; }
+  .gkick { font-family: var(--mono); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--text-3); }
   .lede { color: var(--para); margin-bottom: 22px; }
+  .lede em { font-style: normal; font-weight: 600; color: #378ADD; }
+  /* how to play: physics in the IFS-ENS blue, points and streak in orange (not red, which is FGN); both bold */
+  .steps li span.tx { all: unset; }
+  .steps em { font-style: normal; font-weight: 600; color: #378ADD; }
+  .steps b { font-weight: 600; color: var(--text); }
+  .steps b.hl { color: #e8641f; }
   .steps { list-style: none; margin-bottom: 30px; }
   .steps li { color: var(--para); font-size: .95rem; margin-bottom: 4px; display: flex; gap: 14px; }
   .steps li span { font-family: var(--mono); font-size: 12px; color: var(--red); width: 14px; flex: none; padding-top: 3px; }
@@ -71,7 +78,7 @@
   .roundhead .nm { font-size: clamp(1.5rem, 3.5vw, 2rem); font-weight: 700; letter-spacing: -.02em; line-height: 1.1; }
   .roundhead .sub { font-family: var(--mono); font-size: 11.5px; color: var(--text-3); margin-top: 6px; }
   .q { font-weight: 700; margin-bottom: 12px; }
-  .q em { font-style: normal; color: var(--red); }
+  .q em { font-style: normal; color: #378ADD; }
   .timerbox { min-width: 220px; }
   .timerbox .row { display: flex; justify-content: space-between; font-family: var(--mono); font-size: 11.5px; color: var(--text-3); margin-bottom: 5px; }
   .timerbox .row b { color: var(--text); font-weight: 400; }
@@ -88,6 +95,10 @@
   .windbar .blocks span.none { font-weight: 400; }
   .windbar .ticks { position: relative; height: 1.2rem; }
   .windbar .ticks span { position: absolute; top: .1rem; transform: translateX(-50%); font-family: var(--mono); font-size: .68rem; color: var(--text-3); }
+/* one button for the bias correction: outlined when off, filled when on; a second click undoes it */
+  .biasbtn { font-family: var(--sans); font-size: 0.84rem; line-height: 1.4; padding: 0.3rem 0.85rem; color: var(--text); background: none; border: 1px solid var(--text); border-radius: 0; cursor: pointer; transition: background .12s, color .12s; }
+  .biasbtn:hover { background: color-mix(in srgb, var(--text) 8%, transparent); }
+  .biasbtn[aria-pressed="true"] { background: var(--text); color: var(--bg); }
   .seg { display: inline-flex; align-items: center; }
   .seg button { position: relative; padding: .25rem 0; font-size: .84rem; line-height: 1.4; color: var(--text-3); transition: color .12s; }
   .seg button:first-child { padding-right: 26px; }
@@ -118,9 +129,12 @@
   .rv .mn { font-weight: 700; font-size: 1.05rem; }
   .rv .mk { font-family: var(--mono); font-size: 11.5px; color: var(--text-3); }
   .rv .verdict-tag { font-family: var(--mono); font-size: 11.5px; color: var(--red); margin-top: 2px; }
-  .panel.truth .verdict-tag { color: var(--good); }
-  .panel.truth canvas.map { outline: 2px solid var(--good); outline-offset: 4px; }
-  .panel.miss canvas.map { outline: 1px dashed var(--red); outline-offset: 4px; }
+  /* the physics panel is always IFS-ENS: its blue, as everywhere else */
+  .panel.truth .verdict-tag { color: #378ADD; }
+  .panel.truth canvas.map { outline: 2px solid #378ADD; outline-offset: 4px; }
+  /* a wrong pick in the text colour: red is FGN's colour */
+  .panel.miss canvas.map { outline: 1px dashed var(--text); outline-offset: 4px; }
+  .panel.miss .verdict-tag { color: var(--text-2); }
   .panel.miss { animation: shake .5s; }
   .panel.dim { opacity: .5; }
 
@@ -266,7 +280,9 @@
   @media (max-width: 560px) { .who { grid-template-columns: 1fr; gap: 12px; } .who .ms { flex-wrap: wrap; } #intro .startbar { margin: 6px -16px 0; } }
   .phead { display: inline-grid; place-items: center; width: 24px; height: 24px; border: 1px solid var(--text); border-radius: 50%; font-family: var(--mono); font-weight: 400; font-size: 12px; }
   .panel canvas.map { outline-color: var(--text-4); }
-  .panel:not(.locked) canvas.map:hover { outline-color: var(--text); }
+  /* hovering a map to pick it as the physics model: the IFS-ENS blue, like "physics" in the question */
+  .panel:not(.locked) canvas.map:hover { outline: 2px solid #378ADD; }
+  .panel:not(.locked):hover .phead { border-color: #378ADD; color: #378ADD; }
   .bar { height: 7px; border: 1px solid var(--text); background: repeating-linear-gradient(90deg, transparent 0 calc(10% - 1px), var(--text-4) calc(10% - 1px) 10%); }
   .why { border-top: 1px solid var(--text); padding-top: 12px; }
   @media (max-width: 760px) {
@@ -292,21 +308,17 @@
   <section class="screen on" id="intro">
     <figure class="introfig"><canvas id="introcv"></canvas><figcaption>Erin, August 2025. AI or physics?</figcaption></figure>
     <div class="txt">
-      <h1>Spot the <em>physics</em> model.</h1>
-      <p class="lede">Three forecasts of the same cyclone. Two are AI, one is physics. Find it.</p>
-      <div class="who">
-        <div class="grp">
-          <div class="gk"><b>Physics</b> · solves the equations</div>
-          <div class="ms"><div class="m" style="--c:#378ADD"><b>IFS-ENS</b><span>ECMWF</span></div></div>
-        </div>
-        <div class="grp">
-          <div class="gk"><b>AI</b> · learned from past weather</div>
-          <div class="ms"><div class="m" style="--c:#1D9E75"><b>GenCast</b><span>Google DeepMind</span></div><div class="m" style="--c:#E24B4A"><b>FGN</b><span>Google DeepMind</span></div></div>
-        </div>
-      </div>
-      <p class="fine">Faster answers and streaks score more.</p>
+      <div class="gkick">Game · 5 cyclones of 2025</div>
+      <h1>How to play</h1>
+      <p class="lede">Three predictions: two from AI, one from the <em>physical</em> model.</p>
+      <ol class="steps">
+        <li><span>1</span><span class="tx">Pick out the <em>physics</em> model.</span></li>
+        <li><span>2</span><span class="tx">The <b class="hl">sooner</b> you answer, the <b class="hl">more points</b> you get!</span></li>
+        <li><span>3</span><span class="tx">Correct answers in a row add a <b class="hl">streak bonus</b>!</span></li>
+      </ol>
+      <p class="fine">Look at where the storms go and how strong their winds are.</p>
     </div>
-    <div class="startbar"><span>5 cyclones · about 2 minutes</span><button class="cta" id="start" type="button">Start <span aria-hidden="true">→</span></button></div>
+    <div class="startbar"><span>5 cyclones · about 2 minutes</span><button class="cta" id="start" type="button">Let’s go <span aria-hidden="true">→</span></button></div>
   </section>
 
   <section class="screen" id="round">
@@ -322,12 +334,10 @@
     </div>
     <div class="windkey">
       <div class="windbar" id="windbar"></div>
-      <div class="seg" id="wtog" role="group" aria-label="Forecast wind shown as">
-        <button type="button" data-v="raw" aria-pressed="true">Model winds</button><button type="button" data-v="rank" aria-pressed="false">Rescaled to observations</button>
-      </div>
+      <button type="button" class="biasbtn" id="wtog" aria-pressed="false" title="The forecast winds are weaker than the actual winds. Each forecast wind is replaced by the actual wind of the same rank. Click again to undo.">De-bias wind strength</button>
     </div>
     <div class="qrow">
-      <div class="q">Which panel is the <em>physics</em> model? <span class="hint">Click it<span class="keys">, or press A, B or C</span>.</span></div>
+      <div class="q">Which panel is the <em>physics</em> model? <span class="hint">Click it<span class="keys">, or press <b>A</b>, <b>B</b> or <b>C</b></span>.</span></div>
       <div class="clock"><span class="day" id="day"></span><span class="date" id="date"></span></div>
     </div>
     <div class="panels" id="panels"></div>
@@ -368,9 +378,9 @@
   };
   const catName = kt => kt < 34 ? 'tropical depression' : kt < 64 ? 'tropical storm' : 'Category ' + (1 + [83, 96, 113, 137].filter(b => kt >= b).length);
   const MODEL = {
-    ifsens_e2s: { name: 'IFS-ENS', kind: 'physics · ECMWF', phys: true },
-    gencast_op: { name: 'GenCast', kind: 'AI · Google DeepMind', phys: false },
-    fgn:        { name: 'FGN', kind: 'AI · Google DeepMind', phys: false },
+    ifsens_e2s: { name: 'IFS-ENS', kind: 'physics · ECMWF', phys: true, c: '#378ADD' },
+    gencast_op: { name: 'GenCast', kind: 'AI · Google DeepMind', phys: false, c: '#1D9E75' },
+    fgn:        { name: 'FGN', kind: 'AI · Google DeepMind', phys: false, c: '#E24B4A' },
   };
   const NAMES = ['Erin', 'Ragasa', 'Humberto', 'Melissa', 'Kalmaegi'];
 
@@ -483,12 +493,12 @@
     tick('m/s', CATS.length);
     $('windbar').append(blocks, ticks);
   }
-  // a switch: clicking the selected side (or its half of the box) flips to the other state
-  document.querySelectorAll('#wtog button').forEach(b => b.addEventListener('click', () => {
-    const v = b.getAttribute('aria-pressed') === 'true' ? (b.dataset.v === 'raw' ? 'rank' : 'raw') : b.dataset.v;
-    G.corrected = v === 'rank';
-    document.querySelectorAll('#wtog button').forEach(x => x.setAttribute('aria-pressed', String(x.dataset.v === v)));
-  }));
+  // one button: a click applies the bias correction, a second click shows the winds as forecast again
+  $('wtog').addEventListener('click', () => {
+    G.corrected = !G.corrected;
+    $('wtog').setAttribute('aria-pressed', String(G.corrected));
+    $('wtog').textContent = G.corrected ? 'Wind strength de-biased ✓' : 'De-bias wind strength';
+  });
   $('start').addEventListener('click', () => { G.i = 0; G.score = 0; G.streak = 0; G.results = []; G.shownScore = 0; $('score').textContent = '0'; setStreak(); startRound(); });
 
   function startRound() {
@@ -511,7 +521,7 @@
       const cv = document.createElement('canvas'); cv.className = 'map'; cv.width = G.F.width * dpr; cv.height = G.F.height * dpr; cv.style.height = G.F.height + 'px';
       const hist = document.createElement('canvas'); hist.className = 'hist'; hist.width = G.F.width * dpr; hist.height = HIST_H * dpr; hist.style.height = HIST_H + 'px';
       const cap = document.createElement('div'); cap.className = 'cap';
-      cap.innerHTML = `<div class="rv"><div class="mn">${MODEL[m].name}</div><div class="mk">${MODEL[m].kind}</div><div class="verdict-tag"></div></div>`;
+      cap.innerHTML = `<div class="rv"><div class="mn" style="color:${MODEL[m].c}">${MODEL[m].name}</div><div class="mk">${MODEL[m].kind}</div><div class="verdict-tag"></div></div>`;
       const head = document.createElement('div'); head.className = 'phead'; head.textContent = 'ABC'[k];
       p.append(head, cv, hist, cap);
       p.addEventListener('click', () => pick(m));
@@ -556,7 +566,7 @@
       const x = Math.min(W - 1, X(Math.min(obsMs, HIST_MAX)));
       ctx.fillStyle = css('--text'); ctx.fillRect(x - 1, HIST_TOP - 2, 2, base - HIST_TOP + 2);
       ctx.textBaseline = 'alphabetic'; ctx.textAlign = x <= W * .6 ? 'left' : 'right';
-      ctx.fillText('observed', x <= W * .6 ? x + 4 : x - 4, HIST_TOP - 3);
+      ctx.fillText('actual', x <= W * .6 ? x + 4 : x - 4, HIST_TOP - 3);
     }
   }
 
@@ -576,7 +586,7 @@
     G.panels.forEach((P, k) => drawHist(P, hists[k], yMax, obsMs));
     for (const P of G.panels) drawMap(P, st, F, t, G.corrected);
   }
-  // one map: member tracks and current positions coloured by wind, then the observed track outlined in the text colour
+  // one map: member tracks and current positions coloured by wind, then the actual track outlined in the text colour
   function drawMap(P, st, F, t, corrected) {
     const bg = css('--bg'), fg = css('--text');
     {
@@ -608,9 +618,22 @@
             ctx.beginPath(); ctx.moveTo(xa, F.Y(a[2])); ctx.lineTo(xb, F.Y(b[2])); ctx.lineWidth = lw; ctx.strokeStyle = colorFn(a); ctx.stroke();
           }
         };
+        const ocean = css('--ocean');
         run(5, () => fg); run(2.8, a => a[3] == null ? css('--coast') : windColor(a[3] * KT));
+        // current position, named on the first map
         const o = posAt(st.obs, t);
-        if (o) { ctx.beginPath(); ctx.arc(F.X(o[0]), F.Y(o[1]), 5.5, 0, 6.2832); ctx.fillStyle = o[2] == null ? css('--coast') : windColor(o[2] * KT); ctx.fill(); ctx.lineWidth = 2; ctx.strokeStyle = fg; ctx.stroke(); }
+        if (o) {
+          const x = F.X(o[0]), y = F.Y(o[1]);
+          ctx.beginPath(); ctx.arc(x, y, 5.5, 0, 6.2832); ctx.fillStyle = o[2] == null ? css('--coast') : windColor(o[2] * KT); ctx.fill(); ctx.lineWidth = 2; ctx.strokeStyle = fg; ctx.stroke();
+          if (!G.panels.length || P === G.panels[0]) {
+            // above the ring, clear of the track behind it
+            const ty = y > 24 ? y - 9 : y + 22;
+            ctx.font = '600 11px IBM Plex Mono, ui-monospace, monospace'; ctx.textBaseline = 'bottom'; ctx.textAlign = 'center';
+            ctx.lineWidth = 3; ctx.strokeStyle = ocean; ctx.strokeText('actual', x, ty);
+            ctx.fillStyle = fg; ctx.fillText('actual', x, ty);
+            ctx.textAlign = 'left'; ctx.textBaseline = 'alphabetic';
+          }
+        }
       }
     }
   }
@@ -654,20 +677,21 @@
   function showVerdict(st, ok, bonus, streakB, pts) {
     const v = $('verdict'), last = G.i === storms.length - 1;
     const peaks = {};
-    for (const [m, ens] of Object.entries(st.models)) peaks[m] = median(ens.map(([mb, pts]) => Math.max(...pts.map(q => q[3] ?? 0))).filter(x => x > 0)) / KT;
-    const obsPeak = Math.max(...st.obs.map(q => q[3] ?? 0));
+    for (const [m, ens] of Object.entries(st.models)) peaks[m] = median(ens.map(([mb, pts]) => Math.max(...pts.map(q => q[3] ?? 0))).filter(x => x > 0));
+    const obsPeak = Math.max(...st.obs.map(q => q[3] ?? 0)) * KT;
     const mx = Math.max(obsPeak, ...Object.values(peaks)) * 1.05;
-    const rows = [['observed', obsPeak, css('--text')], ...st.order.map(m => [MODEL[m].name, peaks[m], MODEL[m].phys ? css('--red') : css('--text-3')])];
+    const rows = [['actual', obsPeak, css('--text')], ...st.order.map(m => [MODEL[m].name, peaks[m], MODEL[m].c])];
     const L = 'ABC'[st.order.indexOf('ifsens_e2s')];
+    const nm = m => `<span style="color:${MODEL[m].c}">${MODEL[m].name}</span>`, phys = `<span style="color:${MODEL.ifsens_e2s.c}">physics</span>`;
     v.innerHTML = `
       <div>
         <div class="vscore"><span class="big ${ok ? '' : 'bad'}">+${pts}</span><span class="vmsg ${ok ? 'ok' : ''}">${ok ? 'Correct.' : 'Nope.'}</span></div>
-        <p class="vtxt">${ok ? `${L} is IFS-ENS, the physics model.` : `${L} was physics. ${MODEL[G.picked].name} is AI.`}</p>
+        <p class="vtxt">${ok ? `${L} is ${nm('ifsens_e2s')}, the ${phys} model.` : `${L} was ${phys}. ${nm(G.picked)} is AI.`}</p>
         <div class="vparts">${ok ? `${BASE} correct + ${bonus} speed${streakB ? ' + ' + streakB + ' streak' : ''}` : 'streak reset'}</div>
         <button class="solid next" id="nextbtn" type="button">${last ? 'See my score →' : 'Next cyclone →'}</button>
       </div>
-      <div class="winds"><h4>Strongest wind, kt</h4>
-        ${rows.map(([n, val, c]) => `<div class="wrow"><span>${n}</span><span class="tr"><i style="background:${c}" data-w="${(100 * val / mx).toFixed(1)}"></i></span><span class="v">${Math.round(val)}</span></div>`).join('')}
+      <div class="winds"><h4>Strongest wind, m/s</h4>
+        ${rows.map(([n, val, c]) => `<div class="wrow"><span style="color:${c}">${n}</span><span class="tr"><i style="background:${c}" data-w="${(100 * val / mx).toFixed(1)}"></i></span><span class="v">${Math.round(val)}</span></div>`).join('')}
         <div class="wnote">${peaks.ifsens_e2s > Math.max(peaks.fgn, peaks.gencast_op) ? 'Physics blows harder than both AIs. That is the tell.' : 'This time the winds do not give it away.'} (Median of each member's peak.)</div>
       </div>`;
     v.className = 'on';
@@ -705,7 +729,7 @@
         <div class="ladder">${RANKS.slice().reverse().map((x, i, a) => `<div class="rung ${x === rk ? 'me' : i < a.indexOf(rk) ? 'past' : ''}" style="--i:${i}"><i></i><span>${x[1]}</span></div>`).join('')}</div>
         <div class="rn">${rk[1]}</div></div>
       <p class="appr">${rk[2]}</p>
-      <div class="rows">${G.results.map(x => `<div class="rrow"><span class="mk ${x.ok ? 'ok' : 'no'}">${x.ok ? '✓' : '✗'}</span><span>${x.name}</span><span class="sm">${x.ok ? 'physics found' : 'picked ' + MODEL[x.picked].name}</span><span class="pt">+${x.pts}</span></div>`).join('')}</div>
+      <div class="rows">${G.results.map(x => `<div class="rrow"><span class="mk ${x.ok ? 'ok' : 'no'}">${x.ok ? '✓' : '✗'}</span><span>${x.name}</span><span class="sm">${x.ok ? `<span style="color:${MODEL.ifsens_e2s.c}">physics</span> found` : `picked <span style="color:${MODEL[x.picked].c}">${MODEL[x.picked].name}</span>`}</span><span class="pt">+${x.pts}</span></div>`).join('')}</div>
       <div class="btns"><button class="solid" id="share" type="button">Share my score</button><button class="outl" id="again" type="button">Play again</button></div>
       <div class="why"><span class="lab">Why it is hard</span>The AIs track storms as well as physics, often better. Their tell: their storms are too weak. <a href="index.html#forecasts">Read the story →</a></div>`;
     show('result'); r.classList.remove('on'); void r.offsetWidth; r.classList.add('on');
